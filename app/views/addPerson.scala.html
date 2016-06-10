@@ -1,0 +1,94 @@
+@(mForm: Form[Person])
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+    @views.html.head {
+        <title>ADD USER</title>
+    }
+</head>
+<body>
+
+@views.html.header {
+}
+
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <div class="page-header">
+            <h1>@Messages.get("users")</h1>
+            <hr/>
+        </div>
+
+        <!-- LEFT COLUMN  -->
+        <div class="container col-lg-12">
+
+            @helper.form(routes.User.add()) {
+
+            <p class="lead">@Messages.get("add_user")</p>
+            <form>
+
+                <div class="form-inline">
+                        <div class="form-group">
+                            <label for="userName">Username</label>
+                        <input type="text"  class="form-control" name="userName" id="userName" placeholder="Username">
+                        </div>
+                </div>
+                <br>
+
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text"  class="form-control" name="firstName" id="firstName" placeholder="First name">
+                    </div>
+                </div>
+                <br>
+
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text"  class="form-control" name="lastName" id="lastName" placeholder="Last name">
+                    </div>
+                </div>
+                <br>
+
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text"  class="form-control" name="email" id="email" placeholder="Email">
+                    </div>
+                </div>
+                <br>
+
+
+
+
+                <button type="submit" class="btn btn-primary">@Messages.get("save_user")</button>
+
+            </form>
+
+            }
+        </div>
+
+
+    </div>
+
+</div><!-- /.container -->
+
+<script>
+$("input").prop('required',true);
+$("select").prop('required',true);
+</script>
+
+@views.html.footer{
+
+}
+
+</body>
+</html>

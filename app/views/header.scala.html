@@ -1,0 +1,145 @@
+@(htmlContent: Html)
+@import play.i18n._
+
+@activeLink(currentPath:String) = @{
+    if(request.path.contains(currentPath)) "active"
+}
+
+<!DOCTYPE html>
+<html>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <head>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/header.css")'>
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!--<a class="navbar-brand" href="#">-->
+                        <!--<img src="/assets/images/logo_with_text.png" alt="" height="40px" width="40px">-->
+                    <!--</a>-->
+                    <a class="navbar-brand" href="/welcome" title='@Messages.get("home")'><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+
+                </div>
+
+                <div id="navbar" class="collapse navbar-collapse">
+
+                    <ul class="nav navbar-nav">
+
+                        <!--NOTIFY -->
+                        @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                        <li id="notifyDropdown" class="dropdown">
+                            <a href="#" class="dropdown-toggle manageDropdown" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">@Messages.get("notify") <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li class=@activeLink("/reporting")><a href="/reporting">@Messages.get("eventReporting")</a> </li>
+                            </ul>
+                        </li>
+                        }
+
+                        <!--MANAGE -->
+                        <li id="manageDropdown" class="dropdown">
+                            <a href="#" class="dropdown-toggle manageDropdown" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">@Messages.get("manage") <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li class=@activeLink("/resources/infrastructure")><a href="/resources/infrastructure">@Messages.get("infrastructure")</a> </li>
+                                <li class=@activeLink("/resources/machinery")><a href="/resources/machinery">@Messages.get("machineries")</a></li>
+                                <li class=@activeLink("/contacts")><a href="/contacts">@Messages.get("humanResources")</a></li>
+                            </ul>
+                        </li>
+
+                        <!--VIEW -->
+                        <li id="viewDropdown" class="dropdown">
+                            <a href="#" class="dropdown-toggle manageDropdown" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">@Messages.get("view") <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li class=@activeLink("/documents")><a href="/documents">@Messages.get("legislation")</a> </li>
+                                <li class=@activeLink("/climate")><a href="/climate">@Messages.get("climate")</a></li>
+                                <li class=@activeLink("/maps")><a href="/maps">@Messages.get("mapsAndData")</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li class=@activeLink("/events")><a href="/events">@Messages.get("events")</a></li>
+                                <li class=@activeLink("/disasters")><a href="/disasters">@Messages.get("disasters")</a></li>
+                            </ul>
+                        </li>
+
+                        <!--PLAN -->
+                        <li id="planDropdown" class="dropdown">
+                            <a href="#" class="dropdown-toggle manageDropdown" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">@Messages.get("plan") <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li class=@activeLink("/actions")><a href="/actions">@Messages.get("actions")</a> </li>
+                                <li class=@activeLink("/measures")><a href="/measures">@Messages.get("measures")</a></li>
+                            </ul>
+                        </li>
+
+                        <!--ACT -->
+                        <li id="actDropdown" class="dropdown">
+                            <a href="#" class="dropdown-toggle manageDropdown" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">@Messages.get("act") <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li class=@activeLink("/routing")><a href="/routing">@Messages.get("routing")</a> </li>
+                                <li class=@activeLink("/traffic")><a href="/traffic">@Messages.get("traffic")</a></li>
+                                <li class=@activeLink("/remotesensing")><a href="/remotesensing">@Messages.get("remotesensing")</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">@session.get("userName") <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <!--<li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> @Messages.get("logout") </a></li>-->
+                                <!--<li role="separator" class="divider"></li>-->
+                                <li class="dropdown-header">@session.get("fullName")</li>
+                                <li class=@activeLink("/profile")><a href="/profile">@Messages.get("profile_info")</a></li>
+                                <li role="separator" class="divider"></li>
+                                <!--<li class=@activeLink("/resources")><a href="/resources">@Messages.get("resources_management")</a></li>-->
+                                <!--<li class=@activeLink("/user/add")><a href="/user/add">@Messages.get("staff_management")</a></li>-->
+                                <!--<li role="separator" class="divider"></li>-->
+                                <li class=@activeLink("/contacts")><a href="/contacts">@Messages.get("contacts")</a></li>
+                            </ul>
+                        </li>
+
+
+                            @if(session.get("lang").contains("en")){
+                                <li class="active" title='@Messages.get("english")'><a href="/lang/en">en</a></li>
+                                <li title='@Messages.get("greek")'><a href="/lang/el">el</a></li>
+                            }
+
+                            @if(session.get("lang").contains("el")){
+                                <li title='@Messages.get("english")'><a href="/lang/en">en</a></li>
+                                <li class="active" title='@Messages.get("greek")'><a href="/lang/el">el</a></li>
+                            }
+
+                            <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true" title='@Messages.get("logout")'></span></a></li>
+
+                            @if(session.get("notifications")){
+                                <a href="/events">
+                                    <button class="buttonNotification btn btn-default btn-lg btn-link">
+                                        <span id="newEventMessage">@Messages.get("newEvent")</span> <span class="glyphicon glyphicon-comment"></span>
+                                    </button>
+                                </a>
+                                <span class="badge badge-notify">@session.get("notifications")</span>
+                            }
+
+                    </ul>
+
+                </div><!--/.nav-collapse -->
+
+
+
+
+            </div>
+        </nav>
+    </body>
+
+</html>

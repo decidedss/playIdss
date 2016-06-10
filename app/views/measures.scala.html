@@ -1,0 +1,339 @@
+@(items: List[Measure] , measureForm: Form[Measure], categoriesEn: List[String], categoriesEl: List[String], agency: String, isAdmin: Boolean, isAgencyAdmin: Boolean, hasEdit: Boolean)
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+@views.html.head {
+    <title>@Messages.get("measures")</title>
+    <script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.8/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/measures.css")'>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/measures.js")'></script>
+}
+
+</head>
+
+<body>
+
+@views.html.header {
+}
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("measures")</h1><br/>
+
+        <div class="container col-lg-12">
+
+            <div class="pull-right" style="padding-bottom: 20px;">
+                <button id="addAction" class="btn btn-default idss-default-btn" data-toggle="modal" data-target="#addMeasure">
+                    @Messages.get("add_measure")
+                </button>
+            </div>
+
+            <br/> <br/>
+
+            <div style="text-align: left;">
+                <div class="alert alert-warning" role="alert" id="delete_alert"  style="display: none">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong>Success</strong> Measure deleted!
+                </div>
+
+                <table id="example" class="table table-hover" cellspacing="0" width="100%" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>@Messages.get("measure_name")</th>
+                        <th>@Messages.get("category")</th>
+                        <th>@Messages.get("location")</th>
+                        <th>@Messages.get("description")</th>
+                        <th>@Messages.get("budget")</th>
+                        <th>@Messages.get("riskAddressing")</th>
+                        <th>@Messages.get("start_date")</th>
+                        <th>@Messages.get("end_date")</th>
+                        <th>@Messages.get("edit")</th>
+                        <th>@Messages.get("delete")</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    @for(m <- items) {
+                        @if(agency == m.getAgency() || isAdmin){
+                            <tr>
+                                <td>@m.getName()</td>
+                                <td>@m.getCategory()</td>
+                                <td>@m.getLocation()</td>
+                                <td>@m.getDescription()</td>
+                                <td>@m.getBudget()</td>
+                                <td>@m.getRiskaddressing()</td>
+                                <td>@m.getStartdate()</td>
+                                <td>@m.getEnddate()</td>
+
+                                <td>
+                                    @if(!isAdmin){
+                                        <input type="button" id='@m.getId(),@m.getName(),edit' value='@Messages.get("edit")' class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editMeasure"/>
+                                    }
+                                    @if(isAdmin){ - }
+                                </td>
+                                <td>
+                                    @if(!isAdmin){
+                                        <input type="button" id='@m.getId(),@m.getName(),delete' value='@Messages.get("delete")' class="btn btn-danger btn-sm" />
+                                    }
+                                    @if(isAdmin){ - }
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- Modal edit measure -->
+            <div class="modal fade" id="editMeasure" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">@Messages.get("close")</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabelEdit">
+                                @Messages.get("edit_measure")
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(action = routes.Measures.updateMeasure, 'enctype -> "multipart/form-data") {
+                            <form class="form-horizontal" id="form_members_edit">
+
+                                <div class="form-group" align="left">
+                                    <input type="hidden" class="form-control" id="id" name="id">
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="name">@Messages.get("measure_name"):</label>
+                                        <input type="text"  class="form-control" name="name" id="name" placeholder=@Messages.get("measure_name")>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="category">@Messages.get("category"):</label>
+                                        <select name="category" required id="category" class="js-example-basic-single select2-container" style="width: 100%" data-placeholder='@Messages.get("selectCategory")'>
+                                            @if(session.get("lang").contains("el")){
+                                                @for(category <- categoriesEl) {
+                                                    <option class="select2-container" value='@category'>@category</option>
+                                                }
+                                            }
+                                            @if(session.get("lang").contains("en")){
+                                                @for(category <- categoriesEn) {
+                                                    <option class="select2-container" value='@category'>@category</option>
+                                                }
+                                            }
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="location">@Messages.get("location"):</label>
+                                        <input type="text" class="form-control" name="location" id="location" placeholder=@Messages.get("location")>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="description">@Messages.get("description"):</label>
+                                        <input type="text" class="form-control" name="description" id="description" placeholder=@Messages.get("description")>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="budget">@Messages.get("budget"):</label>
+                                        <input type="text" class="form-control" name="budget" id="budget" placeholder=@Messages.get("budget")>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="riskaddressing">@Messages.get("riskaddressing"):</label>
+                                        <input type="text" class="form-control" name="riskaddressing" id="riskaddressing" placeholder=@Messages.get("riskaddressing")>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="startdate">@Messages.get("start_date"):</label>
+                                        <div class='input-group date' id='startdate'>
+                                            <input type='text' class="form-control" name="startdate"  placeholder='@Messages.get("click") @Messages.get("start_date")' required/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="enddate">@Messages.get("end_date"):</label>
+                                        <div class='input-group date' id='enddate'>
+                                            <input type='text' class="form-control" name="enddate" placeholder='@Messages.get("click") @Messages.get("end_date")' required/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <input id="agency" name="agency" value="@agency" type="hidden"/>
+
+                                <button type="submit" class="btn btn-primary">@Messages.get("update")</button>
+
+                            </form>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal till here-->
+
+            <!-- Modal add measure -->
+            <div class="modal fade" id="addMeasure" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                 aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                @Messages.get("add_measure")
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(routes.Measures.newMeasure()) {
+
+                            <div align="left">
+                                <p><i>@Messages.get("addInfoMessageMeasure"):</i></p>
+                            </div>
+
+                            <form id="addForm">
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="name">@Messages.get("measure_name"):</label>
+                                        <input type="text"  class="form-control" name="name" id="name-n" placeholder='@Messages.get("measure_name")'>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="category">@Messages.get("category"):</label>
+                                        <select name="category" required id="category-n" class="js-example-basic-single select2-container" style="width: 100%" data-placeholder='@Messages.get("selectCategory")'>
+                                            <option selected disabled></option>
+                                            @if(session.get("lang").contains("el")){
+                                            @for(category <- categoriesEl) {
+                                            <option class="select2-container" value='@category'>@category</option>
+                                            }
+                                            }
+                                            @if(session.get("lang").contains("en")){
+                                            @for(category <- categoriesEn) {
+                                            <option class="select2-container" value='@category'>@category</option>
+                                            }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="location">@Messages.get("location"):</label>
+                                        <input type="text" class="form-control" name="location" id="location-n" placeholder='@Messages.get("location")'>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="description">@Messages.get("description"):</label>
+                                        <input type="text" class="form-control" name="description" id="description-n" placeholder='@Messages.get("description")'>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="budget">@Messages.get("budget"):</label>
+                                        <input type="text" class="form-control" name="budget" id="budget-n" placeholder='@Messages.get("budget")'>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="riskaddressing">@Messages.get("riskAddressing"):</label>
+                                        <input type="text" class="form-control" name="riskaddressing" id="riskaddressing-n" placeholder='@Messages.get("riskAddressing")'>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="startdate">@Messages.get("start_date"):</label>
+                                        <div class='input-group date' id='startdate-n'>
+                                            <input type='text' class="form-control" name="startdate"  placeholder='@Messages.get("click") @Messages.get("start_date")' required/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="enddate">@Messages.get("end_date"):</label>
+                                        <div class='input-group date' id='enddate-n'>
+                                            <input type='text' class="form-control" name="enddate" placeholder='@Messages.get("click") @Messages.get("end_date")' required/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <input id="agency" name="agency" value="@agency" type="hidden"/>
+
+                                <button type="submit" class="btn btn-primary">@Messages.get("save_measure")</button>
+
+                            </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal till here-->
+            <br>
+            <div class="pull-right">
+                <a class="btn btn-info" href="/measures/timesheet" role="button" style="width:200px" id="timesheetBtn">Timesheet view</a>
+            </div>
+
+        </div>
+    </div>
+
+</div><!-- /.container -->
+
+@views.html.footer{
+
+}
+
+</body>
+</html>

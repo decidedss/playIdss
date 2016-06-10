@@ -1,0 +1,94 @@
+ body {
+        background-color: #1E3251;
+        color: white;
+    }
+
+    label {
+        color: whitesmoke;
+        text-decoration: none;
+    }
+
+    .modal-content {
+        color: #1e3251;
+    }
+
+    .form-control {
+        padding-right: 30px;
+    }
+
+    .form-control + .glyphicon {
+        position: absolute;
+        right: 0;
+        padding: 8px 27px;
+    }
+
+    .panel-default > .panel-heading {
+        color: #333;
+        background-color: #f5f5f5;
+        border-color: #ddd;
+    }
+
+    .panel-default > .panel-body {
+        background-color: #1E3251;
+        color: white;
+    }
+
+    #fade {
+        display: none;
+        position:fixed;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #ababab;
+        z-index: 1001;
+        -moz-opacity: 0.8;
+        opacity: .90;
+        filter: alpha(opacity=80);
+    }
+
+    #modal {
+        display: none;
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        z-index: 1002;
+        text-align:center;
+        overflow: auto;
+        margin-left:-40px;
+        margin-top:-40px;
+    }
+
+    #results {
+        font-size:1.25em;
+        color:red
+    }
+
+    #loader{
+        width: 80px;
+        height: 80px;
+    }
+
+    .select2-container {
+        color: black;
+    }
+
+
+@import url('//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css');
+
+body {
+    margin: 10px;
+}
+
+.changethisone span{
+    background-color: #FFF;
+}
+
+.changethisone input{
+    border-right-style:none;
+}
+
+
+.img-thumbnail{
+    margin-bottom: 5px;
+}

@@ -1,0 +1,200 @@
+@(layers: List[InfrastructureMapping], sharedAgencies: String, isAdmin: Boolean, agency: String, hasEdit: Boolean, groupnameAgency: Map[String, String], infrastructureAttributes: Map[String, String])
+@import play.i18n._
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("infrastructure")</title>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.10.1/css/ol.css" type="text/css">
+    <link rel="stylesheet"src='@routes.Assets.at("stylesheets/ol-btn-material.css")' type="text/css">
+    <script src="http://openlayers.org/en/v3.10.1/build/ol.js"></script>
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/infrastructure.css")'>
+    }
+</head>
+
+<script type="text/javascript">
+    var geoserver_wfs='@Messages.get("GEOSERVER_WFS")';
+    var geoserver_wms='@Messages.get("GEOSERVER_WMS")';
+    var geoserver_ows='@Messages.get("GEOSERVER_OWS")';
+    var server_path='@Messages.get("SERVER_PATH")';
+
+    var infrastructureLayerIds = [];
+    var infrastructureLayerGeomType = [];
+
+    var idTitle = new Object();
+    var idTitleEn = new Object();
+
+    @for(l <- layers) {
+        infrastructureLayerGeomType.push('@l.getGeometry_type');
+        infrastructureLayerIds.push('@l.getLayer_id');
+        idTitle['@l.getLayer_id'] = '@l.getLayer_title';
+    }
+
+    @for(l <- layers) {
+        infrastructureLayerGeomType.push('@l.getGeometry_type');
+        infrastructureLayerIds.push('@l.getLayer_id');
+        idTitleEn['@l.getLayer_id'] = '@l.getLayer_title_en';
+    }
+
+    function show() { document.getElementById("form-layers").style.display="block"; }
+
+    window.onload = function() {
+        document.getElementById("form-layers").style.display="none";
+        document.getElementById("updateForm").style.display="none";
+    }
+
+</script>
+
+<body>
+@views.html.header {
+
+}
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1 class="main-header">@Messages.get("infrastructure")</h1><br/>
+        <h5>@Messages.get("subtitleInfrastructure")</h5>
+        <br/>
+
+        <div class="container col-lg-1">
+
+        </div>
+        <div class="container col-lg-10">
+
+            <div id="myButtons" align="left">
+                @if(!isAdmin){
+                @if(hasEdit){
+                <h5>@Messages.get("toolsInfrastructure")</h5>
+                <button class="btn btn-primary btn-xs" id="btnAdd" name="btnAdd" data-toggle="tooltip" data-placement="top" title='@Messages.get("addGeometry")' onClick="show()" value="show">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button> &nbsp;
+                <button class="btn btn-success btn-xs" id="btnEdit" data-toggle="tooltip" data-placement="top" title='@Messages.get("editGeometry")'>
+                    <span class="glyphicon glyphicon-edit"></span>
+                </button> &nbsp;
+                }
+                }
+                <button class="btn btn-info btn-xs" id="btnSelect" data-toggle="tooltip" data-placement="top" title='@Messages.get("showInformation")'>
+                    <span class="glyphicon glyphicon-new-window"></span>
+                </button> &nbsp;
+                @if(!isAdmin){
+                @if(hasEdit){
+                <button class="btn btn-warning btn-xs" id="btnUpdate" data-toggle="tooltip" data-placement="top" title='@Messages.get("updateInformation")'>
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </button> &nbsp;
+                <button class="btn btn-danger btn-xs" id="btnDelete" data-toggle="tooltip" data-placement="top" title='@Messages.get("deleteButton")'>
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button> &nbsp;
+                }
+                }
+                <br/><br/>
+            </div>
+
+            <input id="agency" value="@agency" type="hidden"/>
+            <input id="sharedAgencies" value="@sharedAgencies" type="hidden"/>
+            <input id="groupnameAgency" value="@groupnameAgency" type="hidden"/>
+            <input id="infrastructureAttributes" value="@infrastructureAttributes" type="hidden"/>
+            <input id="locationTitle" value='@Messages.get("site")' type="hidden"/>
+            <input id="attributeTitle" value='@Messages.get("attributes")' type="hidden"/>
+
+            @if(session.get("lang").contains("el")){
+            <input class="lang" value="el" type="hidden"/>
+            }
+            @if(session.get("lang").contains("en")){
+            <input class="lang" value="en" type="hidden"/>
+            }
+
+            <form class="form-inline" id="form-layers">
+                <select id="layer_type" class="js-example-basic-single"  title="Select an infrastructure type to draw" style="width: 100%"  data-placeholder='- @Messages.get("pleaseSelectInfrustructure") -'>
+                    <option selected disabled></option>
+                    @if(session.get("lang").contains("el")){
+                    @for(l <- layers) {
+                    <option value="@l.getLayer_id(),@l.getGeometry_type,@agency,'el'">@l.getLayer_title()</option>
+                    }
+                    }
+                    @if(session.get("lang").contains("en")){
+                    @for(l <- layers) {
+                    <option value="@l.getLayer_id(),@l.getGeometry_type,@agency,'en'">@l.getLayer_title_en()</option>
+                    }
+                    }
+                </select>
+                <br/><br/>
+            </form>
+
+            <div id="map" class="map"></div>
+
+            <div style="display: none;">
+                <div id="popup" title='@Messages.get("geometryInfo")'></div>
+            </div>
+
+            <div style="display: none;">
+                <div id="popup_preview" title='@Messages.get("geometryDetails")'></div>
+            </div>
+
+            <div class="jumbotron" id="updateForm">
+                <form id="infrastructureUpdate">
+                    <label>@Messages.get("site")</label>
+                    <input type="text" class="form-control" name="site" id="site"></span>">
+                    <br/>
+                    <label>@Messages.get("attributes")</label>
+                    <small id="attributeValue"></small>
+                    <input type="text" class="form-control" name="attributes" id="attributes"></span>">
+                    <br/>
+                    <button class="btn btn-success" type="submit"  onsubmit="getData()" style="float:left;">@Messages.get("update")</button>
+                    <br/>
+                </form>
+            </div>
+
+
+        </div>
+        <div class="container col-lg-1">
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    var agency = document.getElementById("agency").value;
+    var sharedAgencies = document.getElementById("sharedAgencies").value;
+    var groupnameAgency = document.getElementById("groupnameAgency").value;
+    var infrastructureAttributes = document.getElementById("infrastructureAttributes").value;
+    var lang = document.getElementsByClassName("lang")[0].value;
+    var locationTitle = document.getElementById("locationTitle").value;
+    var attributeTitle = document.getElementById("attributeTitle").value;
+
+    groupnameAgency = groupnameAgency.replace("{", "");
+    groupnameAgency = groupnameAgency.replace("}", "");
+
+    var mapGroupnameAgency = new Map();
+    var datas = groupnameAgency.split(", ");
+
+    for(var i in datas){
+        var key = datas[i].split("=")[0];
+        var value = datas[i].split("=")[1];
+        mapGroupnameAgency.set(key,value);
+    }
+
+    infrastructureAttributes = infrastructureAttributes.replace("{", "");
+    infrastructureAttributes = infrastructureAttributes.replace("}", "");
+
+    var mapAttributes = new Map();
+    var datas = infrastructureAttributes.split(",");
+
+    for(var i in datas){
+        var key = datas[i].split("=")[0];
+        var value = datas[i].split("=")[1];
+        mapAttributes.set(key.trim(),value);
+    }
+
+
+</script>
+
+<script src='@routes.Assets.at("javascripts/infrastructure.js")'  type='text/javascript'></script>
+
+@views.html.footer{
+
+}
+</body>
+
+</html>

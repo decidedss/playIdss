@@ -1,0 +1,391 @@
+@(agency:String, persons: List[Person])
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
+        <script src="//cdn.datatables.net/plug-ins/1.10.8/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+
+        <title>@Messages.get("manageMembers")</title>
+    }
+
+    <script type="text/javascript" charset="utf-8">
+
+        var table;
+        $(document).ready(function() {
+             table = $('#agencyMembers').DataTable();
+
+              $('#agencyMembers tbody').on('click',"input[type='button']",function() {
+                edit_delete_member(this);
+             });
+
+        });
+
+        function edit_delete_member(but){
+
+            var id = but.id.substring(0, but.id.indexOf(','));
+            var action = but.id.substring(but.id.indexOf(',') + 1, but.id.length);
+            <!--console.log(id); // member username-->
+
+            if (action === "edit"){
+                $.ajax( {
+                    url : "/signup/agency/getPerson/" + id,
+                    success :(function(data){
+
+                       for(var k in data){
+                            <!--console.log(k);-->
+                            $('[id="'+k+'"]').val(data[k]);
+                       }
+
+                       // Fill separately checkboxes
+                        console.log(data['groups']);
+
+                        if(data['groups'].includes('GROUP_idss_view')){
+                           $('#view_check').prop('checked', true);
+                        }
+
+                        if(data['groups'].includes('GROUP_idss_edit')){
+                           $('#edit_check').prop('checked', true);
+                        }
+
+                    }),
+                    error: (function(result){
+                    }),
+                });
+            }
+
+            if (action === "delete"){
+                 $.ajax( {
+                    url : "/signup/agency/deletePerson/" + id,
+                    success :(function(data){
+                        <!--console.log(data);-->
+                        table.row(but.closest('tr')).remove().draw();
+                    }),
+                    error: (function(result){
+                    }),
+                });
+            }
+        }
+
+    </script>
+</head>
+
+<body>
+
+@views.html.header {
+}
+
+<style>
+    body {
+      background-color: #1e3251;
+      color: white;
+    }
+
+     label {
+        color: whitesmoke;
+        text-decoration: none;
+    }
+
+    .pagination > .disabled > span, .pagination > .disabled > span:hover, .pagination > .disabled > span:focus, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
+        background-color: #15a689;
+    }
+
+    td {
+        color: black;
+    }
+
+    .modal-content {
+        color: #1e3251;
+    }
+</style>
+
+    <div class="container">
+
+        <div class="container col-lg-12">
+
+            <div class="row" align="center">
+                <br/><br/>
+                <h1>@Messages.get("manageMembers") <i>@agency</i></h1>
+            </div>
+
+            <br/><br/>
+
+            <div class="alert alert-danger" id="alert_template_username" role="alert" style="display: none;" align="center">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">@Messages.get("close")</span>
+                </button>
+            </div>
+
+            <div class="alert alert-danger" id="alert_template_email" role="alert" style="display: none;" align="center">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">@Messages.get("close")</span>
+                </button>
+            </div>
+
+            <div align="left">
+                <!-- Button trigger modal -->
+                <button class="btn btn-primary btn-lg idss-primary-btn" data-toggle="modal" data-target="#myModalNorm">
+                    @Messages.get("addMembers")
+                </button>
+            </div>
+            <br/><br/>
+
+
+
+
+            <div style="text-align: left;">
+
+                <table id="agencyMembers" class="table table-striped table-hover" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>@Messages.get("username")</th>
+                        <th>@Messages.get("name")</th>
+                        <th>Email</th>
+                        <th>@Messages.get("position")</th>
+                        <th>@Messages.get("phoneLandline")</th>
+                        <th>@Messages.get("phoneMobile")</th>
+                        <th>@Messages.get("companyAddress")</th>
+                        <th>@Messages.get("eligibleToView")</th>
+                        <th>@Messages.get("eligibleToEdit")</th>
+                        <th>@Messages.get("edit")</th>
+                        <th>@Messages.get("delete")</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @for(p <- persons) {
+                        <tr>
+                            @if(p.getUserName().equals(session.get("userName"))){ <td><strong>@p.getUserName()</strong></td>} else { <td>@p.getUserName()</td>}
+                            <td>@p.getFirstName()&nbsp;&nbsp;@p.getLastName()</td>
+                            <td>@p.getEmail()</td>
+                            <td>@p.getJobtitle()</td>
+                            <td>@p.getTelephone()</td>
+                            <td>@p.getMobile()</td>
+                            <td>@p.getCompanyaddress1()</td>
+                            @if(p.getGroups().contains("GROUP_idss_view")){<td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td></td>} else {<td></td>}
+                            @if(p.getGroups().contains("GROUP_idss_edit")){<td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td></td>} else {<td></td>}
+                            <td><input type="button" id='@p.getUserName(),edit' value='@Messages.get("edit")' class="btn btn-xs btn-warning" data-toggle="modal" data-target="#myModalNormEdit"/></td>
+                            @if(!p.getGroups().contains("GROUP_idss_admin")){<td><input type="button" id='@p.getUserName(),delete' value='@Messages.get("delete")' class="btn btn-xs btn-danger"/></td>} else {<td></td>}
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                <input type="hidden" name="agency" value='@agency'>
+                <a class="btn btn-default btn-lg idss-default-btn" href="/welcome">@Messages.get("proceedToWelcome")</a>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModalNorm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                @Messages.get("addMemberInAgency") "@agency"
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(routes.User.addWithGroup()) {
+                            <form class="form-horizontal" id="form_members">
+                                <fieldset>
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("username")</h4>
+                                        <input type="text" class="form-control" id="userNameView" name="userName" placeholder='@Messages.get("username")' required>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("firstname")</h4>
+                                        <input type="text" class="form-control" id="firstNameView" name="firstName" placeholder='@Messages.get("firstname")' required>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("lastname")</h4>
+                                        <input type="text" class="form-control" id="lastNameView" name="lastName" placeholder='@Messages.get("lastname")' required>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>Email</h4>
+                                        <input type="text" class="form-control" id="emailView" name="email" placeholder="e.g. example@@email.com" required>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("jobTitle")</h4>
+                                        <input type="text" class="form-control" id="jobtitleView" name="jobtitle" placeholder='@Messages.get("jobTitle")' required>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("phoneLandline")</h4>
+                                        <input type="text" class="form-control" id="telephoneView" name="telephone" placeholder='@Messages.get("phoneLandline")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("phoneMobile")</h4>
+                                        <input type="text" class="form-control" id="mobileView" name="mobile" placeholder='@Messages.get("phoneMobile")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("companyAddress")</h4>
+                                        <input type="text" class="form-control" id="companyaddress1view" name="companyaddress1" placeholder='@Messages.get("companyAddress")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                       <h4>@Messages.get("eligibleTo")</h4>
+                                        <div class="checkbox">
+                                            <label class="label-black"><input type="checkbox" name="view" value="idss_view" checked>@Messages.get("view")</label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="label-black"><input type="checkbox" name="edit" value="idss_edit" checked>@Messages.get("edit")</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">@Messages.get("close")</button>
+                                        <button type="submit" class="btn btn-default">@Messages.get("save")</button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            }
+                        </div>
+
+                    </div>
+                 </div>
+            </div>
+            <!-- Modal till here-->
+
+
+            <!-- Modal Edit through alfresco -->
+            <div class="modal fade" id="myModalNormEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabelEdit" aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabelEdit">
+                                @Messages.get("editAgencyMember") "@agency"
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(routes.User.updateAgencyMembers(agency)) {
+                            <form class="form-horizontal" id="form_members_edit">
+                                <fieldset>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("username")</h4>
+                                        <input type="text" class="form-control" id="userName" name="userName" placeholder='@Messages.get("username")' readonly>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("firstname")</h4>
+                                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder='@Messages.get("firstname")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("lastname")</h4>
+                                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder='@Messages.get("lastname")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>Email</h4>
+                                        <input type="text" class="form-control" id="email" name="email" placeholder="e.g. example@@email.com">
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("jobTitle")</h4>
+                                        <input type="text" class="form-control" id="jobtitle" name="jobtitle" placeholder='@Messages.get("jobTitle")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("phoneLandline")</h4>
+                                        <input type="text" class="form-control" id="telephone" name="telephone" placeholder='@Messages.get("phoneLandline")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("phoneMobile")</h4>
+                                        <input type="text" class="form-control" id="mobile" name="mobile" placeholder='@Messages.get("phoneMobile")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("companyAddress")</h4>
+                                        <input type="text" class="form-control" id="companyaddress1" name="companyaddress1" placeholder='@Messages.get("companyAddress")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("eligibleTo")</h4>
+                                        <div class="checkbox">
+                                            <label class="label-black"><input type="checkbox" id="view_check" name="view" value="idss_view">@Messages.get("view")</label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label class="label-black"><input type="checkbox" id="edit_check"  name="edit" value="idss_edit">@Messages.get("edit")</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">@Messages.get("close")</button>
+                                        <button type="submit" class="btn btn-default">@Messages.get("save")</button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal till here-->
+
+        </div>
+    </div>
+
+</body>
+
+<script type="text/javascript" charset="utf-8">
+
+    @if(flash.get("username")=="exists"){
+        $(alert_template_username).show();
+
+        $("#alert_template_username button").after('@Messages.get("usernameExists")');
+        $('#alert_template_username').fadeIn('slow');
+        $('#alert_template_username .close').click(function(e) {
+            $('#alert_template_username').hide();
+        });
+    }
+
+     @if(flash.get("email")=="wrong"){
+        $(alert_template_email).show();
+
+        $("#alert_template_email button").after('@Messages.get("invalidEmail")');
+        $('#alert_template_email').fadeIn('slow');
+        $('#alert_template_email .close').click(function(e) {
+            $('#alert_template_email').hide();
+        });
+    }
+
+    @if(flash.get("email")=="exists"){
+        $(alert_template_email).show();
+
+        $("#alert_template_email button").after('@Messages.get("emailExists")');
+        $('#alert_template_email').fadeIn('slow');
+        $('#alert_template_email .close').click(function(e) {
+            $('#alert_template_email').hide();
+        });
+    }
+
+</script>
+
+</html>

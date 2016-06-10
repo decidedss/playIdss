@@ -1,0 +1,213 @@
+@(person:Person, group: String, message: String, isAdmin: Boolean, share: Boolean)
+
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+        <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+        <title>User Profile</title>
+    }
+</head>
+
+<script type="text/javascript" charset="utf-8">
+
+    $(function() {
+        // On load page get the value of share property
+        if (@share)
+            $("#toggle-one").bootstrapToggle('on');
+        else
+            $("#toggle-one").bootstrapToggle('off');
+    });
+
+</script>
+
+<body>
+
+    @views.html.header {
+    }
+    <style>
+        body {
+            background-color: #1E3251;
+            color: white;
+        }
+        .modal-content {
+            color: #1e3251;
+        }
+    </style>
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <div class="page-header">
+            <h1>@Messages.get("profile")</h1>
+        </div>
+
+        <div class="container col-lg-6">
+            <br/>
+            <div class="alert alert-success" id="agencyInfo" role="alert" >
+                <h4 align="left"><strong>@session.get("userName"):</strong> @Messages.get("belongsToAgency") <strong>@group</strong></h4>
+            </div>
+            <br/>
+
+            @if(!isAdmin && session.get("groups").contains("idss_admin")){
+                <!--Bootstrap switch-->
+                <div class="share-checkbox" align="left">
+                    <label>
+                        <input id="toggle-one" type="checkbox" data-onstyle="success" data-toggle="toggle" checked=@share> &nbsp; <i>@Messages.get("shareFlag")</i>
+                    </label>
+                </div>
+
+                <!--<div class="alert alert-info" align="left">-->
+                <div align="left">
+                    <br/>
+                    <a class="btn btn-default idss-default-btn" href="/signup/agency/members">@Messages.get("manageMembers")</a><br/><br/>
+
+                    <div class="alert alert-danger" id="alert_template_display" role="alert" style="display: none;">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">@Messages.get("close")</span>
+                        </button>
+                    </div>
+
+                    <a class="btn btn-default idss-default-btn" title='@Messages.get("rename")' data-toggle="modal" data-target="#myModalNorm">@Messages.get("rename")</a><br/>
+                </div>
+            }
+
+            @helper.form(routes.User.passwordmail_in) {
+                <form>
+                    <h3>@Messages.get("change_password")</h3>
+                    <br/>
+                    <label>@Messages.get("enterNewPassword")</label>
+                    <input name="password" id="password" class="form-control" placeholder='@Messages.get("enterNewPassword")' required>
+                    <br>
+                    <button class="btn btn-warning" type="submit" style="float:left;">@Messages.get("change_password")</button>
+                </form>
+            }
+            <br/><br/><br/>
+            <div class="alert alert-warning" id="alert_template" role="alert" style="display: none;">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="container col-lg-6">
+            @helper.form(routes.User.updateUserDetails()) {
+            <form>
+                <label>@Messages.get("username")</label>
+                <input type="text" class="form-control" name="userName" value='@person.getUserName()'>
+                <label>@Messages.get("firstname")</label>
+                <input type="text" class="form-control" name="firstName" value='@person.getFirstName()'>
+                <label>@Messages.get("lastname")</label>
+                <input type="text" class="form-control" name="lastName" value='@person.getLastName()'>
+                <label>Email</label>
+                <input type="text" class="form-control" name="email" value='@person.getEmail()'>
+                <label>@Messages.get("jobTitle")</label>
+                <input type="text" class="form-control" name="jobtitle" value='@person.getJobtitle()'>
+                <!--<label>Location</label>-->
+                <!--<input type="text" class="form-control" name="location" value='@person.getLocation()'>-->
+                <label>@Messages.get("phoneLandline")</label>
+                <input type="text" class="form-control" name="telephone" value='@person.getTelephone()'>
+                <label>@Messages.get("phoneMobile")</label>
+                <input type="text" class="form-control" name="mobile" value='@person.getMobile()'>
+                <label>@Messages.get("companyAddress")</label>
+                <input type="text" class="form-control" name="companyaddress1" value='@person.getCompanyaddress1()'>
+                <br>
+                <button class="btn btn-success" type="submit" style="float:left;">@Messages.get("updateProfileDetails")</button>
+                <br/>
+            </form>
+            }
+        </div>
+    </div>
+
+</div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModalNorm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" align="center">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        @Messages.get("rename")&nbsp;@session.get("agencyDisplay")
+                    </h4>
+                </div>
+                <div class="modal-body">
+                        @helper.form(routes.User.renameAgency()) {
+                        <form class="form-horizontal">
+                            <fieldset>
+                                <div class="form-group" align="left">
+                                    <h4>@Messages.get("agencyName")</h4>
+                                    <input type="text" class="form-control" id="agencyName" name="agencyName" value='@session().get("agencyDisplay")' required>
+                                </div>
+                                <div class="form-group" align="left">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">@Messages.get("close")</button>
+                                    <button type="submit" class="btn btn-default">@Messages.get("save")</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</div>
+
+    <script type="text/javascript">
+         @if(message){
+           $(alert_template).show();
+
+            $("#alert_template button").after('@message');
+            $('#alert_template').fadeIn('slow');
+            $('#alert_template .close').click(function(e) {
+                $('#alert_template').hide();
+            });
+         }
+
+         @if(flash.get("agencydisplay")=="exists"){
+            $(alert_template_display).show();
+
+            $("#alert_template_display button").after('@Messages.get("invalidDisplay")');
+            $('#alert_template_display').fadeIn('slow');
+            $('#alert_template_display .close').click(function(e) {
+                $('#alert_template_display').hide();
+            });
+        }
+
+          $(function() {
+            $('#toggle-one').change(function() {
+                // console.log( $(this).prop('checked') );
+
+                $.ajax( {
+                    type: "GET",
+                    url : "/signup/agency/share/content/" + $(this).prop('checked'),
+                    success :(function(result){
+                        if (result == 'fail'){
+                            alert("Agency does not exist in system's database!");
+                        }
+                    }),
+                    error: (function(result){
+                    }),
+                });
+
+            })
+          });
+    </script>
+
+</body>
+
+@views.html.footer{
+
+}
+
+
+</html>

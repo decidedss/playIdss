@@ -1,0 +1,108 @@
+@(form: Form[Application.Login], groups: Map[String, String], warning: String)
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>@Messages.get("alreadyRegisteredBody")</title>
+    }
+</head>
+
+<body>
+    <style>
+        body {
+        background-color: #1e3251;
+        color: white;
+        }
+    </style>
+
+    <div class="container">
+
+        <div class="row">
+            <div class="container col-lg-1">
+            </div>
+
+            <div class="container col-lg-10">
+                <a href="/signup/agency" style="float:left; color:white;"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span></a>
+                <div style="float:right;">
+                    @if(session.get("lang").contains("en")){
+                    <a class="activeLocale loginLocale" href="/lang/en">en</a>
+                    &emsp;
+                    <a class="loginLocale" href="/lang/el">el</a>
+                    }
+
+                    @if(session.get("lang").contains("el")){
+                    <a class="loginLocale" href="/lang/en">en</a>
+                    &emsp;
+                    <a class="activeLocale loginLocale" href="/lang/el">el</a>
+                    }
+                </div>
+            </div>
+
+            <div class="container col-lg-1">
+            </div>
+        </div>
+
+        <div class="row" align="center">
+            <h1>@Messages.get("alreadyRegisteredBody")</h1>
+        </div>
+
+        <div class="container col-lg-3">
+        </div>
+
+        <div class="container col-lg-6" align="center">
+            <br/>
+            <h2>@Messages.get("enterCredentials")</h2>
+            @helper.form(routes.Application.authenticateAgency) {
+            <br/>
+            <form>
+                <div class="form-group">
+                    <select class="form-control" id="agency" name="agencyname" required>
+                        <option value="" selected disabled>@Messages.get("selectBodySignup")</option>
+                        @for(((key, value), currentIndex) <- groups.zipWithIndex) {
+                            <option value='@key'>@value</option>
+                        }
+                    </select>
+                </div>
+                <!--<label for="username" class="sr-only">Username</label>-->
+                <input name="username" id="username" class="form-control" placeholder='@Messages.get("username")' required>
+                <br/>
+                <!--<label for="password" class="sr-only">Username</label>-->
+                <input name="password" id="password" class="form-control" placeholder='@Messages.get("password")' required>
+                <br/>
+                <button type="submit" class="btn btn-default btn-lg idss-default-btn"><h4>@Messages.get("iamdone")</h4></button>
+            </form>
+            }
+            <br/>
+            <div class="alert alert-warning" id="alert_template" role="alert" style="display: none;">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="container col-lg-3">
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+         @if(warning){
+           $(alert_template).show();
+
+            $("#alert_template button").after('@warning');
+            $('#alert_template').fadeIn('slow');
+            $('#alert_template .close').click(function(e) {
+                $('#alert_template').hide();
+            });
+         }
+
+    </script>
+</body>
+
+</html>

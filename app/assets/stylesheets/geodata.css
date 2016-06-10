@@ -1,0 +1,26 @@
+body {
+    background-color: #1E3251;
+    color: white;
+}
+
+#layertree li > span {
+    cursor: pointer;
+}
+
+label {
+    color: whitesmoke;
+    text-decoration: none;
+}
+
+.popover{
+    min-width:220px;
+    width: auto;
+    max-height: 310px;
+    overflow-y: auto;
+}
+
+/* Popover Header */
+.popover-title {
+    font-size: 16px;
+    text-align:center;
+}

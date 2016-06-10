@@ -1,0 +1,72 @@
+@()
+
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>You represent a new agency</title>
+        <link href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap2/bootstrap-switch.css' rel="stylesheet">
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js'></script>
+    }
+</head>
+
+<body>
+
+<style>
+    body {
+      background-color: #1e3251;
+      color: white;
+    }
+</style>
+
+    <div class="container">
+
+
+        <div class="row">
+            <div class="container col-lg-1">
+            </div>
+
+            <div class="container col-lg-10">
+                <a href="/login" style="float:left; color:white;"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span></a>
+                <div style="float:right;">
+                    @if(session.get("lang").contains("en")){
+                    <a class="activeLocale loginLocale" href="/lang/en">en</a>
+                    &emsp;
+                    <a class="loginLocale" href="/lang/el">el</a>
+                    }
+
+                    @if(session.get("lang").contains("el")){
+                    <a class="loginLocale" href="/lang/en">en</a>
+                    &emsp;
+                    <a class="activeLocale loginLocale" href="/lang/el">el</a>
+                    }
+                </div>
+            </div>
+
+            <div class="container col-lg-1">
+            </div>
+        </div>
+
+
+        <div class="container col-lg-12">
+            <div class="jumbotron">
+                <h1 align="center">@Messages.get("error")</h1>
+                <br/>
+                <h2>@Messages.get("errorBodyExists")</h2>
+                <br/>
+                <a class="btn btn-default btn-lg idss-default-btn" href="/login">@Messages.get("errorBack")</a>
+                <br/><br/>
+                <a class="btn btn-default btn-lg idss-default-btn" href="/agency/login">@Messages.get("alreadyRegisteredBody")</a>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

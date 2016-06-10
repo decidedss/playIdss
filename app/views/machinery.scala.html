@@ -1,0 +1,162 @@
+@(machineriesType: List[MachineryType], username: String, agency: String, sharedAgencies: String, isAdmin: Boolean, hasEdit: Boolean, groupnameAgency: Map[String, String])
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<!--add machinery on the map-->
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("machineries")</title>
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/machinery.css")'>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    }
+</head>
+
+<script type="text/javascript">
+    var geoserver_wfs='@Messages.get("GEOSERVER_WFS")';
+    var geoserver_wms='@Messages.get("GEOSERVER_WMS")';
+    var geoserver_ows='@Messages.get("GEOSERVER_OWS")';
+    var server_path='@Messages.get("SERVER_PATH")';
+</script>
+
+<body>
+<script src="http://openlayers.org/en/v3.10.1/build/ol.js"></script>
+
+
+@views.html.header {
+}
+
+<script>
+
+function show() { document.getElementById("form-machinery").style.display="block"; }
+window.onload = function() { document.getElementById("form-machinery").style.display="none"; }
+
+</script>
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("resourcesManagement")</h1><br/>
+        <h5>@Messages.get("subtitleMachinery")</h5>
+        <br/>
+
+        <div class="container col-lg-1">
+        </div>
+
+        <div class="container col-lg-10">
+
+            <div id="myButtons" align="left">
+                @if(!isAdmin){
+                @if(hasEdit){
+                <h5>@Messages.get("toolsMachinery")</h5>
+                <button class="btn btn-primary btn-xs" id="btnAdd" name="btnAdd" data-toggle="tooltip" data-placement="top" title='@Messages.get("addGeometry")' onClick="show()" value="show">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button> &nbsp;
+                <button class="btn btn-success btn-xs" id="btnEdit" data-toggle="tooltip" data-placement="top" title='@Messages.get("reallocationPoint")'>
+                    <span class="glyphicon glyphicon-edit"></span>
+                </button> &nbsp;
+                }
+                }
+                <button class="btn btn-info btn-xs" id="btnSelect" data-toggle="tooltip" data-placement="top" title='@Messages.get("showInformation")'>
+                    <span class="glyphicon glyphicon-new-window"></span>
+                </button> &nbsp;
+                @if(!isAdmin){
+                @if(hasEdit){
+                <button class="btn btn-danger btn-xs" id="btnDelete" data-toggle="tooltip" data-placement="top" title='@Messages.get("deleteButton")'>
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+                }
+                }
+                <br/><br/>
+            </div>
+
+            <input id="agency" value="@agency" type="hidden"/>
+            <input id="sharedAgencies" value="@sharedAgencies" type="hidden"/>
+            <input id="groupnameAgency" value="@groupnameAgency" type="hidden"/>
+
+            <input id="brandTitle" value='@Messages.get("brand")' type="hidden"/>
+            <input id="licensePlateTitle" value='@Messages.get("licensePlate")' type="hidden"/>
+            <input id="horsepowerTitle" value='@Messages.get("horsepower")' type="hidden"/>
+            <input id="seatTitle" value='@Messages.get("seat")' type="hidden"/>
+            <input id="equipmentTitle" value='@Messages.get("equipment")' type="hidden"/>
+            <input id="cargoTitle" value='@Messages.get("cargo")' type="hidden"/>
+            <input id="capacityTitle" value='@Messages.get("capacity")' type="hidden"/>
+            <input id="driverTitle" value='@Messages.get("driver")' type="hidden"/>
+            <input id="disasterTitle" value='@Messages.get("disaster")' type="hidden"/>
+            <input id="equipmentConditionTitle" value='@Messages.get("equipmentCondition")' type="hidden"/>
+            <input id="tiresConditionTitle" value='@Messages.get("tiresCondition")' type="hidden"/>
+            <input id="notesTitle" value='@Messages.get("notes")' type="hidden"/>
+            <input id="machineryAvailabilityTitle" value='@Messages.get("machineryAvailability")' type="hidden"/>
+            <input id="yesTitle" value='@Messages.get("yes")' type="hidden"/>
+            <input id="noTitle" value='@Messages.get("no")' type="hidden"/>
+            <input id="agencyTitle" value='@Messages.get("agency")' type="hidden"/>
+            <input id="machineryTypeTitle" value='@Messages.get("machineryTypeTitle")' type="hidden"/>
+            <input id="coordinatesTitle" value='@Messages.get("coordinatesTitle")' type="hidden"/>
+
+            <input id="egDisaster" value='@Messages.get("egDisaster")' type="hidden"/>
+            <input id="egBrand" value='@Messages.get("egBrand")' type="hidden"/>
+            <input id="egLicensePlate" value='@Messages.get("egLicensePlate")' type="hidden"/>
+            <input id="egHorsepower" value='@Messages.get("egHorsepower")' type="hidden"/>
+            <input id="egSeat" value='@Messages.get("egSeat")' type="hidden"/>
+            <input id="egEquipmentCondition" value='@Messages.get("egEquipmentCondition")' type="hidden"/>
+            <input id="egTiresCondition" value='@Messages.get("egTiresCondition")' type="hidden"/>
+            <input id="egNotes" value='@Messages.get("egNotes")' type="hidden"/>
+            <input id="saveGeometryMetadata" value='@Messages.get("saveGeometryMetadata")' type="hidden"/>
+
+            @if(session.get("lang").contains("el")){
+            <input class="lang" value="el" type="hidden"/>
+            }
+            @if(session.get("lang").contains("en")){
+            <input class="lang" value="en" type="hidden"/>
+            }
+
+
+            <form class="form-inline" id="form-machinery">
+                <select id="type" class="js-example-basic-single" title="Select a machinery" style="width: 100%"  data-placeholder='@Messages.get("selectMachinery")'>
+                    <option selected disabled></option>
+                    @for(m <- machineriesType) {
+                    <option class="select2-container" value='Point' id='@m.getId(),@m.getVehicle_type(), @username, @agency'>@m.getVehicle_type()</option>
+                    }
+                </select>
+                &nbsp;
+            </form>
+
+            <div id="map" class="map"></div>
+
+            <div style="display: none;">
+                <div id="popup" title='@Messages.get("addMachineryTitle")'></div>
+            </div>
+
+            <div style="display: none;">
+                <div id="popup_preview" title='@Messages.get("machineryDetailsTitle")'></div>
+            </div>
+
+            <br/>
+
+            <div align="center">
+                <a href="/resources/machinery/edit" class="btn btn-danger" id="addMachinery">
+                    @if(isAdmin){
+                    @Messages.get("instancesButtonView")
+                    }
+                    @if(!isAdmin){
+                    @Messages.get("instancesButton")
+                    }
+                </a>&ensp;
+            </div>
+
+        </div>
+
+        <div class="container col-lg-1">
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript" src='@routes.Assets.at("javascripts/machinery.js")'></script>
+@views.html.footer{
+}
+</body>
+
+</html>

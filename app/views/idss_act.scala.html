@@ -1,0 +1,67 @@
+@()
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>The iDSS</title>
+    }
+</head>
+
+<body>
+
+    @views.html.header {
+    }
+
+    <style>
+        body {
+            background-color: #1E3251;
+            color: white;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="starter-template">
+
+            <div class="row" align="right">
+                <a class="btn btn-primary idss-primary-btn" href="/view">View</a>
+                <a class="btn btn-primary idss-primary-btn" href="/plan">Plan</a>
+            </div>
+
+            <div class="page-header">
+                <h1>Act</h1>
+                <!--<hr/>-->
+            </div>
+
+            <div class="row">
+                <div class="container col-lg-4">
+                </div>
+                <div class="container col-lg-4" align="left">
+                    <h2>Time is precious</h2><br/>
+                    <!--<hr/>-->
+                    <!--@if(!session.get("groups").contains("GROUP_CivilProtection") && !session.get("groups").contains("GROUP_DecentralizedAdministration#")){-->
+                    <h4><a href="/routing" class="btn btn-lg btn-default idss-default-btn btn-block" role="button">Routing &nbsp&nbsp<span class="glyphicon glyphicon-road" aria-hidden="true"></span></a>
+                    <small> &nbsp;Suggestions of routing paths</small></h4>
+                    <br/><br/>
+                    <!--}-->
+                    <!--<h4><a href="/allocation" class="btn btn-lg btn-default btn-lg idss-default-btn btn-block" role="button"> Allocation &nbsp&nbsp<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></a>-->
+                    <!--<small> &nbsp;Optimally allocate your resources</small></h4>-->
+                    <!--<br/><br/>-->
+                    <h4><a href="#" class="btn btn-lg btn-default idss-default-btn btn-block" role="button"> Traffic &nbsp&nbsp<span class="glyphicon glyphicon-plane" aria-hidden="true"></span></a>
+                    <small> &nbsp;Manage your traffic</small></h4>
+                    <br/><br/>
+                </div>
+                <div class="container col-lg-4">
+                </div>
+            </div>
+         </div>
+    </div>
+
+
+    @views.html.footer{
+    }
+</body>
+
+</html>

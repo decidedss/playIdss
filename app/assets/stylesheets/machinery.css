@@ -1,0 +1,131 @@
+body {
+    background-color: #1E3251;
+    color: white;
+}
+
+.modal-content {
+    color: #1e3251;
+}
+.select2-container {
+    color: black;
+}
+blockquote{
+    display: none !important;
+}
+
+.btn-info{
+    padding: 1px 5px !important;
+}
+
+.ol-popup {
+	display: inline-block;
+	white-space: nowrap;
+	position: absolute;
+	background-color: white;
+	-webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+	filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+	padding: 15px;
+	/* border-radius: 10px; */
+	border: 1px solid #cccccc;
+	bottom: 12px;
+	left: -50px;
+	color: black;
+	}
+
+.ol-popup:after, .ol-popup:before {
+	top: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+	}
+
+.ol-popup:after {
+	border-top-color: white;
+	border-width: 10px;
+	left: 48px;
+	margin-left: -10px;
+	}
+
+.ol-popup:before {
+	border-top-color: #cccccc;
+	border-width: 11px;
+	left: 48px;
+	margin-left: -11px;
+	}
+
+.ol-popup-closer {
+	position: absolute;
+	top: 4px;
+	right: 2px;
+	cursor: pointer;
+	padding: 3px;
+	color: #545454;
+}
+
+..ol-popup-closer.add{
+    right: 10px !important;
+}
+
+.ol-popup-closer:hover {
+	color: #151515;
+}
+
+.preview_title{
+    font-weight: bold;
+}
+
+#popup {
+    overflow-y:scroll;
+    z-index: 100;
+}
+
+.popover{
+    min-width: 220px;
+}
+
+.popover-title{
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ebebeb;
+    color: #000;
+}
+
+.popover-content{
+    color: #2c3e50;
+    background-color: #fff;
+    min-width: 250px;
+}
+
+.popover-content-add{
+    overflow-y: scroll;
+    height: 390px;
+    padding-right: 10px;
+}
+
+body {
+    background-color: #1E3251;
+    color: white;
+}
+
+label {
+    color: whitesmoke;
+    text-decoration: none;
+}
+
+.modal-content {
+    color: #1e3251;
+}
+
+.pagination > .disabled > span, .pagination > .disabled > span:hover, .pagination > .disabled > span:focus, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
+    background-color: #15a689;
+}
+
+td {
+    color: black;
+}
+
+.dataTables_info{
+    color: #fff !important;
+}

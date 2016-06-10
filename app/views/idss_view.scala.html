@@ -1,0 +1,67 @@
+@()
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>The iDSS</title>
+    }
+</head>
+
+<body>
+
+    @views.html.header {
+    }
+
+
+    <style>
+        body {
+            background-color: #1E3251;
+            color: white;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="starter-template">
+
+            <div class="row" align="right">
+                <a class="btn btn-primary idss-primary-btn" href="/plan">Plan</a>
+                <a class="btn btn-primary idss-primary-btn" href="/act">Act</a>
+            </div>
+
+            <div class="page-header">
+                <h1>View</h1>
+                <!--<hr/>-->
+            </div>
+
+            <div class="row">
+                <div class="container col-lg-4">
+                </div>
+                <div class="container col-lg-4" align="left">
+                    <h2>following elements: </h2><br/>
+                    <!--<hr/>-->
+                    <h4><a href="/documents" class="btn btn-lg btn-default idss-default-btn btn-block" role="button">Legislation &nbsp&nbsp<span class="glyphicon glyphicon-book" aria-hidden="true"></span></a>
+                    <small> &nbsp;for keeping up with the pertinent civil protection laws</small></h4>
+                    <br/><br/>
+                    <h4><a href="/climate" class="btn btn-lg btn-default idss-default-btn btn-block" role="button"> Climate &nbsp&nbsp<span class="glyphicon glyphicon-cloud" aria-hidden="true"></span></a>
+                    <small> &nbsp;All you need to know on past and forecasted climatic conditions</small></h4>
+                    <br/><br/>
+                    <h4><a href="/disasters" class="btn btn-lg btn-default idss-default-btn btn-block" role="button"> Disasters &nbsp&nbsp<span class="glyphicon glyphicon-fire" aria-hidden="true"></span></a>
+                    <small> &nbsp;What, where and when they happened</small></h4>
+                    <br/><br/>
+                </div>
+                <div class="container col-lg-4">
+                </div>
+            </div>
+
+         </div>
+    </div>
+
+
+    @views.html.footer{
+    }
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+@(messge:String)
+@import play.i18n._
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    @views.html.head {
+
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/routing.js")'></script>
+    <title>@Messages.get("routing")</title>
+    }
+
+    <script type="text/javascript">
+
+        var osrm_server = '@Messages.get("OSRM_SERVER")';
+        var Instructions = new Array();
+        Instructions.push('@Messages.get("NoTurn")');
+        Instructions.push('@Messages.get("GoStraight")');
+        Instructions.push('@Messages.get("TurnSlightRight")');
+        Instructions.push('@Messages.get("TurnRight")');
+        Instructions.push('@Messages.get("TurnSharpRight")');
+        Instructions.push('@Messages.get("UTurn")');
+        Instructions.push('@Messages.get("TurnSharpLeft")');
+        Instructions.push('@Messages.get("TurnLeft")');
+        Instructions.push('@Messages.get("TurnSlightLeft")');
+        Instructions.push('@Messages.get("ReachViaLocation")');
+        Instructions.push('@Messages.get("HeadOn")');
+        Instructions.push('@Messages.get("EnterRoundAbout")');
+        Instructions.push('@Messages.get("LeaveRoundAbout")');
+        Instructions.push('@Messages.get("StayOnRoundAbout")');
+        Instructions.push('@Messages.get("StartAtEndOfStreet")');
+        Instructions.push('@Messages.get("ReachedYourDestination")');
+        Instructions.push('@Messages.get("EnterAgainstAllowedDirection")');
+        Instructions.push('@Messages.get("LeaveAgainstAllowedDirection")');
+
+        var from = '@Messages.get("routingFrom")';
+        var to = '@Messages.get("routingTo")';
+        var totalTime = '@Messages.get("routingTotalTime")';
+        var totalDistance = '@Messages.get("routingTotalDistance")';
+
+    </script>
+</head>
+<body onload="routing()">
+@views.html.header {
+}
+
+<style>
+    body {
+    background-color: #1E3251;
+    color: white;
+    }
+
+    /*
+    hr {
+    width: 60%;
+    border-top: solid 2px gray;
+    }*/
+
+    .panel > .panel-body {
+    background-color: #1E3251;
+    color: white;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("routing")</h1><br/>
+
+        <!-- LEFT COLUMN -->
+        <div class="container col-lg-3">
+            <h5 align="left"><i>@Messages.get("routingSelect2")</i></h5>
+            <button type="button" class="btn btn-default idss-default-btn btn-lg btn-block" onclick="handleRouting()"
+                    id="routingBtn" disabled>@Messages.get("routingGetDirections") <span class="glyphicon glyphicon-road" aria-hidden="true"></span></button>
+            <button type="button" class="btn btn-primary idss-primary-btn btn-lg btn-block" onclick="clearRouting()"  id="clearBtn" disabled>@Messages.get("routingClear")</button>
+            <br/><br/>
+
+            <div id="instructionsPanel" class="panel panel-default" style="display:none;">
+                <div class="panel-heading"><strong>@Messages.get("routingInstructions")</strong></div>
+                <div class="panel-body">
+                    <div id="Results" class="text-left"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CENTER COLUMN -->
+        <div class="container col-lg-9">
+            <div id="map" class="map"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+    $('#actDropdown').addClass('active');
+</script>
+
+@views.html.footer{
+
+}
+</body>
+
+</html>

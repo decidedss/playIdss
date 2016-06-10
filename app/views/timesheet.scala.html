@@ -1,0 +1,70 @@
+@(items: List[Measure], agency: String, isAdmin: Boolean)
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+
+    <link rel="stylesheet" href='@routes.Assets.at("stylesheets/timesheet.css")'>
+    <script src="https://sbstjn.github.io/timesheet.js/script/timesheet.min.js"></script>
+    <title>@Messages.get("measures")</title>
+
+    }
+    <script type="text/javascript">
+
+    function Init()
+    {
+        var colors = ["default", "VH", "H", "M", "L"];
+        var items= new Array();
+
+        @for(m <- items) {
+            @if(agency == m.getAgency() || isAdmin){
+                var rand = colors[Math.floor(Math.random() * colors.length)];
+                items.push (['@m.getStart()', '@m.getEnd()', '@m.getName()', rand]);
+            }
+        }
+
+        new Timesheet('timesheet', 2014, 2020, items);
+
+    }
+</script>
+
+</head>
+
+<body class="white" onload="Init()">
+
+@views.html.header {
+}
+
+<div class="container-fluid">
+
+    <div class="starter-template">
+
+        <div class="page-header">
+            <h1>@Messages.get("measures")</h1>
+        </div>
+
+        <div class="container col-lg-12">
+
+            <div id="timesheet" style="text-align: left;">
+                <!-- <h3>@items.size() Measure(s)</h3> -->
+            </div>
+            <br/>
+            <div class="pull-right">
+                <a class="btn btn-info" href="/measures" role="button" style="width:200px">Tabular view</a>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /.container -->
+
+@views.html.footer{
+
+}
+</body>
+
+</html>

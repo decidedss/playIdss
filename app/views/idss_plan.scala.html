@@ -1,0 +1,70 @@
+@()
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>The iDSS</title>
+    }
+</head>
+
+<body>
+
+    @views.html.header {
+    }
+    <style>
+        body {
+            background-color: #1E3251;
+            color: white;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="starter-template">
+
+            <div class="row" align="right">
+                <a class="btn btn-primary idss-primary-btn" href="/view">View</a>
+                <a class="btn btn-primary idss-primary-btn" href="/act">Act</a>
+            </div>
+
+            <div class="page-header">
+                <h1>Plan</h1>
+                <!--<hr/>-->
+            </div>
+
+            <div class="row">
+                <div class="container col-lg-4">
+                </div>
+                <div class="container col-lg-4" align="left">
+                    <h2>following elements:</h2><br/>
+
+                    <h4><a href="/action" class="btn btn-lg btn-default idss-default-btn btn-block" role="button">Actions &nbsp&nbsp<span class="glyphicon glyphicon-list" aria-hidden="true"></span></a>
+                    <small> &nbsp;Suggestion of actions under a prioritization view</small></h4>
+                    <br/><br/>
+                    <h4><a href="/measures" class="btn btn-lg btn-default idss-default-btn btn-block" role="button">Measures &nbsp&nbsp<span class="glyphicon glyphicon-list" aria-hidden="true"></span></a>
+                    <small> &nbsp;Suggestion of protection measures under a prioritization view</small></h4>
+                    <br/><br/>
+
+                    <!--<h4><a href="/allocation" class="btn btn-lg btn-default idss-default-btn btn-block" role="button"> Allocation &nbsp&nbsp<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></a>-->
+                    <!--<small> &nbsp;Optimally place your resources</small></h4>-->
+                    <!--<br/><br/>-->
+                    <!--<h4><a href="#" class="btn btn-lg btn-default idss-default-btn btn-block" role="button"> tbd &nbsp&nbsp<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>-->
+                    <!--<small> &nbsp;tbd</small></h4>-->
+                    <!--<br/><br/>-->
+
+                </div>
+                <div class="container col-lg-4">
+                </div>
+            </div>
+
+         </div>
+    </div>
+
+
+    @views.html.footer{
+    }
+</body>
+
+</html>

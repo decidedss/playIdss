@@ -1,0 +1,729 @@
+@(items: List[Contact], cForm: Form[Contact], sms: List[String], groups: List[ContactGroup], groupsMatched: List[ContactGroup])
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("contacts")</title>
+    <script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.8/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    }
+    <script type="text/javascript" charset="utf-8">
+
+    var table;
+    $(document).ready(function() {
+         //table = $('#myContacts').DataTable();
+
+          table =
+          $('#myContacts').DataTable( {
+            responsive: true
+         });
+
+         $('#myContacts tbody').on('click',"input[type='button']",function() {
+             deleteCall(this);
+        });
+    });
+
+
+    function editCall(id){
+        $.ajax( {
+            url : "/contacts/" + id,
+            success :(function(data){
+                for(var k in data){
+                    <!--console.log(k + " -> " + data[k]);-->
+                    $('[id="'+k+'"]').val(data[k]);
+                }
+                $("#group_id").select2("val", data['group_id']);
+            }),
+            error: (function(result){
+            }),
+        });
+    }
+
+
+     function editCallAlfresco(username){
+
+      $.ajax( {
+            url : "/contacts/alfresco/" + username,
+            success :(function(data){
+
+                if (data!=""){
+                    for(var k in data){
+                        //console.log(k + " -> " + data[k]);
+                        $('[id="'+k+'"]').val(data[k]);
+                    }
+                   $("#group_id_alfresco").select2("val", data['group_id']);
+                   $("#contact_id").val(data['contact_id']);
+                   $("#username").val(data['username']);
+
+                }
+                else {
+                    //console.log("in else");
+                    $("#contact_id").val(0);
+                    $("#username").val(username);
+                }
+            }),
+            error: (function(result){
+            }),
+        });
+
+     }
+
+
+    function deleteCall(but) {
+
+        var id = but.id.substring(0, but.id.indexOf(','));
+        var mobile = but.id.substring(but.id.indexOf(',') + 1, but.id.length);
+        var result;
+
+        $.ajax( {
+            url : "/contacts/delete/" + id,
+            success :(function(data){
+                table.row(but.closest('tr')).remove().draw();
+
+                if (table.rows().data().length < 1){
+                    $('#smsButton').hide();
+                }
+
+            })
+        });
+
+       // return result;
+	}
+
+
+    </script>
+</head>
+
+<body>
+
+@views.html.header {
+}
+
+<style>
+    body {
+    background-color: #1E3251;
+    color: white;
+    }
+
+    label {
+    color: whitesmoke;
+    text-decoration: none;
+    }
+
+    .pagination > .disabled > span, .pagination > .disabled > span:hover, .pagination > .disabled > span:focus,
+    .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
+    background-color: #15a689;
+    }
+
+    td {
+    color: black;
+    }
+
+    .modal-content {
+    color: #1e3251;
+    }
+
+
+    .select2-container {
+    color: black;
+    }
+
+    .removeGroup {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    }
+
+
+</style>
+
+<div class="container-fluid">
+    <div class="starter-template">
+        <h1>@Messages.get("listContacts")</h1><br/>
+        <div class="container col-lg-12">
+
+                <!--<h2>@Messages.get("listContacts")</h2><br/>-->
+
+                @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                <div align="left">
+                    <!-- Button trigger modal -->
+                    <button class="btn btn-primary btn-lg idss-primary-btn" data-toggle="modal"
+                            data-target="#myModalNorm">
+                        @Messages.get("addContact")
+                    </button>
+                </div>
+                <br/>
+                }
+
+                <div class="alert alert-danger" id="alert_template" role="alert" style="display: none;">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+
+                <div style="text-align: left;">
+                    <table id="myContacts" class="table table-striped table-hover" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            @if(session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                            <th>@Messages.get("agency")</th>
+                            }
+                            <th>@Messages.get("group")</th>
+                            <th>@Messages.get("username")</th>
+                            <th>@Messages.get("lastname")</th>
+                            <th>@Messages.get("name")</th>
+                            <th>@Messages.get("email")</th>
+                            <th>@Messages.get("mobile")</th>
+                            <th>@Messages.get("profession")</th>
+                            <th>@Messages.get("position")</th>
+                            @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                            <th>@Messages.get("edit")</th>
+                            <th>@Messages.get("delete")</th>
+                            }
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- From Contacts -->
+                        @for(m <- items) {
+                        <tr>
+                            @if(session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                            <td>@m.getAgencyDisplay()</td>
+                            }
+                            <td>
+                                @if(m.getId()>0){
+                                <strong>@m.getContactGroup()</strong>
+                                }
+                                @if(m.getId()==0){ <!--Alfresco agency member -->
+                                <!--<strong>Alfresco</strong>-->
+                                <strong>
+                                    @if(m.getContactGroup()!=""){
+                                        @m.getContactGroup()
+                                        (@Messages.get("registeredUser"))
+                                    }
+                                    @if(m.getContactGroup()==""){
+                                        (@Messages.get("registeredUser"))
+                                    }
+                                </strong>
+                                }
+                            </td>
+                            <td>
+                                @if(m.getId()>0){
+                                <strong>-</strong>
+                                }
+                                @if(m.getId()==0){
+                                @m.getUsername()
+                                }
+                            </td>
+                            <td>@m.getLastname()</td>
+                            <td>@m.getFirstname()</td>
+                            <td>@m.getEmail()</td>
+                            <td>@m.getMobile()</td>
+                            <td>@m.getProfession()</td>
+                            <td>@m.getPosition()</td>
+                            @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                            <td>
+                                <!--If simple contact-->
+                                @if(m.getId()>0) {
+                                <button class="btn btn-xs btn-warning" data-toggle="modal"
+                                        data-target="#myModalNormEdit" onclick='editCall(@m.getId())'>@Messages.get("edit")
+                                </button>
+                                }
+                                <!--If alfresco user-->
+                                @if(m.getId()==0) {
+                                <button class="btn btn-xs btn-warning" data-toggle="modal"
+                                        data-target="#myModalNormEditAlfresco" onclick='editCallAlfresco("@m.getUsername()")'>@Messages.get("edit")
+                                </button>
+                                }
+                            </td>
+                            <td>
+                                @if(m.getId()>0) {
+                                <input type="button" id='@m.getId(),@m.getMobile()' value='@Messages.get("delete")'
+                                       class="btn btn-xs btn-danger"/>
+                                }
+                            </td>
+                            }
+                        </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <!-- Modal add contact -->
+                <div class="modal fade" id="myModalNorm" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                    <span class="sr-only">@Messages.get("close")</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    @Messages.get("addContact")
+                                </h4>
+                            </div>
+
+                            <!-- Modal Body -->
+                            <div class="modal-body">
+                                @helper.form(routes.Contacts.addContact()) {
+                                <form class="form-horizontal" id="form_contacts">
+
+                                    <fieldset>
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="lastname">@Messages.get("lastname")</label>
+                                            <input type="text" class="form-control" name="lastname"
+                                                   placeholder='@Messages.get("lastname")' required>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="firstname">@Messages.get("firstname")</label>
+                                            <input type="text" class="form-control" name="firstname"
+                                                   placeholder='@Messages.get("firstname")' required>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="email">Email</label>
+                                            <input type="text" class="form-control" name="email"
+                                                   placeholder="e.g. example@@email.com" required>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="mobile">@Messages.get("mobile")</label>
+                                            <input type="text" class="form-control" name="mobile"
+                                                   placeholder="e.g. 69xxxxxxxx" required>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black">@Messages.get("profession")</label>
+                                            <input type="text" class="form-control" name="profession"
+                                                   placeholder='@Messages.get("profession")'>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black">@Messages.get("position")</label>
+                                            <input type="text" class="form-control" name="position"
+                                                   placeholder='@Messages.get("position")'>
+                                        </div>
+
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="group_id_add">@Messages.get("group")</label>
+                                            <select id="group_id_add" name="group_id" class="js-example-tags"
+                                                    title='@Messages.get("assignToGroup")' style="width: 100%"
+                                                    data-placeholder='@Messages.get("please_select")'>
+                                                <option selected disabled></option>
+                                                @for(g <- groups) {
+                                                <option class="select2-container" value='@g.getId()'>@g.getGroupname()
+                                                </option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">@Messages.get("close")
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">@Messages.get("save")</button>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal edit contact -->
+                <div class="modal fade" id="myModalNormEdit" role="dialog" aria-labelledby="myModalLabelEdit"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                    <span class="sr-only">Close</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabelEdit">
+                                    @Messages.get("editContact")
+                                </h4>
+                            </div>
+
+                            <!-- Modal Body -->
+                            <div class="modal-body">
+                                @helper.form(routes.Contacts.updateContact()) {
+                                <form class="form-horizontal" id="form_contacts_edit">
+
+                                    <fieldset>
+                                        <input type="hidden" class="form-control" id="id" name="id" placeholder="id">
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="lastname">@Messages.get("lastname")</label>
+                                            <input type="text" class="form-control" id="lastname" name="lastname"
+                                                   placeholder='@Messages.get("lastname")' required>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="firstname">@Messages.get("firstname")</label>
+                                            <input type="text" class="form-control" id="firstname" name="firstname"
+                                                   placeholder='@Messages.get("firstname")' required>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="email">Email</label>
+                                            <input type="text" class="form-control" id="email" name="email"
+                                                   placeholder="e.g. example@@email.com" required>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="mobile">@Messages.get("mobile")</label>
+                                            <input type="text" class="form-control" id="mobile" name="mobile"
+                                                   placeholder="e.g. 69xxxxxxxx" required>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black">@Messages.get("profession")</label>
+                                            <input type="text" class="form-control" id="profession" name="profession"
+                                                   placeholder='@Messages.get("profession")'>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black">@Messages.get("position")</label>
+                                            <input type="text" class="form-control" id="position" name="position"
+                                                   placeholder='@Messages.get("position")'>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="group_id">@Messages.get("group")</label>
+                                            <select id="group_id" name="group_id" class="js-example-tags" title='@Messages.get("assignToGroup")' style="width: 100%" data-placeholder='@Messages.get("please_select")'>
+                                                <option selected disabled></option>
+                                                @for(g <- groups) {
+                                                <option class="select2-container" value='@g.getId()'>@g.getGroupname()</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">@Messages.get("close")
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">@Messages.get("save")</button>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal edit alfresco user contact group -->
+                <div class="modal fade" id="myModalNormEditAlfresco" role="dialog" aria-labelledby="myModalLabelEditAlfresco"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                    <span class="sr-only">Close</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabelEditAlfresco">
+                                    Edit alfresco contact group
+                                </h4>
+                            </div>
+
+                            <!-- Modal Body -->
+                            <div class="modal-body">
+                                @helper.form(routes.Contacts.updateAlfrescoContact()) {
+                                <form class="form-horizontal" id="form_contacts_edit_alfresco">
+                                    <fieldset>
+                                        <input type="hidden" class="form-control" id="contact_id" name="contact_id">
+
+                                        <input type="hidden" class="form-control" id="username" name="username">
+
+                                        <div class="form-group" align="left">
+                                            <label class="label-black" for="group_id">Group</label>
+                                            <select id="group_id_alfresco" name="group_id" class="js-example-tags" title="Assign to group" style="width: 100%" data-placeholder='@Messages.get("please_select")'>
+                                                <option selected disabled></option>
+                                                @for(g <- groups) {
+                                                <option class="select2-container" value='@g.getId()'>@g.getGroupname()
+                                                </option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group" align="left">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">@Messages.get("close")</button>
+                                            <button type="submit" class="btn btn-primary">@Messages.get("update")</button>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                <div align="left">
+                    <h4>@Messages.get("createContactList")</h4><br/>
+                    <div id="agency-groups">
+                        <form class="form-inline">
+                            <input class="form-control" type="text" id="input" placeholder='@Messages.get("addGroup")...'>
+                            <button class="btn btn-primary idss-primary-btn" id="addGroup" type="submit">@Messages.get("addBtn")</button>
+                        </form>
+                        <br/>
+                        <ul id="groupList">
+                            @for(g <- groups){
+                            <label class="list" name='@g.getGroupname()'>@g.getGroupname() &nbsp;
+                                <button class="removeGroup" id='@g.getGroupname()'><span
+                                        class="glyphicon glyphicon-trash"></span></button>
+                            </label><br/>
+                            }
+                        </ul>
+
+                    </div>
+                </div>
+                }
+
+                <!-- Notification of contacts form -->
+                @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                    @if(!groupsMatched.isEmpty) {
+                        @helper.form(routes.Contacts.notifyContacts()) {
+
+                        <!-- Modal when sending sms pr email -->
+                        <div class="modal fade" id="myModalSend" tabindex="-1" role="dialog" aria-labelledby="myModalSendLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                                aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="myModalSendLabel">@Messages.get("send")</h4>
+                                    </div>
+                                    <div class="modal-body">@Messages.get("contactsNotifyConfirmation")</div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-warning" data-dismiss="modal">
+                                            @Messages.get("cancel")
+                                        </button>
+                                        <button type="submit" class="btn btn-danger" id="btnSend">OK</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <form class="form-horizontal" id="formNotify">
+                            <fieldset>
+                                <h2>@Messages.get("notifyContacts")</h2><br/>
+
+                                <!------------------------------ Here set the select with history messages_new -------------------->
+                                <div class="form-group" align="center">
+                                    <select class="js-example-tags" id="select2_sms" data-placeholder='@Messages.get("olderMessages")' style="width: 100%">
+                                        <option selected disabled></option>
+                                        @for(s <- sms) {
+                                            <option>@s</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <!------------------------- Message to send ----------------------->
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="2" id="message-text" name="message-text" required></textarea>
+                                </div>
+
+
+                                <!------------------------------ List of matched groups ----------------------->
+                                <div id="groups" class="form-group" align="center">
+                                    <p class="text-muted">@Messages.get("groupsToNotify")</p>
+                                    <select id="select2groups" class="js-example-basic-multiple" multiple="multiple" title="Choose groups" style="width: 60%" required>
+                                        @for(g <- groupsMatched) {
+                                        <option class="select2-container" value='@g.getId()'>@g.getGroupname()</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="contactGroups" name="contactGroups">
+                                </div>
+
+                                <!----------------- SMS or Email Buttons - Bootstrap switch--------------------------->
+                                <div class="reporting-checkbox" align="center">
+                                    <label>
+                                        <i>Email</i>&nbsp;<input id="toggle-email" name="toggle-email" type="checkbox" data-onstyle="success" data-toggle="toggle">&emsp;
+                                        <i>SMS</i>&nbsp;<input id="toggle-sms" name="toggle-sms" type="checkbox" data-onstyle="success" data-toggle="toggle">
+                                    </label> &emsp;
+                                    <!--<button type="submit" class="btn btn-lg btn-danger" id="contactsNotify" disabled>@Messages.get("send")</button>-->
+                                    <button type="button" title="Notify contacts" class="btn btn-lg btn-danger" id="contactsNotify" disabled="disabled" data-toggle="modal" data-target="#myModalSend">@Messages.get("send")</button>
+
+                                </div>
+
+                        </fieldset>
+                    </form>
+                    }
+                }
+            }
+
+
+            </div>
+        </div>
+    </div><!-- /.container -->
+
+
+    <script type="text/javascript">
+
+
+    $(function() {
+
+        var addGroup = $('#addGroup');
+
+        var listContainer = $('#groupList');
+
+        addGroup.on('click', function() {
+
+             event.preventDefault(); // stop default behaviour of submit button
+            // value of input
+            inputValue = $('#input').val();
+
+            // Ajax - add new item in db
+            $.ajax( {
+               type: "POST",
+                url : "/contacts/groups/" + inputValue ,
+                success:(function(result){
+
+                    // add new list item
+                    if (result){
+                        location.reload();
+                    }
+                }),
+                error: function() {
+                    alert('Error adding group');
+                }
+            });
+
+            // clear value input
+            $('#input').val('');
+
+        });
+
+        // Remove group button
+        $('.removeGroup').on('click', function(btn) {
+             $.ajax( {
+                    url : "/contacts/groups/delete/" + this.id ,
+                    success:(function(result){
+                        location.reload();
+                    }),
+                    error: function() {
+                        alert('Error deleting group');
+                    }
+             });
+        });
+
+     $(".js-example-basic-multiple").select2({
+	    allowClear: true,
+     });
+
+
+    $('.js-example-basic-multiple').select2().on("change", function(e) {
+            gps = [];
+            $('#select2groups :selected').each(function(i, selected){
+                gps[i] = $(selected).val();
+            });
+            $('#contactGroups').val(gps.toString());
+
+    });
+
+
+     $('#toggle-email').change(function () {
+        if ($(this).is(':checked')) {
+          $('#contactsNotify').prop("disabled", false);
+        }
+        else {
+            if (!$('#toggle-sms').prop('checked')){ // if email and sms disabled
+                 $('#contactsNotify').prop("disabled", true);
+            }
+            else {
+                $('#contactsNotify').prop("disabled", false);
+            }
+
+        }
+    });
+
+     $('#toggle-sms').change(function () {
+        if ($(this).is(':checked')) {
+          $('#contactsNotify').prop("disabled", false);
+        }
+        else {
+            if (!$('#toggle-email').prop('checked')){ // if sms and email disabled
+                 $('#contactsNotify').prop("disabled", true);
+            }
+            else {
+                $('#contactsNotify').prop("disabled", false);
+            }
+
+        }
+    });
+
+    }); // End of jQuery
+
+
+	 $(".js-example-tags").select2({
+		theme : "classic",
+	   // placeholder : " Please select "
+        allowClear: true,
+        tags: true
+	 });
+
+    $('#select2_sms').change(function() {
+		var msg = $(this).val();
+		if(msg !='') {
+            $("textarea#message-text").val($("#select2_sms option:selected").text());
+            $('input[type="submit"]').attr('disabled' , false);
+		}
+	});
+
+    @if(flash.get("mobile")=="exists"){
+        $(alert_template).show();
+
+        $("#alert_template button").after('@Messages.get("mobileExists")');
+		$('#alert_template').fadeIn('slow');
+		$('#alert_template .close').click(function(e) {
+			$('#alert_template').hide();
+		});
+    }
+
+    @if(flash.get("mobile")=="wrong"){
+        $(alert_template).show();
+
+        $("#alert_template button").after('@Messages.get("mobileWrong")');
+		$('#alert_template').fadeIn('slow');
+		$('#alert_template .close').click(function(e) {
+			$('#alert_template').hide();
+		});
+    }
+
+    </script>
+
+    @views.html.footer{
+
+    }
+
+</body>
+
+</html>

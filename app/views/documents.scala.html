@@ -1,0 +1,714 @@
+@import org.apache.chemistry.opencmis.client.api._;
+@(categories: Map[String, ArrayList[String]], agencyItems: List[File], commonItems: List[File], tags: List[QueryResult], keyword: String, isAdmin: Boolean, hasEdit: Boolean)
+
+@import helper._
+@import play.i18n._
+
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    @views.html.head {
+        <title>@Messages.get("legislation")</title>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/legislation.css")'>
+        <link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css">
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+        <!--http://michaelsoriano.com/create-a-responsive-photo-gallery-with-bootstrap-framework/-->
+        <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.bsPhotoGallery.js")'></script>
+    }
+
+    <script type="text/javascript" charset="utf-8">
+            $(document).ready(function() {
+                $("#searchButton").click(function() {
+                  location.href="/documents?q="+$("#keyword").val();
+                });
+            });
+
+
+
+            function addTag(){
+                $.ajax({
+                        type: "POST",
+                        url: "/documents/addtag",
+                        data: "tagname="+$("#tagname").val(),
+                        success: (function(data){
+
+                        var tag = $.parseJSON(data);
+                        $("#tagslist").append('<li><input type="checkbox" name="' + tag.name+'" value="'+ tag.nodeRef +'" />' + tag.name+'</li>');
+                        $("#tagslistEdit").append('<li><input type="checkbox" name="' + tag.name+'" value="'+ tag.nodeRef +'" />' + tag.name+'</li>');
+                    }),
+
+                    });
+            }
+
+            function addTagEdit(){
+                $.ajax({
+                        type: "POST",
+                        url: "/documents/addtag",
+                        data: "tagname="+$("#tagnameEdit").val(),
+                        success: (function(data){
+
+                        var tag = $.parseJSON(data);
+                        $("#tagslistEdit").append('<li><input type="checkbox" name="' + tag.name+'" value="'+ tag.nodeRef +'" />' + tag.name+'</li>');
+                        $("#tagslist").append('<li><input type="checkbox" name="' + tag.name+'" value="'+ tag.nodeRef +'" />' + tag.name+'</li>');
+                    }),
+
+                    });
+            }
+
+            function deleteDocAdmin(data){
+                $.ajax({
+                        type : "POST",
+                        data : "id="+data.split(",")[0],
+                        url: "/documents/delete/"+data.split(",")[0],
+                        beforeSend: function (jqXHR, settings) {
+                            url = settings.url + "?" + settings.data;
+                            console.log(url);
+                        },
+                        success :(function(data){
+                        loadAjax();
+                         window.setTimeout(function(){
+                         location.reload();
+                        }, 30000);
+
+                        })
+                });
+            }
+
+            function deleteDoc(data){
+                $.ajax({
+                        type : "POST",
+                        data : "id="+data.split(",")[0],
+                        url: "/documents/delete/"+data.split(",")[0],
+                        beforeSend: function (jqXHR, settings) {
+                            url = settings.url + "?" + settings.data;
+                            console.log(url);
+                        },
+                        success :(function(data){
+                        loadAjax();
+                         window.setTimeout(function(){
+                         location.reload();
+                        }, 30000);
+
+                        })
+                });
+            }
+
+            function downloadDoc(data){
+                $.ajax({
+                        type : "POST",
+                        data : "id="+data.split(",")[0],
+                        url: "/documents/download/"+data.split(",")[0],
+                        success :(function(data){
+                            window.location=data;
+                        })
+                });
+            }
+
+            function getEditId(data){
+                document.getElementById('id2edit').value=data.split(",")[0];
+                document.getElementById('title').value=data.split(",")[1];
+                document.getElementById('description').value=data.split(",")[2];
+
+                document.getElementById('publisher').value=data.split(",")[3];
+                document.getElementById('number').value=data.split(",")[4];
+                document.getElementById('issuing').value=data.split(",")[5];
+
+                var categories = data.split(",")[7].split("#");
+                @for(((key, value), currentIndex) <- categories.zipWithIndex) {
+                    var fill = [];
+                    for (var c in categories){
+                        var options = '@value';
+                        if(options.indexOf(categories[c])>0){
+                            console.log(categories[c]);
+                            fill.push(categories[c]);
+                        }
+                    }
+                    $("#select2categoriesEdit@currentIndex").select2("val", fill);
+                }
+
+                var tags = data.split(",")[6].split("\t");
+                for (var i in tags) {
+                    if (document.getElementById("workspace://SpacesStore/" + tags[i])!=null) {
+                        document.getElementById("workspace://SpacesStore/" + tags[i]).checked = true;
+                    }
+                }
+            }
+    </script>
+
+    <script>
+
+function openModal() {
+    document.getElementById('modal').style.display = 'block';
+    document.getElementById('fade').style.display = 'block';
+}
+
+function loadAjax() {
+    document.getElementById('results').innerHTML = '';
+    openModal();
+    $('html,body').scrollTop(0);
+}
+
+    </script>
+</head>
+
+<body>
+
+@views.html.header {
+}
+
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+
+        @if(flash.containsKey("indexing")) {
+        <div class="alert alert-warning" id="alert_template" role="alert">
+            @flash.get("indexing")
+            <a href="/welcome" class="btn btn-warning btn-xs">
+                <span class="glyphicon glyphicon-home"></span>
+            </a>
+
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+            </button>
+        </div><br/>
+        } else {
+
+        }
+
+        @if(flash.containsKey("contentAlreadyExists")) {
+        <div class="alert alert-danger" id="alert_template_exists" role="alert">
+            @flash.get("contentAlreadyExists")
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+            </button>
+        </div><br/>
+        } else {
+
+        }
+
+        <div class="page-header">
+            <h1>@Messages.get("legislation")</h1>
+        </div>
+
+        <!-----------------------------------------LEFT COLUMN------------------------------------------------->
+        <div class="row">
+            <div class="container col-lg-12" align="center">
+
+                <!--Action buttons-->
+                <div id="actions">
+                    <a class="btn btn-primary idss-default-btn" data-toggle="modal" data-target="#uploadModal">@Messages.get("uploadLegislation")</a>
+                    <a class="btn btn-primary idss-default-btn" data-toggle="modal" data-target="#categoriesModal">@Messages.get("filterCategory")</a>
+                    <a class="btn btn-primary idss-default-btn" href="/documents">@Messages.get("clearFilters")</a>
+                </div>
+
+                <br/>
+
+                <!--Search button-->
+                <div id="search" style="width:50%">
+                    @helper.form(routes.Documents.search()) {
+                    <form class="form-horizontal">
+                        <div class="input-group">
+                            <input type="text" class="form-control" aria-label="..."  id="keyword" name="keyword" required="true" placeholder='@Messages.get("search_for")' width="100%" value="@keyword"/>
+                            <div class="input-group-btn">
+                                <!-- Buttons -->
+                                <button type="submit" id="searchButton" class="btn idss-default-btn" aria-label="Search" title="Search">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <br/><br/><br/>
+
+        <!-----------------------------------------RIGHT COLUMN------------------------------------------------->
+
+        <div class="row">
+        <div class="container col-lg-12">
+
+            @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><a data-toggle="collapse" href="#collapse1">@session.get("agencyDisplay")&nbsp; @Messages.get("repository")</a></h3>
+                </div>
+                <div class="panel-body">
+                    <div id="collapse1" class="panel-collapse">
+
+                        <ul class="row first list-inline">
+                        @for(m <- agencyItems) {
+                            <li>
+                                <img src="@m.getThumbnail()" width="150px" height="150px" class="img-thumbnail">
+                                <div class="text">
+                                    @if(m.getUrl()){
+                                        <button id='@m.getId(),"noAdmindownload"' onclick="downloadDoc(this.id)" class="btn btn-warning btn-xs" title='@Messages.get("download")'><span class="glyphicon glyphicon-arrow-down"></span></button>
+                                    }
+                                    @if(hasEdit){
+                                    <button id='@m.getId(),@m.getTitle,@m.getDescription,@m.getPublisher,@m.getNumber,@m.getIssuingDate,@m.getTags,@m.getCategories,"noAdmin"' onClick="getEditId(this.id)" title='@Messages.get("edit")' class="btn btn-success btn-xs" data-toggle="modal" data-target="#myModalEditDocument"> <span class="glyphicon glyphicon-pencil"></span></button>
+                                    <button id='@m.getId(),"noAdmin' onclick="deleteDoc(this.id)" class="btn btn-danger btn-xs" title='@Messages.get("delete")'><span class="glyphicon glyphicon-trash"></span></button>
+                                    <input type="hidden" id="DocId" value="@m.getId()">
+                                    }
+
+                                    <h5><b>@Messages.get("title"):</b>
+                                        @if(!m.getTitle()){
+                                        <i>n/a</i>
+                                        }
+                                        @if(m.getTitle()){
+                                        <i>@m.getTitle()</i>
+                                        }
+                                    </h5>
+                                    <h5><b>@Messages.get("description"):</b>
+                                        @if(!m.getDescription()){
+                                        <i>n/a</i>
+                                        }
+                                        @if(m.getDescription()){
+                                        <i>@m.getDescription()</i>
+                                        }
+                                    </h5>
+                                    <h5><b>@Messages.get("publisher"):</b>
+                                        @if(!m.getPublisher()){
+                                        <i>n/a</i>
+                                        }
+                                        @if(m.getPublisher()){
+                                        <i>@m.getPublisher()</i>
+                                        }
+                                    </h5>
+                                    <h5><b>@Messages.get("number"):</b>
+                                        @if(!m.getNumber()){
+                                        <i>n/a</i>
+                                        }
+                                        @if(m.getNumber()){
+                                        <i>@m.getNumber()</i>
+                                        }
+                                    </h5>
+                                    <h5><b>@Messages.get("issuingDate"):</b>
+                                        @if(!m.getIssuingDate()){
+                                        <i>n/a</i>
+                                        }
+                                        @if(m.getIssuingDate()){
+                                        <i>@m.getIssuingDate()</i>
+                                        }
+                                    </h5>
+                                    <h5><b>@Messages.get("categories"):</b>
+                                        @if(!m.getCategories()){
+                                            <i>n/a</i>
+                                        }
+                                        @if(m.getCategories()){
+                                            <i>@m.getCategories().replace('#', '-')</i>
+                                        }
+                                    </h5>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                    </div>
+                </div>
+            </div>
+            }
+
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><a data-toggle="collapse" href="#collapse2">@Messages.get("common") &nbsp; @Messages.get("repository")</a></h3>
+                </div>
+                <div class="panel-body">
+                    <div id="collapse2" class="panel-collapse">
+
+                        <ul class="row first list-inline">
+                        @for(m <- commonItems) {
+                        <li>
+                            <img src="@m.getThumbnail()" width="150px" height="150px" class="img-thumbnail">
+                            <div class="text">
+                                @if(m.getUrl()){
+                                    <button id='@m.getId(),"admindownload"' onclick="downloadDoc(this.id)" class="btn btn-warning btn-xs" title='@Messages.get("download")'><span class="glyphicon glyphicon-arrow-down"></span></button>
+                                }
+                                @if(isAdmin){
+                                    <button id='@m.getId(),@m.getTitle,@m.getDescription,@m.getPublisher,@m.getNumber,@m.getIssuingDate,@m.getTags,@m.getCategories,"admin"' onClick="getEditId(this.id)" title='@Messages.get("edit")' class="btn btn-success btn-xs" data-toggle="modal" data-target="#myModalEditDocument"><span class="glyphicon glyphicon-pencil"></span></button>
+                                    <button id='@m.getId(),"admin"' onclick="deleteDocAdmin(this.id)" class="btn btn-danger btn-xs" title='@Messages.get("delete")'><span class="glyphicon glyphicon-trash"></span></button>
+                                    <input type="hidden" id="DocIdAdmin" value="@m.getId()">
+                                }
+                                <h5><b>@Messages.get("title"):</b>
+                                    @if(!m.getTitle()){
+                                    <i>n/a</i>
+                                    }
+                                    @if(m.getTitle()){
+                                    <i>@m.getTitle()</i>
+                                    }
+                                </h5>
+                                <h5><b>@Messages.get("description"):</b>
+                                    @if(!m.getDescription()){
+                                    <i>n/a</i>
+                                    }
+                                    @if(m.getDescription()){
+                                    <i>@m.getDescription()</i>
+                                    }
+                                </h5>
+                                <h5><b>@Messages.get("publisher"):</b>
+                                    @if(!m.getPublisher()){
+                                    <i>n/a</i>
+                                    }
+                                    @if(m.getPublisher()){
+                                    <i>@m.getPublisher()</i>
+                                    }
+                                </h5>
+                                <h5><b>@Messages.get("number"):</b>
+                                    @if(!m.getNumber()){
+                                    <i>n/a</i>
+                                    }
+                                    @if(m.getNumber()){
+                                    <i>@m.getNumber()</i>
+                                    }
+                                </h5>
+                                <h5><b>@Messages.get("issuingDate"):</b>
+                                    @if(!m.getIssuingDate()){
+                                    <i>n/a</i>
+                                    }
+                                    @if(m.getIssuingDate()){
+                                    <i>@m.getIssuingDate()</i>
+                                    }
+                                </h5>
+                                <h5><b>@Messages.get("categories"):</b>
+                                    @if(!m.getCategories()){
+                                    <i>n/a</i>
+                                    }
+                                    @if(m.getCategories()){
+                                    <i>@m.getCategories().replace('#', '-')</i>
+                                    }
+                                </h5>
+                            </div>
+                        </li>
+                        }
+                    </ul>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <a href="javascript: void(0);loadAjax();"></a>
+            <div id="results"></div>
+            <div id="fade"></div>
+            <div id="modal">
+                <img id="loader" src="http://www.andrekozmetika.com/andre/img/loader.gif" /><br/><br/>
+                <p>@Messages.get("leadingMessage")</p>
+            </div>
+        </div>
+        </div>
+
+        <!-----------------------------------------MODALS------------------------------------------------->
+        <!-- Upload document modal -->
+        <div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Upload document
+                        </h4>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        @helper.form(action = routes.Documents.savefile, 'enctype -> "multipart/form-data") {
+                        <form id="uploadDoc" class="form-horizontal">
+                            <fieldset>
+                                <div class="form-group" align="left">
+                                    <!--<h4>Select file </h4>-->
+                                    <label class="label-black">Select file</label>
+                                    <input type="file" name="document" class="form-control" accept="image/*,.xlsx,.xls,.doc,.docx, .ppt,.pptx, .txt, .pdf" required>
+                                </div>
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("title")</label>
+                                    <input type="text" name="title" class="form-control" placeholder='@Messages.get("title")'  required>
+                                </div>
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("description")</label>
+                                    <input type="text" name="description" class="form-control" placeholder='@Messages.get("description")'  required>
+                                </div>
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("publisher")</label>
+                                    <input type="text" name="publisher" class="form-control" placeholder='@Messages.get("publisher")'  required>
+                                </div>
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("number")</label>
+                                    <input type="text" name="number" class="form-control" placeholder='@Messages.get("number")' required>
+                                </div>
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("issuingDate")</label>
+                                    <div class='input-group date' id='datetimepicker8'>
+                                        <input type='text' class="form-control" name="issuing" required/>
+                                        <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                    </div>
+                                </div>
+
+                                <!-- Tags -->
+                                <!--<div class="form-group" align="left">-->
+                                    <!--<label class="label-black">@Messages.get("tags")</label>-->
+                                    <!--<input type="text" name="tagname" id="tagname"/>-->
+                                    <!--<a onclick="addTag()" class="btn btn btn-default" >Add tag</a>-->
+                                    <!--<ul id="tagslist">-->
+                                        <!--@for(t<-tags){-->
+                                        <!--<li>-->
+                                            <!--<input type="checkbox" class="tags" name='tagsList[]' value='@t.getPropertyByQueryName("alfcmis:nodeRef").getFirstValue().toString()'>@t.getPropertyByQueryName("cmis:name").getFirstValue().toString()<br>-->
+                                        <!--</li>-->
+                                        <!--}-->
+                                    <!--</ul>-->
+                                <!--</div>-->
+
+                                <!--Categories-->
+                                <div class="form-group" align="left">
+                                    @for(((key, value), currentIndex) <- categories.zipWithIndex) {
+                                    <div id="categories@currentIndex" class="form-group" align="left">
+                                        <label class="label-black">@key</label>
+                                        <select id="select2categories@currentIndex" class="js-example-basic-multiple" multiple="multiple" style="width: 100%">
+                                            @for(v <- value) {
+                                                <option class="select2-container" value='@v'>@v</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    }
+                                </div>
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="categories" name="categories">
+                                </div>
+
+
+                                <div class="form-group" align="left">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">@Messages.get("cancel")</button>
+                                    <button type="submit" class="btn btn-primary" value="Upload">@Messages.get("upload")</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                        }
+                    </div> <!-- end of modal body -->
+                </div>
+            </div>
+        </div> <!-- end of modal -->
+
+        <!-- Modal edit document -->
+        <div class="modal fade" id="myModalEditDocument" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" align="center">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">@Messages.get("close")</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabelEdit">
+                            @Messages.get("documentEditButton")
+                        </h4>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        @helper.form(action = routes.Documents.updatefile, 'enctype -> "multipart/form-data") {
+                        <form class="form-horizontal" id="form_members_edit">
+                            <fieldset>
+
+                                <input type="hidden" class="form-control" id="id2edit" name="id2edit">
+
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("title")</label>
+                                    <input type="text" name="title" id="title" class="form-control" placeholder='@Messages.get("title")'  required>
+                                </div>
+
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("description")</label>
+                                    <input type="text" name="description" id="description" class="form-control" placeholder='@Messages.get("description")'  required>
+                                </div>
+
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("publisher")</label>
+                                    <input type="text" name="publisher" id="publisher" class="form-control" placeholder='@Messages.get("publisher")'  required>
+                                </div>
+
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("number")</label>
+                                    <input type="text" name="number" id="number" class="form-control" placeholder='@Messages.get("number")'  required>
+                                </div>
+
+                                <div class="form-group" align="left">
+                                    <label class="label-black">@Messages.get("issuingDate")</label>
+                                    <div class='input-group date' id='datetimepicker9'>
+                                        <input type='text' class="form-control" name="issuing" id="issuing" required/>
+                                        <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                    </div>
+                                </div>
+
+                                <!--<div class="form-group" align="left">-->
+                                    <!--<label class="label-black">Tags</label>-->
+                                    <!--<input type="text" name="tagname" id="tagnameEdit"/>-->
+                                    <!--<a onclick="addTagEdit()" class="btn btn btn-default" >Add tag</a>-->
+                                    <!--<ul id="tagslistEdit">-->
+                                        <!--@for(t<-tags){-->
+                                        <!--<li>-->
+                                            <!--<input type="checkbox" class="tags" name='tagsList[]' id='@t.getPropertyByQueryName("alfcmis:nodeRef").getFirstValue().toString()' value='@t.getPropertyByQueryName("alfcmis:nodeRef").getFirstValue().toString()'>@t.getPropertyByQueryName("cmis:name").getFirstValue().toString()<br>-->
+                                        <!--</li>-->
+                                        <!--}-->
+                                    <!--</ul>-->
+                                <!--</div>-->
+
+                                <!--Categories-->
+                                <div class="form-group" align="left">
+                                    @for(((key, value), currentIndex) <- categories.zipWithIndex) {
+                                    <div id="categoriesEdit@currentIndex" class="form-group" align="left">
+                                        <label class="label-black">@key</label>
+                                        <select id="select2categoriesEdit@currentIndex" class="js-example-basic-multiple" multiple="multiple" style="width: 100%">
+                                            @for(v <- value) {
+                                                <option class="select2-container" value='@v'>@v</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    }
+                                </div>
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="categoriesEdit" name="categories">
+                                </div>
+
+                                <div class="form-group" align="left">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">@Messages.get("cancel")</button>
+                                    <button type="submit" class="btn btn-primary" value="Upload">@Messages.get("save")</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- Modal ends here-->
+
+
+        <!-- Filter by tags modal -->
+        <!--<div class="modal fade" id="tagsModal" role="dialog">-->
+        <!--<div class="modal-dialog">-->
+            <!--&lt;!&ndash; Modal content&ndash;&gt;-->
+            <!--<div class="modal-content">-->
+                <!--<div class="modal-header">-->
+                    <!--<button type="button" class="close" data-dismiss="modal">&times;</button>-->
+                    <!--<h4 class="modal-title">Filter documents by tag</h4>-->
+                <!--</div>-->
+                <!--<div class="modal-body">-->
+                    <!--<div class="list-group">-->
+                        <!--@for(t<-tags){-->
+                            <!--<a class="list-group-item" href='/documents?tag=@t.getPropertyByQueryName("cmis:name").getFirstValue().toString()'>@t.getPropertyByQueryName("cmis:name").getFirstValue().toString()</a>-->
+                        <!--}-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="modal-footer">-->
+                    <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+
+        <div class="modal fade" id="categoriesModal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">@Messages.get("filterByCategoryTitle")</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group">
+                            @for(((key, value), currentIndex) <- categories.zipWithIndex) {
+                                <h3>@key</h3>
+                                @for(v <- value) {
+                                    <a class="list-group-item" href='/documents?category=@v'>@v</a>
+                                }
+                                <br/>
+                            }
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div> <!-- /.template -->
+</div><!-- /.container -->
+
+<script type="text/javascript" charset="utf-8">
+        var startDate, endDate;
+        var cats;
+
+        $(function() {
+
+             $('.js-example-basic-multiple').select2().on("change", function(e) {
+                cats = [];
+                @for(((key, value), currentIndex) <- categories.zipWithIndex) {
+
+                    $('#select2categories@currentIndex :selected').each(function(i, selected){
+                      cats.push($(selected).val());
+                    });
+                    /////////////////////////////////
+                    $('#select2categoriesEdit@currentIndex :selected').each(function(i, selected){
+                      cats.push($(selected).val());
+                    });
+                }
+
+                console.log(cats);
+               $('#categories').val(cats.toString());
+               $('#categoriesEdit').val(cats.toString());
+             });
+
+             $(".js-example-basic-multiple").select2({
+                allowClear: true
+             });
+
+
+            // Bootstrap date time picker
+            $('#datetimepicker8').datetimepicker({
+                format: 'DD-MM-YYYY',
+                useCurrent: false,
+            });
+
+            $('#datetimepicker9').datetimepicker({
+                format: 'DD-MM-YYYY',
+                useCurrent: false,
+            });
+
+            $("#datetimepicker8").on("dp.change", function (e) {
+                startDate = e.date._d;
+                $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+            });
+            $("#datetimepicker9").on("dp.change", function (e) {
+                endDate = e.date._d;
+                $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+            });
+            ////////////////////////////////////////////////////////////////////
+
+            $('ul.first').bsPhotoGallery({
+                "classes" : "col-lg-2 col-md-4 col-sm-3 col-xs-4 col-xxs-12",
+                "hasModal" : false
+            });
+
+        }); // End of jquery
+
+    </script>
+
+@views.html.footer{
+
+}
+
+</body>
+</html>

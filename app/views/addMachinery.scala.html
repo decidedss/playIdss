@@ -1,0 +1,305 @@
+@(machineriesType: List[MachineryType], machineriesLayer: List[MachineryLayer], machineriesOther: List[MachineryLayer], vehicleType: Map[Integer, String], isAdmin: Boolean, hasEdit: Boolean, isAgencyAdmin: Boolean, groupnameAgency: Map[String, String])
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<!--show machinery instances-->
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("editMachineryTitle")</title>
+    <script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.8/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/machinery.css")'>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/addMachinery.js")'></script>
+    }
+
+</head>
+
+<body>
+
+@views.html.header {
+}
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("addMachineryHeader")</h1>
+        <br/>
+
+        <div class="container col-lg-12" align="left">
+            <br/>
+
+            @if(isAdmin || isAgencyAdmin){
+                <div align="right">
+                    <a href="/resources/machinery/addType" class="btn btn-danger" id="addMachinery">@Messages.get("typeButton")</a>&ensp;
+                </div>
+            }
+
+            <br/>
+
+            @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+            <h3>@Messages.get("titleListMine")</h3><br/>
+            }
+            <div style="text-align: left;" >
+                <table id="machineryInstance" class="table table-hover" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        @if(!isAdmin){
+                        @if(hasEdit){
+                        <th>@Messages.get("edit")</th>
+                        }
+                        }
+
+                        @if(isAdmin){
+                        <th>@Messages.get("agency")</th>
+                        }
+                        <th>@Messages.get("vehicleType")</th>
+                        <th>@Messages.get("brand")</th>
+                        <th>@Messages.get("licensePlate")</th>
+                        <th>@Messages.get("horsepower")</th>
+                        <th>@Messages.get("seat")</th>
+                        <th>@Messages.get("equipment")</th>
+                        <th>@Messages.get("cargo")</th>
+                        <th>@Messages.get("capacity")</th>
+                        <th>@Messages.get("driver")</th>
+                        <th>@Messages.get("disaster")</th>
+                        <th>@Messages.get("equipmentCondition")</th>
+                        <th>@Messages.get("tiresCondition")</th>
+                        <th>@Messages.get("notes")</th>
+                        <th>@Messages.get("availability")</th>
+                        @if(!isAdmin || !hasEdit){
+                        @if(hasEdit){
+                        <th>@Messages.get("delete")</th>
+                        }
+                        }
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @for((m, index) <- machineriesLayer.zipWithIndex) {
+                    <tr>
+                        <td>@(index+1)</td>
+                        @if(!isAdmin){
+                        @if(hasEdit){
+                        <td>
+                            <input type="button" id='@m.getId(),edit' value='@Messages.get("edit")' class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModalNormEditInstance"/>
+                        </td>
+                        }
+                        }
+
+                        @if(isAdmin){
+                        <td>
+                            @m.getAgencyDisplay()
+                        </td>
+                        }
+                        <td>@vehicleType.get(m.getMachinery_id())</td>
+                        <td>@m.getBrand()</td>
+                        <td>@m.getLicence_plate()</td>
+                        <td>@m.getBhp()</td>
+                        <td>@m.getSeats()</td>
+                        <td>@m.getEquipment()</td>
+                        <td>@m.getCargo_type()</td>
+                        <td>@m.getCapacity_m3()</td>
+                        <td>@m.getDriver()</td>
+                        <td>@m.getDisaster_type()</td>
+                        <td>@m.getMachinery_status()</td>
+                        <td>@m.getTires_status()</td>
+                        <td>@m.getNotes()</td>
+                        <td>
+                            @if(m.getAvailability().equals("true")){@Messages.get("yes")}
+                            @if(m.getAvailability().equals("false")){@Messages.get("no")}
+                        </td>
+                        @if(!isAdmin){
+                        @if(hasEdit){
+                        <td>
+                            <input type="button" id='@m.getId(),delete' value='@Messages.get("delete")' class="btn btn-danger btn-sm"/>
+                        </td>
+                        }
+                        }
+                    </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+
+            @if(!isAdmin){
+            <br/><h3>@Messages.get("titleListOther")</h3><br/>
+            <div style="text-align: left;" >
+                <table id="machineryInstanceOther" class="table table-hover" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>@Messages.get("agency")</th>
+                        <th>@Messages.get("vehicleType")</th>
+                        <th>@Messages.get("brand")</th>
+                        <th>@Messages.get("licensePlate")</th>
+                        <th>@Messages.get("horsepower")</th>
+                        <th>@Messages.get("seat")</th>
+                        <th>@Messages.get("equipment")</th>
+                        <th>@Messages.get("cargo")</th>
+                        <th>@Messages.get("capacity")</th>
+                        <th>@Messages.get("driver")</th>
+                        <th>@Messages.get("disaster")</th>
+                        <th>@Messages.get("equipmentCondition")</th>
+                        <th>@Messages.get("tiresCondition")</th>
+                        <th>@Messages.get("notes")</th>
+                        <th>@Messages.get("availability")</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @for((m, index) <- machineriesOther.zipWithIndex) {
+                    <tr>
+                        <td>@(index+1)</td>
+
+                        <td>@groupnameAgency.get(m.getAgency())</td>
+
+                        <td>@vehicleType.get(m.getMachinery_id())</td>
+                        <td>@m.getBrand()</td>
+                        <td>@m.getLicence_plate()</td>
+                        <td>@m.getBhp()</td>
+                        <td>@m.getSeats()</td>
+                        <td>@m.getEquipment()</td>
+                        <td>@m.getCargo_type()</td>
+                        <td>@m.getCapacity_m3()</td>
+                        <td>@m.getDriver()</td>
+                        <td>@m.getDisaster_type()</td>
+                        <td>@m.getMachinery_status()</td>
+                        <td>@m.getTires_status()</td>
+                        <td>@m.getNotes()</td>
+                        <td>
+                            @if(m.getAvailability().equals("true")){@Messages.get("yes")}
+                            @if(m.getAvailability().equals("false")){@Messages.get("no")}
+                        </td>
+                    </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            }
+
+            <!-- Modal edit machinery Instance -->
+            <div class="modal fade" id="myModalNormEditInstance" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">@Messages.get("close")</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabelEdit">
+                                @Messages.get("instanceEditButton")
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(action = routes.Resources.machineryLayerUpdate, 'enctype -> "multipart/form-data") {
+                            <form class="form-horizontal" id="form_members_edit">
+                                <fieldset>
+
+                                    <div class="form-group" align="left">
+                                        <input type="hidden" class="form-control" id="id" name="id">
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <input type="hidden" class="form-control" id="machinery_id" name="machinery_id" value="9">
+                                    </div>
+
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("brand")</h4>
+                                        <input type="text" class="form-control" id="brand" name="brand" placeholder='@Messages.get("forInstance") Fiat'>
+                                    </div>
+
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("licensePlate")</h4>
+                                        <input type="text" class="form-control" id="licence_plate" name="licence_plate" placeholder='@Messages.get("forInstance") NHI 2233'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("horsepower")</h4>
+                                        <input type="text" class="form-control" id="bhp" name="bhp" placeholder='@Messages.get("forInstance") 75'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("seat")</h4>
+                                        <input type="text" class="form-control" id="seats" name="seats" placeholder='@Messages.get("forInstance") 5'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("equipment")</h4>
+                                        <input type="text" class="form-control" id="equipment" name="equipment" placeholder='@Messages.get("equipment")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("cargo")</h4>
+                                        <input type="text" class="form-control" id="cargo_type" name="cargo_type" placeholder='@Messages.get("cargo")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("capacity")</h4>
+                                        <input type="text" class="form-control" id="capacity_m3" name="capacity_m3" placeholder='@Messages.get("capacity")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("driver")</h4>
+                                        <input type="text" class="form-control" id="driver" name="driver" placeholder='@Messages.get("driver")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("disaster")</h4>
+                                        <input type="text" class="form-control" id="disaster_type" name="disaster_type" placeholder='@Messages.get("forInstance") @Messages.get("fire")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("equipmentCondition")</h4>
+                                        <input type="text" class="form-control" id="machinery_status" name="machinery_status" placeholder='@Messages.get("forInstance") @Messages.get("needsChecking")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("tiresCondition")</h4>
+                                        <input type="text" class="form-control" id="tires_status" name="tires_status" placeholder='@Messages.get("forInstance") @Messages.get("needsChecking")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("notes")</h4>
+                                        <input type="text" class="form-control" id="notes" name="notes" placeholder='@Messages.get("yourNotes")'>
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("availability")</h4>
+                                        <input type="radio" name="availability" value="true" checked> @Messages.get("yes") <br/>
+                                        <input type="radio" name="availability" value="false"> @Messages.get("no")
+                                    </div>
+
+                                    <!-- ADD THE REST OF THE FIELDS HERE -->
+                                    <div class="form-group" align="left">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">@Messages.get("close")</button>
+                                        <button type="submit" class="btn btn-default">@Messages.get("update")</button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal till here-->
+            <br/>
+
+        </div>
+
+    </div>
+</div>
+
+@views.html.footer{
+}
+</body>
+
+</html>

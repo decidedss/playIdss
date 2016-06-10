@@ -1,0 +1,54 @@
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>@Messages.get("remotesensing")</title>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/remotesensing.css")'>
+    }
+</head>
+
+<script type="text/javascript">
+
+</script>
+
+<body>
+
+@views.html.header {
+}
+
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("remotesensing")</h1><br/>
+        <br/>
+
+        <div class="container col-lg-1">
+        </div>
+
+        <div class="container col-lg-10">
+
+            <object width="640" height="360">
+                <param name="movie" value="https://www.youtube.com/embed/vjUAL2lDWF8"/>
+                <param name="allowFullScreen" value="true"/>
+                <param name="allowscriptaccess" value="always"/>
+                <embed width="640" height="360" src="https://www.youtube.com/embed/vjUAL2lDWF8" type="text/html" allowscriptaccess="always" allowfullscreen="true"/>
+            </object>
+
+
+        </div>
+
+        <div class="container col-lg-1">
+        </div>
+
+    </div>
+</div>
+
+@views.html.footer{
+}
+</body>
+
+</html>

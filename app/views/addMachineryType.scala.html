@@ -1,0 +1,252 @@
+@(machineriesType: List[MachineryType], machineriesTypeAgency: List[MachineryType], vehicleType: Map[Integer, String], isAdmin: Boolean, isAgencyAdmin: Boolean, hasEdit: Boolean)
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<!--show/add machinery types-->
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("machineryType")</title>
+    <script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.8/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/machinery.css")'>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/addMachineryType.js")'></script>
+    }
+
+</head>
+
+<body>
+
+@views.html.header {
+}
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("typeButton")</h1>
+        <br/>
+
+        <div class="container col-lg-12" align="left">
+
+            <h3>@Messages.get("titleListTypeOther")</h3><br/>
+
+            @if(isAdmin){
+                <div align="left">
+                    <button id="addMachinery" class="btn btn-default idss-default-btn" data-toggle="modal" data-target="#myModalNorm">
+                        @Messages.get("addMachineryType")
+                    </button>
+                </div>
+
+                <br/><br/>
+            }
+
+            <div>
+                <table id="machinery" class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        @if(isAdmin){
+                        <th>@Messages.get("edit")</th>
+                        }
+                        <th>@Messages.get("image")</th>
+                        <th>@Messages.get("vehicleType")</th>
+                        @if(isAdmin){
+                            <th>@Messages.get("delete")</th>
+                        }
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @for((m, index) <- machineriesType.zipWithIndex) {
+                    <tr>
+                        <td>@(index+1)</td>
+                        @if(isAdmin){
+                        <td>
+                            <input type="button" id='@m.getId(),edit' value='@Messages.get("edit")' class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModalNormEdit"/>
+                        </td>
+                        }
+                        <td><img src='@m.getIcon()' width="40" height="40"></td>
+                        <td>@m.getVehicle_type()</td>
+
+                        @if(isAdmin){
+                        <td>
+                            <input type="button" id='@m.getId(),delete' value='@Messages.get("delete")' class="btn btn-danger btn-sm"/>
+                        </td>
+                        }
+                    </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+
+            @if(isAgencyAdmin){
+            <h3>@Messages.get("titleListTypeMine")</h3><br/>
+
+            <div align="left">
+                <!-- Button trigger modal -->
+                <button id="addMachinery" class="btn btn-default idss-default-btn" data-toggle="modal" data-target="#myModalNorm">
+                    @Messages.get("addMachineryType")
+                </button>
+            </div>
+            }
+
+            @if(machineriesTypeAgency.size() > 0){
+
+            @if(!isAgencyAdmin){
+            <h3>@Messages.get("titleListTypeMine")</h3>
+            }
+
+            <br/><br/>
+
+            <div>
+                <table id="machineryMine" class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        @if(hasEdit){
+                            <th>@Messages.get("edit")</th>
+                        }
+                        <th>@Messages.get("image")</th>
+                        <th>@Messages.get("vehicleType")</th>
+                        @if(hasEdit){
+                            <th>@Messages.get("delete")</th>
+                        }
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @for((m, index) <- machineriesTypeAgency.zipWithIndex) {
+                    <tr>
+                        <td>@(index+1)</td>
+                        @if(hasEdit){
+                            <td>
+                                <input type="button" id='@m.getId(),editM' value='@Messages.get("edit")' class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModalNormEdit"/>
+                            </td>
+                        }
+                        <td><img src='@m.getIcon()' width="40" height="40"></td>
+                        <td>@m.getVehicle_type()</td>
+                        @if(hasEdit){
+                            <td>
+                                <input type="button" id='@m.getId(),deleteM' value='@Messages.get("delete")' class="btn btn-danger btn-sm"/>
+                            </td>
+                        }
+                    </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            }
+
+            <!-- Modal add machinery Type -->
+            <div class="modal fade" id="myModalNorm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">@Messages.get("close")</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                @Messages.get("addMachineryType")
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(action = routes.Resources.machineryTypeAdd, 'enctype -> "multipart/form-data") {
+                            <form class="form-horizontal" id="form_members_add">
+                                <fieldset>
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("vehicleType")</h4>
+                                        <input type="text" class="form-control" name="vehicle_type" placeholder='@Messages.get("vehicleType")' required>
+                                    </div>
+
+                                    <br/>
+                                    <div class="form-group" align="left">
+                                        <h4>@Messages.get("addDefaultImage")</h4>
+                                        <input type="file" class="" accept=".jpg, .png, .bmp" name="image" id="imgInp" required>
+                                        <p class="help-block">@Messages.get("uploadIconInfo")</p>
+                                        <img id="imgPreview" src="#" alt="" class="img-rounded img-responsive" width="200" height="200"/>
+                                    </div>
+                                    <br/>
+
+                                    <!-- ADD THE REST OF THE FIELDS HERE -->
+                                    <div class="form-group" align="left">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">@Messages.get("close")</button>
+                                        <button type="submit" class="btn btn-default">@Messages.get("save")</button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal till here-->
+
+            <!-- Modal edit machinery Type -->
+            <div class="modal fade" id="myModalNormEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabelEdit">
+                                Edit Machinery Type
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(action = routes.Resources.machineryTypeUpdate, 'enctype -> "multipart/form-data") {
+                            <form class="form-horizontal" id="form_members_edit">
+                                <fieldset>
+
+                                    <div class="form-group" align="left">
+                                        <input type="hidden" class="form-control" id="id" name="id">
+                                    </div>
+
+                                    <div class="form-group" align="left">
+                                        <h4>Vehicle Type</h4>
+                                        <input type="text" class="form-control" id="vehicle_type" name="vehicle_type" placeholder="Vehicle Type" required>
+                                    </div>
+
+                                    <br/>
+                                    <div class="form-group" align="left">
+                                        <h4>Add default image</h4>
+                                        <input type="file" class="" accept=".jpg, .png, .bmp" name="image" id="imgInp_edit" required>
+                                        <p class="help-block">Upload small icon (up to 50px) to represent the machinery type.</p>
+                                        <img id="imgPreview_edit" src="#" alt="" class="img-rounded img-responsive" width="200" height="200"/>
+                                    </div>
+                                    <br/>
+
+                                    <!-- ADD THE REST OF THE FIELDS HERE -->
+                                    <div class="form-group" align="left">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-default">Update</button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal till here-->
+
+        </div>
+
+    </div>
+</div>
+
+@views.html.footer{
+}
+</body>
+
+</html>

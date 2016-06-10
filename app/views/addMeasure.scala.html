@@ -1,0 +1,171 @@
+@(mForm: Form[Measure], categoriesEn: List[String], categoriesEl: List[String])
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+    @views.html.head {
+    <title>MEASURES PAGE</title>
+    }
+</head>
+<body>
+
+@views.html.header {
+}
+
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <div class="page-header">
+            <h1>@Messages.get("measures")</h1>
+            <hr/>
+        </div>
+
+        <div class="container col-lg-3" >
+        </div>
+
+        <div class="container col-lg-6" >
+
+        <div class="panel panel-default">
+            <div class="panel-heading"><strong>@Messages.get("add_measure")</strong></div>
+
+            <div class="panel-body">
+                @helper.form(routes.Measures.newMeasure()) {
+
+                <div align="left">
+                    <p><i>Please fill in all the following fields concerning the measure you would like to add:</i></p>
+                </div>
+                <form>
+
+                    <div align="left">
+                        <div class="form-group">
+                            <label for="name">@Messages.get("measure_name"):</label>
+                            <input type="text"  class="form-control" name="name" id="name" placeholder=@Messages.get("measure_name")>
+                        </div>
+                    </div>
+
+                    <div align="left">
+                        <div class="form-group">
+                            <label for="category">@Messages.get("category"):</label>
+                            <select name="category" required id="category" class="js-example-basic-single select2-container" style="width: 100%" data-placeholder='@Messages.get("selectPhase")'>
+                            <option selected disabled></option>
+                            @if(session.get("lang").contains("el")){
+                                @for(category <- categoriesEl) {
+                                    <option class="select2-container" value='@category'>@category</option>
+                                }
+                            }
+                            @if(session.get("lang").contains("en")){
+                                @for(category <- categoriesEn) {
+                                    <option class="select2-container" value='@category'>@category</option>
+                                }
+                            }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div align="left">
+                        <div class="form-group">
+                            <label for="location">@Messages.get("location"):</label>
+                            <input type="text" class="form-control" name="location" id="location" placeholder=@Messages.get("location")>
+                        </div>
+                    </div>
+
+                    <div align="left">
+                        <div class="form-group">
+                            <label for="description">@Messages.get("description"):</label>
+                            <input type="text" class="form-control" name="description" id="description" placeholder=@Messages.get("description")>
+                        </div>
+                    </div>
+
+                    <div align="left">
+                        <div class="form-group">
+                            <label for="budget">@Messages.get("budget"):</label>
+                            <input type="text" class="form-control" name="budget" id="budget" placeholder=@Messages.get("budget")>
+                        </div>
+                    </div>
+
+                    <div align="left">
+                        <div class="form-group">
+                            <label for="riskaddressing">@Messages.get("riskaddressing"):</label>
+                            <input type="text" class="form-control" name="riskaddressing" id="riskaddressing" placeholder=@Messages.get("riskaddressing")>
+                        </div>
+                    </div>
+
+                    <div align="left">
+                        <div class="form-group">
+                            <label for="startdate">@Messages.get("start_date"):</label>
+                            <div class='input-group date' id='startdate'>
+                                <input type='text' class="form-control" name="startdate"  placeholder='@Messages.get("click") @Messages.get("start_date")' required/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div align="left">
+                        <div class="form-group">
+                            <label for="enddate">@Messages.get("end_date"):</label>
+                            <div class='input-group date' id='enddate'>
+                                <input type='text' class="form-control" name="enddate" placeholder='@Messages.get("click") @Messages.get("end_date")' required/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">@Messages.get("save_measure")</button>
+
+                </form>
+                }
+                <br/><br/>
+                <div class="pull-right">
+                    <a href="/measures" class="btn btn-primary" role="button" style="width:80px;"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back</a>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="container col-lg-3" >
+        </div>
+
+
+    </div>
+    </div>
+</div><!-- /.container -->
+
+<script type="text/javascript">
+    $("input").prop('required',true);
+    $("select").prop('required',true);
+
+    $.fn.datepicker.defaults.format = "yyyy-mm-dd";
+
+    <!--$('#startdate').datepicker();-->
+    $('#startdate').datepicker().on('changeDate',function(e) {
+        $('#startdate').datepicker('hide');
+    });
+
+    <!--$('#enddate').datepicker();-->
+    $('#enddate').datepicker().on('changeDate',function(e) {
+        $('#enddate').datepicker('hide');
+    });
+
+    $(".js-example-basic-single").select2({
+		    theme : "classic"
+	});
+</script>
+
+@views.html.footer{
+
+}
+
+
+</body>
+</html>

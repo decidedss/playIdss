@@ -1,0 +1,123 @@
+@import play.i18n._
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>@Messages.get("welcome")</title>
+        <link rel="stylesheet" href='@routes.Assets.at("stylesheets/welcome.css")'>
+    }
+</head>
+
+<style>
+    #layertree li > span {
+        cursor: pointer;
+    }
+
+    label {
+        color: whitesmoke;
+        text-decoration: none;
+    }
+
+    .padding{
+        padding: 4px 0;
+    }
+</style>
+
+<body>
+    @views.html.header {
+    }
+
+    <div class="container-fluid">
+        <div class="starter-template">
+
+            <div class="row">
+
+                @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+                <!-- NOTIFY -->
+                <div class="container col-lg-2">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">@Messages.get("notify")</div>
+                        <div class="panel-body" align="left">
+                            <strong>
+                                <a class="button-links padding" href="/reporting">@Messages.get("eventReporting")</a><br/>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- MANAGE -->
+                <div class="container col-lg-3">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">@Messages.get("manage")</div>
+                        <div class="panel-body" align="left">
+                            <strong>
+                                <a class="button-links padding" href="/resources/infrastructure">@Messages.get("infrastructure")</a><br/>
+                                <a class="button-links padding" href="/resources/machinery">@Messages.get("machineries")</a><br/>
+                                <a class="button-links padding" href="/contacts">@Messages.get("humanResources")</a><br/>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW -->
+                <div class="container col-lg-3">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">@Messages.get("view")</div>
+                        <div class="panel-body" align="left">
+                            <strong>
+                                <a class="button-links padding" href="/documents">@Messages.get("legislation")</a><br/>
+                                <a class="button-links padding" href="/climate">@Messages.get("climate")</a><br/>
+                                <a class="button-links padding" href="/maps">@Messages.get("mapsAndData")</a><br/>
+                                <hr/>
+                                <a class="button-links padding" href="/events">@Messages.get("events")</a><br/>
+                                <a class="button-links padding" href="/disasters">@Messages.get("disasters")</a><br/>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLAN -->
+                <div class="container col-lg-2">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">@Messages.get("plan")</div>
+                        <div class="panel-body" align="left">
+                            <strong>
+                                <a class="button-links padding" href="/actions">@Messages.get("actions")</a><br/>
+                                <a class="button-links padding" href="/measures">@Messages.get("measures")</a><br/>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACT -->
+                <div class="container col-lg-2">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">@Messages.get("act")</div>
+                        <div class="panel-body" align="left">
+                            <strong>
+                                <a class="button-links padding" href="/routing">@Messages.get("routing")</a><br/>
+                                <a class="button-links padding" href="/traffic">@Messages.get("traffic")</a><br/>
+                                <a class="button-links padding" href="/remotesensing">@Messages.get("remotesensing")</a><br/>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+       // $('#layertree').append("<strong>here will append the rest of the data</strong>");
+    </script>
+</body>
+
+@views.html.footer{
+
+}
+
+</html>

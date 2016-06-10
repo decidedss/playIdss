@@ -1,0 +1,21 @@
+.page-header {
+    margin: 0 !important;
+}
+
+#addeventtype{
+    margin-bottom: -100px;
+    margin-right: 12px;
+}
+
+body {
+    background-color: #1E3251;
+    color: white;
+}
+
+.modal-content {
+    color: #1e3251;
+}
+
+.select2-container {
+    color: black;
+}

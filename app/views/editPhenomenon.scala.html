@@ -1,0 +1,125 @@
+@(phenomenon: List[ActionsPhenomenon], isAdmin: Boolean, hasEdit: Boolean, isAgencyAdmin: Boolean, agency: String)
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<!--show machinery instances-->
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("editMachineryTitle")</title>
+    <script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.8/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" media='screen' href='@routes.Assets.at("stylesheets/actions.css")'>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/editPhenomenonActions.js")'></script>
+    }
+
+</head>
+
+<body>
+
+@views.html.header {
+}
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("editPhenomenon")</h1>
+        <br/>
+
+        <div class="container col-lg-12 actions-table" align="left">
+            <br/>
+
+            <div style="text-align: left;" >
+                <table id="phenomenonTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>@Messages.get("phenomenon")</th>
+                        <th>@Messages.get("edit")</th>
+                        <th>@Messages.get("delete")</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    @for(m <- phenomenon) {
+                    @if(agency == m.getAgency() || isAdmin){
+                        <tr>
+                            <td>@m.getTitle()</td>
+                            @if(hasEdit || (isAdmin && agency == m.getAgency())){
+                                <td>
+                                    <input type="button" id='@m.getId(),edit' value='@Messages.get("edit")' class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editPhenomenon"/>
+                                </td>
+                                <td>
+                                    <input type="button" id='@m.getId(),delete' value='@Messages.get("delete")' class="btn btn-danger btn-sm"/>
+                                </td>
+                            }
+                            @if(!hasEdit && (isAdmin && agency != m.getAgency())){
+                                <td>-</td>
+                                <td>-</td>
+                            }
+                        </tr>
+                    }
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal edit phenomenon - action -->
+            <div class="modal fade" id="editPhenomenon" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">@Messages.get("close")</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabelEdit">
+                                @Messages.get("editPhenomenon")
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(action = routes.Actions.updatePhenomenon, 'enctype -> "multipart/form-data") {
+                            <form class="form-horizontal" id="form_members_edit">
+
+                                <div class="form-group" align="left">
+                                    <input type="hidden" class="form-control" id="id" name="id">
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="title">@Messages.get("phenomenon"):</label>
+                                        <input type="text"  class="form-control" name="title" id="title" placeholder='@Messages.get("phenomenon")'>
+                                    </div>
+                                </div>
+
+                                <input id="agency" name="agency" value="@agency" type="hidden"/>
+
+                                <button type="submit" class="btn btn-primary">@Messages.get("update")</button>
+
+                            </form>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal till here-->
+
+
+
+
+
+        </div>
+
+    </div>
+</div>
+
+@views.html.footer{
+}
+</body>
+
+</html>

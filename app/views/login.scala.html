@@ -1,0 +1,149 @@
+@(form: Form[Application.Login], warning: String)
+
+@import play.i18n._
+@import helper._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>@Messages.get("idssLoginTitle")</title>
+
+    @views.html.head {
+    }
+</head>
+
+<body>
+
+    <style>
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #eee;
+
+            background: url(assets/images/black-forest-816113.jpg) no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+
+        .btn-block {
+            display: block;
+            width: 50%;
+        }
+
+        .view-logo img {
+            max-width: 100%;
+            height: auto;
+            <!--opacity: 0.8;-->
+            <!--margin: 30px;-->
+            <!--filter: alpha(opacity=20);-->
+            <!--background-color: #ffffff;-->
+        }
+
+
+        .view-logo-small img {
+            max-width: 100%;
+            height: auto;
+            <!--opacity: 0.8;-->
+            <!--margin: 30px;-->
+            <!--filter: alpha(opacity=20);-->
+            <!--background-color: #ffffff;-->
+        }
+
+
+    </style>
+
+    <div class="container">
+        <div class="row">
+            <div class="container col-lg-1">
+            </div>
+            <div class="container col-lg-10">
+                <a class="btn btn-default idss-default-btn" href="/signup/agency" style="float:left;">@Messages.get("signup")</a>
+                <div style="float:right;">
+                    @if(session.get("lang").contains("en")){
+                        <a class="activeLocale loginLocale" href="/lang/en">en</a>
+                        &emsp;
+                        <a class="loginLocale" href="/lang/el">el</a>
+                    }
+
+                    @if(session.get("lang").contains("el")){
+                        <a class="loginLocale" href="/lang/en">en</a>
+                        &emsp;
+                        <a class="activeLocale loginLocale" href="/lang/el">el</a>
+                    }
+                </div>
+            </div>
+            <div class="container col-lg-1">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container col-lg-1">
+            </div>
+
+            <div class="container col-lg-10" align="center">
+                @helper.form(routes.Application.authenticate) {
+                <br/>
+                <form class="form-signin" autocomplete="off">
+                    <div class="view-logo">
+                        <img class="img-fluid" alt="Decide Logo" src="/assets/images/logo_with_text_big.png"  height="319" width="843" align="left">
+                    </div>
+
+                    <div class="view-logo-small">
+                        <img class="img-fluid" alt="Decide Logo Small" src="/assets/images/logo_with_text_cropped.png" height="180px" width="160px">
+                        <br/><br/>
+                    </div>
+
+                    <label for="username" class="sr-only">Username</label>
+                    <input name="username" type="text" id="username" class="form-control" placeholder='@Messages.get("username")' required autofocus style="width:50%; white-space: normal;">
+                    <br/>
+                    <!-- Fake fields that help autocomplete work event for google chrome -->
+                    <input style="visibility: hidden; position: absolute; left:-99999px" type="password" name="fakepasswordfieldtoturnoffautocomplete">
+
+                    <label for="password" class="sr-only">Password</label>
+                    <input name="password" type="password" id="password" class="form-control" placeholder='@Messages.get("password")' required style="width:50%; white-space: normal;">
+                    <br/>
+                    <button class="btn btn-lg btn-primary btn-block"  id="loginbutton" type="submit">@Messages.get("login")</button>
+                    <div align="right" style="width:50%; white-space: normal;"><a href="/password/update">@Messages.get("forgotPassword")</a></div>
+                </form>
+                }
+                <br/>
+                <div class="alert alert-warning" id="alert_template" role="alert" style="display: none;">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">@Messages.get("close")</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="container col-lg-1">
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+         @if(warning){
+           $(alert_template).show();
+
+            $("#alert_template button").after('@warning');
+            $('#alert_template').fadeIn('slow');
+            $('#alert_template .close').click(function(e) {
+                $('#alert_template').hide();
+            });
+         }
+
+    </script>
+
+
+</body>
+
+</html>

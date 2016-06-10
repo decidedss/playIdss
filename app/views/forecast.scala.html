@@ -1,0 +1,462 @@
+@(geodataCoords: Map[String, Map[Double, Double]])
+@import play.i18n._
+
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>Forecast</title>
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" media='screen' href='@routes.Assets.at("stylesheets/forecast.css")'>
+    <link rel="stylesheet" href="//rawgithub.com/Caged/d3-tip/master/examples/example-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+    }
+</head>
+
+<body onload="drawMap()">
+
+<script type="text/javascript">
+var map ;
+
+var olRoute;
+var point;
+var points = [];
+var eventLocation;
+
+function drawMap() {
+    // Base Layers
+    var source = new ol.source.OSM({
+             layers: 'basic'
+    });
+
+    var osm = new ol.layer.Tile({
+     source: source,
+     name: "osm"
+     });
+
+    olRoute  = new ol.layer.Vector({
+        source: new ol.source.Vector()
+    });
+
+    var thessaloniki = [22.9308600, 40.6436200];
+    var thessalonikiMercator = ol.proj.fromLonLat(thessaloniki);
+
+    var view = new ol.View({
+        center: thessalonikiMercator,
+        zoom: 7
+    });
+
+    var features = [];
+
+    @for((key, value) <- geodataCoords){
+        <!--alert(@value.entrySet().iterator().next().getValue());-->
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.transform([@value.entrySet().iterator().next().getValue(), @value.entrySet().iterator().next().getKey()], 'EPSG:4326', 'EPSG:3857')),
+            name: '@key',
+            population: 4000,
+            rainfall: 500
+        });
+
+        var iconStyle = new ol.style.Style({
+          image: new ol.style.Icon( ({
+            anchor: [0.5, 46],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            opacity: 0.75,
+            src: 'https://cdn3.iconfinder.com/data/icons/glypho-travel/64/map-pin-marker-circle-64.png'
+          }))
+        });
+
+        iconFeature.setStyle(iconStyle);
+
+        features.push(iconFeature);
+    }
+
+    var vectorSource = new ol.source.Vector({
+          features: features
+    });
+
+    var vectorLayer = new ol.layer.Vector({
+          source: vectorSource
+    });
+
+    map = new ol.Map({
+            layers: [osm, olRoute, vectorLayer],
+            target: 'map',
+            view: view
+    });
+
+    var element = document.getElementById('popup');
+
+    var popup = new ol.Overlay({
+      element: element,
+      positioning: 'bottom-center',
+      stopEvent: false
+    });
+    map.addOverlay(popup);
+
+    document.getElementById("chartsResults").style.visibility = "hidden";
+
+    map.on('click', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel,
+          function(feature, layer) {
+            return feature;
+          });
+        if (feature) {
+            document.getElementById("chartsResults").style.visibility = "visible";
+
+            popup.setPosition(evt.coordinate);
+            $(element).popover({
+              'placement': 'top',
+              'html': true,
+              'content': feature.get('name')
+            });
+
+            $(".head h4").html(feature.get('name'));
+
+            Chart.types.Line.extend({
+                name: "LineAlt",
+                draw: function () {
+                    Chart.types.Line.prototype.draw.apply(this, arguments);
+
+                    var ctx = this.chart.ctx;
+                    ctx.save();
+                    // text alignment and color
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "bottom";
+                    ctx.fillStyle = this.options.scaleFontColor;
+                    // position
+                    var x = this.scale.xScalePaddingLeft * 0.4;
+                    var y = this.chart.height / 2;
+                    // change origin
+                    ctx.translate(x, y)
+                    // rotate text
+                    ctx.rotate(-90 * Math.PI / 180);
+                    ctx.fillText(this.datasets[0].label, 0, 0);
+                    ctx.restore();
+                }
+            });
+
+
+            <!---------CAPACITATION--------->
+            var data = [];
+            var labels = [];
+
+            $.ajax( {
+                <!--type: "GET",-->
+                url : "/forecast/getCapacitation/" + feature.get('name'),
+                success :(function(result){
+
+                  for(var x in result){
+                        labels.push(x);
+                        data.push(result[x]);
+
+                  }
+                  var lineData = {
+                  labels: labels,
+                  datasets: [
+                  {
+                    label: "Percentage (%)",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: data
+                  }
+                ]};
+
+
+
+                var ctx = document.getElementById("myChartCapacitation").getContext("2d");
+                var myLineChart = new Chart(ctx).LineAlt(lineData, {
+                    responsive: false,
+                    tooltipTemplate: "<%= value %>",
+                    showTooltips: true,
+                    onAnimationComplete: function()
+                    {
+                        this.showTooltip(this.datasets[0].points, true);
+                    },
+                    tooltipEvents: [],
+                    scaleLabel: "          <%=value%>"
+                });
+                }),
+                error: (function(result){
+                    console.log(result);
+                    })
+            });
+            <!-------END CAPACITATION-------->
+
+            <!---------PRECIPITATION--------->
+            var dataPrec = [];
+            var labelsPrec = [];
+
+            $.ajax( {
+                <!--type: "GET",-->
+                url : "/forecast/getPrecipitation/" + feature.get('name'),
+                success :(function(result){
+
+                  for(var x in result){
+                        labelsPrec.push(x);
+                        dataPrec.push(result[x]);
+
+                  }
+                  var lineDataPrec = {
+                  labels: labelsPrec,
+                  datasets: [
+                  {
+                    label: "Millimeter (mm)",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: dataPrec
+                  }
+                ]};
+
+                var ctx = document.getElementById("myChartPrecipitation").getContext("2d");
+                new Chart(ctx).LineAlt(lineDataPrec, {
+                    responsive: false,
+                    tooltipTemplate: "<%= value %>",
+                    showTooltips: true,
+                    onAnimationComplete: function()
+                    {
+                        this.showTooltip(this.datasets[0].points, true);
+                    },
+                    tooltipEvents: [],
+                    scaleLabel: "          <%=value%>"
+                });
+                }),
+                error: (function(result){
+                    console.log(result);
+                    })
+            });
+            <!-------END PRECIPITATION------->
+
+            <!---------TEMPERATURE--------->
+            var dataTemp = [];
+            var labelsTemp = [];
+
+            $.ajax( {
+                <!--type: "GET",-->
+                url : "/forecast/getTemperature/" + feature.get('name'),
+                success :(function(result){
+
+                  for(var x in result){
+                        labelsTemp.push(x);
+                        dataTemp.push(result[x]);
+
+                  }
+
+                  var lineDataTemp = {
+                  labels: labelsTemp,
+                  datasets: [
+                  {
+                    label: "Celsius (°C)",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: dataTemp
+                  }
+                ]};
+
+                var ctx = document.getElementById("myChartTemp").getContext("2d");
+                new Chart(ctx).LineAlt(lineDataTemp, {
+                    responsive: false,
+                    tooltipTemplate: "<%= value %>",
+                    showTooltips: true,
+                    onAnimationComplete: function()
+                    {
+                        this.showTooltip(this.datasets[0].points, true);
+                    },
+                    tooltipEvents: [],
+                    scaleLabel: "          <%=value%>"
+                });
+                }),
+                error: (function(result){
+                    console.log(result);
+                    })
+            });
+            <!-------END TEMPERATURE------->
+
+            <!---------WIND (DEGREES)--------->
+            var dataWindDegree = [];
+            var labelsWindDegree = [];
+
+            $.ajax( {
+                <!--type: "GET",-->
+                url : "/forecast/getWindDegrees/" + feature.get('name'),
+                success :(function(result){
+
+                  for(var x in result){
+                        labelsWindDegree.push(x);
+                        dataWindDegree.push(result[x]);
+
+                  }
+
+                  var lineDataWindDegree = {
+                  labels: labelsWindDegree,
+                  datasets: [
+                  {
+                    label: "Degrees (°)",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: dataWindDegree
+                  }
+                ]};
+
+                var ctx = document.getElementById("myChartWindDegree").getContext("2d");
+                new Chart(ctx).LineAlt(lineDataWindDegree, {
+                    responsive: false,
+                    tooltipTemplate: "<%= value %>",
+                    showTooltips: true,
+                    onAnimationComplete: function()
+                    {
+                        this.showTooltip(this.datasets[0].points, true);
+                    },
+                    tooltipEvents: [],
+                    scaleLabel: "          <%=value%>"
+                });
+                }),
+                error: (function(result){
+                    console.log(result);
+                    })
+            });
+            <!-------END WIND (DEGREES)------->
+
+
+            <!---------WIND (SPEED)--------->
+            var dataWindSpeed = [];
+            var labelsWindSpeed = [];
+
+            $.ajax( {
+                <!--type: "GET",-->
+                url : "/forecast/getWindSpeed/" + feature.get('name'),
+                success :(function(result){
+
+                  for(var x in result){
+                        labelsWindSpeed.push(x);
+                        dataWindSpeed.push(result[x]);
+
+                  }
+
+                  var lineDataWindSpeed = {
+                  labels: labelsWindSpeed,
+                  datasets: [
+                  {
+                    label: "Kiloton (kt)",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: dataWindSpeed
+                  }
+                ]};
+
+                var ctx = document.getElementById("myChartWindSpeed").getContext("2d");
+                new Chart(ctx).LineAlt(lineDataWindSpeed, {
+                    responsive: false,
+                    tooltipTemplate: "<%= value %>",
+                    showTooltips: true,
+                    onAnimationComplete: function()
+                    {
+                        this.showTooltip(this.datasets[0].points, true);
+                    },
+                    tooltipEvents: [],
+                    scaleLabel: "          <%=value%>"
+                });
+                }),
+                error: (function(result){
+                    console.log(result);
+                    })
+            });
+            <!-------END WIND (DEGREES)------->
+
+            }
+         });
+
+    var cursorHoverStyle = "pointer";
+    var target = map.getTarget();
+    var jTarget = typeof target === "string" ? $("#"+target) : $(target);
+
+    map.on("pointermove", function (event) {
+        var mouseCoordInMapPixels = [event.originalEvent.offsetX, event.originalEvent.offsetY];
+
+        //detect feature at mouse coords
+        var hit = map.forEachFeatureAtPixel(mouseCoordInMapPixels, function (feature, layer) {
+            return true;
+        });
+
+        if (hit) {
+            jTarget.css("cursor", cursorHoverStyle);
+        } else {
+            jTarget.css("cursor", "");
+        }
+    });
+
+}
+
+</script>
+
+@views.html.header {
+}
+
+<div class="container-fluid">
+    <div class="starter-template">
+        <div class="page-header">
+            <h1>@Messages.get("forecast")</h1>
+        </div>
+
+        <div class="row">
+            <div class="container col-lg-6">
+                <div id="map" class="map" style="height:100%;position: relative;"><div id="popup"></div></div>
+                <br/>
+            </div>
+
+            <div class="container col-lg-5" id="chartsResults">
+                <div class="head">
+                    <h4></h4> <br/>
+                </div>
+
+                <h3>@Messages.get("forecastCapacitation")</h3>
+                <canvas id="myChartCapacitation"  width="900" height="250"></canvas>
+
+                <h3>@Messages.get("forecastPrecipitation")</h3>
+                <canvas id="myChartPrecipitation" width="900" height="250"></canvas>
+
+                <h3>@Messages.get("forecastTemperature")</h3>
+                <canvas id="myChartTemp" width="900" height="250"></canvas>
+
+                <h3>@Messages.get("forecastWindDegree")</h3>
+                <canvas id="myChartWindDegree" width="900" height="250"></canvas>
+
+                <h3>@Messages.get("forecastWindSpeed")</h3>
+                <canvas id="myChartWindSpeed" width="900" height="250"></canvas>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@views.html.footer{
+
+}
+
+</body>
+
+</html>

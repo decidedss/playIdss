@@ -1,0 +1,218 @@
+@(phases: List[ActionsPhase], phenomenon: List[ActionsPhenomenon], implementingBodies: List[ActionsImplemetingBody], agency: String)
+
+@import helper._
+@import play.i18n._
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    @views.html.head {
+    <meta charset="UTF-8">
+    <title>@Messages.get("actions")</title>
+
+    <script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.8/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/actions.js")'></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" media='screen' href='@routes.Assets.at("stylesheets/actions.css")'>
+    }
+
+</head>
+
+<body>
+@views.html.header {
+}
+
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("actions")</h1><br/>
+
+        <div class="container col-lg-12 actions-table">
+            <div class="pull-right">
+                <button id="addAction" class="btn btn-default idss-default-btn" data-toggle="modal"
+                        data-target="#myModalNorm">
+                    @Messages.get("addAction")
+                </button>
+            </div>
+
+            <div align="pull-right">
+                <a href="/actions/editPhenomenon" class="btn btn-warning">
+                    @Messages.get("editPhenomenon")
+                </a>&ensp;
+            </div>
+
+            <h2>@Messages.get("filterMessage")</h2>
+            <br/>
+
+            @helper.form(action = routes.Actions.searchActions, 'name -> "ActionsForm") {
+            <form id="ActionsForm">
+                <div align="left">
+                    <div class="form-group">
+                        <label>@Messages.get("phenomenon")</label><br/>
+                        <select name="phenomenon" required id="phenomenon-s"
+                                class="js-example-basic-single select2-container" style="width: 100%"
+                                data-placeholder='@Messages.get("selectPhenomenon")'>
+                            <option selected disabled></option>
+                            @for(phenomeno <- phenomenon) {
+                            <option class="select2-container" value='@phenomeno.getTitle()'>@phenomeno.getTitle()</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div align="left">
+                    <div class="form-group">
+                        <label>@Messages.get("phase")</label><br/>
+                        <select name="phase" required id="phase-s" class="js-example-basic-single select2-container"
+                                style="width: 100%" data-placeholder='@Messages.get("selectPhase")' multiple="multiple">
+                            @if(session.get("lang").contains("el")){
+                                @for(phase <- phases) {
+                                    <option class="select2-container" value='@phase.getTitle()'>@phase.getTitle()</option>
+                                }
+                            }
+
+                            @if(session.get("lang").contains("en")){
+                                @for(phase <- phases) {
+                                    <option class="select2-container" value='@phase.getTitle_en()'>@phase.getTitle_en()</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <input name="phases" value="" type="hidden"/>
+
+                <br/>
+                <div class="form-group">
+                    <h4><b>@Messages.get("tabularFormHeader")</b></h4>
+                    <button id="submit" type="submit" value="Submit" class="btn btn-danger" onclick="GetPhases('search');">
+                        @Messages.get("tabularForm")
+                    </button>
+                </div>
+            </form>
+            }
+
+            <!-- Modal add traffic data -->
+            <div class="modal fade" id="myModalNorm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                 aria-hidden="true" align="center">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                @Messages.get("addAction")
+                            </h4>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            @helper.form(routes.Actions.addAction(), 'name -> "AddForm") {
+
+                            <div align="left">
+                                <p><i>@Messages.get("addInfoMessage"):</i></p>
+                            </div>
+
+                            <form id="addForm">
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="phenomenon">@Messages.get("phenomenon"):</label><br/>
+                                        <select name="phenomenon" id="phenomenon" required
+                                                class="select2-container-modal js-example-basic-single"
+                                                data-placeholder='@Messages.get("selectPhenomenon")'>
+                                            <option selected disabled></option>
+                                            @for(phenomeno <- phenomenon) {
+                                            <option class="select2-container-modal" value='@phenomeno.getTitle()'>
+                                                @phenomeno.getTitle()
+                                            </option>
+                                            }
+                                            <option class="select2-container-modal" value="other">@Messages.get("other")</option>
+                                        </select>
+
+                                        <br/>
+
+                                        <div id="phenomenon-other" class="form-group" style="display:none">
+                                            <br/>
+                                            <input type="text" class="form-control" name="phenomenonOther" id="phenomenon-other-child" placeholder='@Messages.get("addNewPhenomenon")'>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="phase">@Messages.get("phase"):</label><br/>
+                                        <select style="width: 100%" name="phase" required id="phase" class="js-example-basic-single select2-container"
+                                                style="width: 100%" data-placeholder='@Messages.get("selectPhase")' multiple="multiple">
+                                            @for(phase <- phases) {
+                                            <option class="select2-container" value='@phase.getTitle()'>@phase.getTitle()</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <input name="phasesAdd" value="" type="hidden"/>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="category">@Messages.get("category"):</label>
+                                        <input type="text" class="form-control" name="category" id="category"
+                                               placeholder='@Messages.get("addCategory")' required>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="description">@Messages.get("description"):</label>
+                                        <input type="text" class="form-control" name="description" id="description"
+                                               placeholder='@Messages.get("addDescription")' required>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="implementing_body">@Messages.get("implementingBody"):</label>
+                                        <input type="text" class="form-control" name="implementing_body" id="implementing_body"
+                                               placeholder='@Messages.get("addImplementingBody")'>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="body">@Messages.get("body"):</label>
+                                        <input type="text" class="form-control" name="body" id="body"
+                                               placeholder='@Messages.get("addBody")'>
+                                    </div>
+                                </div>
+
+                                <div align="left">
+                                    <div class="form-group">
+                                        <label for="participating_body">@Messages.get("participatingBody"):</label>
+                                        <input type="text" class="form-control" name="participating_body" id="participating_body"
+                                               placeholder='@Messages.get("addParticipatingBody")'>
+                                    </div>
+                                </div>
+
+                                <input id="agency" name="agency" value="@agency" type="hidden"/>
+
+                                <button type="submit" class="btn btn-primary" onclick="GetPhases('add');">@Messages.get("save_action")</button>
+
+                            </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal till here-->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

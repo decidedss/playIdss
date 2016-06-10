@@ -1,0 +1,44 @@
+body {
+    background-color: #1E3251;
+    color: white;
+}
+
+.panel-body {
+    color: #000;
+}
+
+.popover{
+   /* max-width: 100%; /* Max Width of the popover (depending on the container!) */
+   max-width: 350px;
+   max-height: 310px;
+   overflow-y: auto;
+}
+
+.popover-content {
+  min-width: 250px;
+}
+
+#datetimepicker6, #datetimepicker7, #datetimepickerdisaster{
+    color: #000;
+}
+
+#eventButton {
+    color: #fff;
+}
+
+.jumbotron{
+    background-color: #fafafa;
+    height: auto;
+}
+
+.jumbotron label, .jumbotron small{
+    color: black;
+}
+
+.modal-content {
+    color: #1e3251;
+}
+
+.group {
+    color: #000;
+}

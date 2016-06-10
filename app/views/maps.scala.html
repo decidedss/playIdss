@@ -1,0 +1,155 @@
+@(geodataLayers: Map[String, List[Geodata]], groupnameAgency: Map[String, String])
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>@Messages.get("mapsAndData")</title>
+        <link rel="stylesheet" href='@routes.Assets.at("stylesheets/geodata.css")'>
+    }
+
+    <script>
+        var geoserver_wms='@Messages.get("GEOSERVER_WMS")';
+
+        var groups = [];
+        var data = []; // 2D array
+
+         var i = 0;
+         @for((key, value) <- geodataLayers){
+            //console.log('@key');
+
+            data[i] = [];
+            groups.push('@key');
+            var j=0;
+            @for(v <- value) {
+                data[i][j] = '@v.getTablename' + "#" + '@v.getLayertitle';
+                j++;
+            }
+            i++;
+         }
+    </script>
+
+</head>
+
+<body onload="geodata()">
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/geodata.js")'></script>
+
+    @views.html.header {
+    }
+
+    <div class="container-fluid">
+        <div class="starter-template">
+
+            <!-- MAPS -->
+            <div class="row">
+                <h2>@Messages.get("mapsAndData")</h2><br/>
+                <h5>@Messages.get("mapsSubtitle")</h5>
+                <br/>
+
+                <div class="container col-lg-3" align="left">
+
+                    <input id="groupnameAgency" value="@groupnameAgency" type="hidden"/>
+
+                    <div id="layertree" class="span6">
+                        <h4>@Messages.get("selectLayers")</h4>
+                        <ul>
+
+                        <!--Group of BASE LAYERS-->
+                        <li class="current"><span>Base maps</span></li>
+                            <ul class="ul-map">
+                                <li><span>OpenStreetMap</span>
+                                    <fieldset id="layer00">
+                                        <label class="checkbox" for="visible00">
+                                            <input id="visible00" class="visible" type="checkbox"/>@Messages.get("visibility")
+                                        </label>
+                                        <label>@Messages.get("opacity")</label>
+                                        <input class="opacity" type="range" min="0" max="1" step="0.01"/>
+                                    </fieldset>
+                                </li>
+                                <li><span>Stamen water color</span>
+                                    <fieldset id="layer01">
+                                        <label class="checkbox" for="visible01">
+                                            <input id="visible01" class="visible" type="checkbox"/>@Messages.get("visibility")
+                                        </label>
+                                        <label>@Messages.get("opacity")</label>
+                                        <input class="opacity" type="range" min="0" max="1" step="0.01"/>
+                                    </fieldset>
+                                </li>
+                                <li><span>MapQuest Satellite</span>
+                                    <fieldset id="layer02">
+                                        <label class="checkbox" for="visible02">
+                                            <input id="visible02" class="visible" type="checkbox"/>@Messages.get("visibility")
+                                        </label>
+                                        <label>@Messages.get("opacity")</label>
+                                        <input class="opacity" type="range" min="0" max="1" step="0.01"/>
+                                    </fieldset>
+                                </li>
+                            </ul>
+
+                        <!-- Rest of the GROUPS-->
+                        @for((key, value) <- geodataLayers){
+                            <p></p>
+                               <li class="current"><span>@key</span></li>
+                                <ul class="ul-map">
+                                @for(v <- value) {
+                                    <li><span>@v.getLayertitle</span>
+                                        <fieldset id='@v.getLayerid.replace("#", "")'>
+                                            <label class="checkbox" for='@v.getVisibleid.replace("#", "")'>
+                                                <input id='@v.getVisibleid.replace("#", "")' class="visible" type="checkbox"/>@Messages.get("visibility")
+                                            </label>
+                                            <label>@Messages.get("opacity")</label>
+                                            <input class="opacity" type="range" min="0" max="1" step="0.01"/>
+                                        </fieldset>
+                                   </li>
+                                }
+                                </ul>
+
+                        }
+                        <!-- End of data -->
+                        </ul>
+                    </div>
+                </div>
+                <!---->
+                <div class="container col-lg-9">
+                    <div id="map" class="map"></div>
+
+                    <div style="display: none;">
+                        <div id="popup" title="Info"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+        var groupnameAgency = document.getElementById("groupnameAgency").value;
+        groupnameAgency = groupnameAgency.replace("{", "");
+        groupnameAgency = groupnameAgency.replace("}", "");
+        var mapGroupnameAgency = new Map();
+        var datas = groupnameAgency.split(", ");
+
+        for(var i in datas){
+            var key = datas[i].split("=")[0];
+            var value = datas[i].split("=")[1];
+            mapGroupnameAgency.set(key,value);
+        }
+
+
+        $('#viewDropdown').addClass('active');
+
+        $('ul ul.ul-map').hide();
+
+        $(".current").click(function(){
+          $(this).next("ul").toggle();
+        });
+    </script>
+
+   @views.html.footer{
+
+    }
+
+</body>
+
+</html>

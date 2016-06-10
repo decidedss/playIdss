@@ -1,0 +1,330 @@
+@(events: List[Notification], eventTypes: List[EventType], logs: List[Notification], from: String, to: String)
+
+@import play.i18n._
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("events")</title>
+    <!--<link rel="stylesheet" href='@routes.Assets.at("javascripts/rangeslider/rangeslider.css")'>-->
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/events.css")'>
+    <!--<link rel="stylesheet" href='@routes.Assets.at("javascripts/layerswitcher/ol3-layerswitcher.css")'/>-->
+    <!--<script src='@routes.Assets.at("javascripts/layerswitcher/ol3-layerswitcher.js")'></script>-->
+    <link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+
+    }
+</head>
+
+<body onload="eventMap()">
+
+@views.html.header {
+}
+
+<script type="text/javascript" src='@routes.Assets.at("javascripts/events.js")'></script>
+<script>
+        var isAdmin = 'false';
+        if (@session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
+          isAdmin = 'true';
+        }
+
+        var base_url = '@Messages.get("baseUrl")';
+        var ids = [];
+        var longitude = [];
+        var latitude = [];
+        var types = [];
+        var description = [];
+        var image = [];
+        var username = [];
+        var agency = [];
+        var insert_date = [];
+        var isOwn = [];
+
+        //
+        var numOfEventTypes = @eventTypes.length;
+        var event_types = [];
+        var event_types_code = [];
+        // var event_types_description = [];
+         var icons = [];
+        @for(t <- eventTypes) {
+            @if(session.get("lang").contains("el")){
+                event_types['@t.getCode()'] = '@t.getDescription()';
+            }
+            @if(session.get("lang").contains("en")){
+                event_types['@t.getCode()'] = '@t.getDescription_en()';
+            }
+            //event_types['@t.getCode()'] = '@t.getDescription()';
+            event_types_code.push('@t.getCode()');
+            icons.push('@t.getIcon');
+        }
+        //
+        var numOfEvents = @events.length;
+        @for(e <- events) {
+            ids.push(@e.getId());
+            longitude.push(@e.getLon());
+            latitude.push(@e.getLat());
+            types.push('@e.getType()');
+            description.push('@e.getDescr()');
+            image.push('@e.getImage()');
+            username.push('@e.getUsername()');
+            agency.push('@e.getAgencyDisplay()');
+            insert_date.push('@e.getInsert_dateFormatted()');
+            isOwn.push('@e.isOwn()');
+        }
+
+         var geoserver_ows='@Messages.get("GEOSERVER_OWS")';
+         var markAsDisasterText='@Messages.get("markAsDisaster")';
+         var markAsDisasterBody='@Messages.get("markAsDisasterBody")';
+         var deleteEventText='@Messages.get("deleteEvent")';
+         var deleteEventBody='@Messages.get("deleteEventBody")';
+         var eventTitle='@Messages.get("eventTitle")';
+         var disasterComments='@Messages.get("disasterComments")';
+         var reportedBy='@Messages.get("reportedBy")';
+
+
+</script>
+
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <!--<div class="page-header">-->
+        <h1>@Messages.get("events")</h1><br/>
+        <h5>@Messages.get("subtitleEvents")</h5><br/>
+        <!--</div>-->
+
+        <!-- Modal when click on checkbox "Mark as disaster" -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">@Messages.get("markAsDisaster")</h4>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">
+                            @Messages.get("cancel")
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="markBtn">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal when deleting event -->
+        <div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabelDelete">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabelDelete">@Messages.get("deleteEvent")</h4>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">
+                            @Messages.get("cancel")
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="markBtnDel">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container col-lg-3" align="left">
+            <h5>@Messages.get("searchEvent")</h5>
+            @helper.form(routes.Events.eventCalendarSearch()) {
+            <form id="calendarForm" class="form-horizontal">
+                <!--FROM-->
+                <div class="form-group">
+                    <label>@Messages.get("fromDate")</label>
+                    <div class='input-group date' id='datetimepicker6'>
+                        <input type='text' class="form-control" name="from" required/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                    </div>
+                </div>
+                <!--TO-->
+                <div class="form-group">
+                    <label>@Messages.get("toDate")</label>
+                    <div class='input-group date' id='datetimepicker7'>
+                        <input type='text' class="form-control" name="to" required/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success" id="searchBtn">@Messages.get("search")&nbsp;<span class="glyphicon glyphicon-search"/></button>
+                <a class="btn btn-primary idss-default-btn" href="/events">@Messages.get("clearFilters")</a>
+            </form>
+            }
+
+            <br/><br/>
+            <div class="panel-group">
+                <h5>@Messages.get("selectEvent")</h5>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#collapse1">@Messages.get("filterEvents")</a>
+                        </h4>
+                    </div>
+                    <div id="collapse1" class="panel-collapse">
+                        <div class="panel-body">
+                            @for(e <- eventTypes) {
+                            <label class="checkbox">
+                                &emsp;&emsp;<input class="layerCheckbox" type="checkbox" id='@e.getCode()'
+                                                   name='@e.getCode()' value="1" checked/>
+                                @if(session.get("lang").contains("el")){
+                                @e.getDescription()
+                                }
+                                @if(session.get("lang").contains("en")){
+                                @e.getDescription_en()
+                                }
+                                &nbsp;<img src='@e.getIcon_thumbnail()'>
+                            </label>
+                            }
+                            <input type=button id="eventButton" class="btn idss-default-btn" value='Uncheck all'
+                                   onClick="toggleAllLayers()">
+                        </div>
+                        <!--<div class="panel-footer">Panel Footer</div>-->
+                    </div>
+                </div>
+            </div>
+
+            <br/>
+            @if(!logs.isEmpty){
+            <h3>@Messages.get("recentEvents")</h3>
+            <hr/>
+            <small><i>
+                <ol>
+                    @for(log <- logs) {
+                    <li>
+                        @for(t <- eventTypes) {
+                            @if(t.getCode() == log.getType()){
+                                @if(session.get("lang").contains("el")){
+                                    @log.getInsert_dateFormatted(),&nbsp;@t.getDescription(),&nbsp;@log.getUsername() [@log.getAgencyDisplay()]
+                                }
+                                @if(session.get("lang").contains("en")){
+                                    @log.getInsert_dateFormatted(),&nbsp;@t.getDescription_en(),&nbsp;@log.getUsername() [@log.getAgencyDisplay()]
+                                }
+                            }
+                        }
+                    </li>
+                    }
+                </ol>
+            </i></small>
+            }
+        </div>
+
+        <div class="container col-lg-9" align="left">
+
+            <h4>
+                @if(from){
+                @Messages.get("fromDate")&emsp;@from&emsp;@Messages.get("toDate")&emsp;@to&emsp;
+                }
+
+                @if(events.size==0){
+                <i>@Messages.get("noEvents")</i>
+                }
+            </h4>
+
+            <div class="row" id="checkAllEvents">
+                <div class="col-lg-6" align="left">
+                    <i><p id="numOfEvents"></p></i>
+                </div>
+                <div class="col-lg-6" align="right">
+                  <i>@Messages.get("showAllEvents") <input type="checkbox" id="filterAll"/></i>
+                </div>
+            </div>
+
+            <div id="map" class="map" style="width:100%;height:100%">
+            </div>
+
+            <div style="display: none;">
+                <div id="popup" title='@Messages.get("eventTitle")'></div>
+            </div>
+
+            <br/>
+            <a class="btn btn-lg btn-danger" href="/reporting">@Messages.get("newreport")</a>&emsp;
+            <a class="btn btn-lg btn-warning" href="/disasters">@Messages.get("disasters")</a>
+        </div>
+
+    </div>
+</div>
+
+<!--<script src='@routes.Assets.at("javascripts/rangeslider/rangeslider.js")'></script>-->
+<script type="text/javascript" charset="utf-8">
+
+        var startDate, endDate;
+
+        $(function() {
+
+
+            // Bootstrap date time picker
+            $('#datetimepicker6').datetimepicker({
+                format: 'YYYY-MM-DD hh:mm',
+            });
+
+            $('#datetimepicker7').datetimepicker({
+                format: 'YYYY-MM-DD hh:mm',
+                useCurrent: false //Important! See issue #1075
+            });
+
+            $("#datetimepicker6").on("dp.change", function (e) {
+                startDate = e.date._d;
+                $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+            });
+            $("#datetimepicker7").on("dp.change", function (e) {
+                endDate = e.date._d;
+                $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+            });
+            ////////////////////////////////////////////////////////////////////
+
+            if (document.location.pathname.indexOf("/all")>0) {
+               $("#numOfEvents").text('@Messages.get("allEvents")');
+               $("#filterAll").prop("checked", true);
+            }
+            else {
+                if (document.location.pathname.indexOf("/calendar")>0){
+                    $("#checkAllEvents").hide();
+                } else {
+                    $("#numOfEvents").text('@Messages.get("recent3days")');
+                }
+            }
+
+            $("#filterAll").change(function() {
+                if(this.checked) {
+                   window.location.href = '/events/all';
+                }
+                else {
+                  window.location.href = '/events';
+                }
+            });
+
+        }); // End of jquery
+
+        $('#searchBtn').click(function(){
+            var startDate = $("#datetimepicker6").find("input").val();
+            var endDate = $("#datetimepicker7").find("input").val();
+        });
+
+        $('#viewDropdown').addClass('active');
+
+
+
+</script>
+
+@views.html.footer{
+}
+</body>
+
+</html>

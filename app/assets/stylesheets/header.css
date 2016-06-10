@@ -1,0 +1,36 @@
+.badge-notify{
+   background:red;
+   position:relative;
+   top: -15px;
+   left: -37px;
+}
+
+#newEventMessage{
+    font-size:12pt;
+}
+
+a:hover{
+    text-decoration: none !important;
+}
+
+.btn-info {
+    background: #3399CC;
+    color: #fffff;
+    padding: 14px 24px;
+    letter-spacing: 1px;
+}
+
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .open > .dropdown-toggle.btn-info {
+    background: #3399FF;
+}
+
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
+}
+
+.buttonNotification{
+    padding-top: 0px;
+    margin-top: 15px !important;
+}

@@ -1,0 +1,295 @@
+@(form: Form[Reporting.UploadImageForm], eventTypes: List[EventType], groups: List[ContactGroup])
+
+@import play.i18n._
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>Event Reporting</title>
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/reporting.css")'>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    }
+</head>
+
+<script type="text/javascript" charset="utf-8">
+
+    $(function() {
+        // On load set toggle to 'off'
+        $("#toggle-email").bootstrapToggle('off');
+        $("#toggle-sms").bootstrapToggle('off');
+    });
+
+
+</script>
+
+<body onload="drawMap()">
+<style>
+
+    .myFile {
+    position: absolute;
+    overflow: hidden;
+    float: left;
+    clear: left;
+    height:200px;
+    width:200px;
+    }
+    .myFile input[type="file"] {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+    font-size: 100px;
+    filter: alpha(opacity=0);
+    cursor: pointer;
+    }
+
+</style>
+<script type="text/javascript" src='@routes.Assets.at("javascripts/reporting.js")'></script>
+
+@views.html.header {
+}
+
+<div class="container-fluid">
+    <div class="starter-template">
+
+        <h1>@Messages.get("reporting_navbar")</h1><br/>
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="container col-lg-1">
+                </div>
+                <div class="container col-lg-10">
+
+                    @helper.form(action = routes.Reporting.newReport, 'enctype -> "multipart/form-data") {
+                    <form class="form-horizontal" id="newReport">
+                        <fieldset>
+
+                            <!--------------------------- Event Types -------------------------------->
+                            <div class="form-group">
+                                <select id="eventType" name="type" class="js-example-basic-single"
+                                        title="Select an event type" style="width: 100%"
+                                        data-placeholder='@Messages.get("select2EventPlaceholder")'>
+                                    <option selected disabled></option>
+                                    @for(e <- eventTypes) {
+                                    <option value=@e.getCode()>
+                                        @if(session.get("lang").contains("el")){
+                                        @e.getDescription()
+                                        }
+                                        @if(session.get("lang").contains("en")){
+                                        @e.getDescription_en()
+                                        }
+                                    </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!--------------------------- Map -------------------------------->
+                            <div class="form-group">
+                                <div id="map" class="map"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" class="form-control" id="lat" name="lat">
+                                <input type="hidden" class="form-control" id="lon" name="lon">
+                            </div>
+
+                            <!--------------------------- Text area -------------------------------->
+                            <div class="form-group">
+                                <p class="text-muted">@Messages.get("textareaTitle")</p>
+                                <textarea id="descrArea" name="descr" class="form-control" rows="1"></textarea>
+                            </div>
+
+                            <!--------------------------- Groups -------------------------------->
+                            @if(!groups.isEmpty) {
+                            <div id="groups" class="form-group" align="center">
+                                <p class="text-muted">@Messages.get("groupsToNotify")</p>
+                                <select id="select2groups" class="js-example-basic-multiple" multiple="multiple"
+                                        title="Choose groups" style="width: 50%">
+                                    @for(g <- groups) {
+                                    <option class="select2-container" value='@g.getId()'>@g.getGroupname()</option>
+                                    }
+                                </select>
+                            </div>
+                            }
+                            @if(groups.isEmpty) {
+                            <br/>
+                            <p class="text-muted" style="color:#FFCC33;"><i>@Messages.get("noMatchedGroups")</i> &nbsp;
+                                <a class="btn btn-warning btn-xs" id="btnContacts" href="/contacts"
+                                   data-toggle="tooltip" data-placement="top" title="Contacts">
+                                    <span class="glyphicon glyphicon-share-alt"></span>
+                                </a>
+                            </p>
+                            }
+                            <div class="form-group">
+                                <input type="hidden" class="form-control" id="contactGroups" name="contactGroups">
+                            </div>
+
+
+                            <!-- Image upload-->
+                            <div class="form-group" align="left">
+                                <p class="text-muted">@Messages.get("uploadimage")</p>
+                                <label class="myFile">
+                                    <img src='@routes.Assets.at("images/image_add.png")' alt=""/>
+                                    <input type="file" title='@Messages.get("uploadimage")' class=""
+                                           accept=".jpg, .png, .bmp" name="image" id="imgInp">
+                                    <img id="imgPreview" src="" alt="" class="img-rounded img-responsive"/>
+                                </label>
+                            </div>
+
+
+                            <!-----------------Save Confirmation modal---------------------->
+                            <div class="modal fade" id="confirmationModalSave" tabindex="-1" role="dialog"  aria-labelledby="confirmationModalLabelSave">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="confirmationModalLabelSave">
+                                                @Messages.get("report")</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            @Messages.get("reportConfirmation")
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-warning" data-dismiss="modal">
+                                                @Messages.get("cancel")
+                                            </button>
+                                            <button type="submit" class="btn btn-danger" name="send" value="send">
+                                                @Messages.get("report")
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Bootstrap switch-->
+                            <div class="reporting-checkbox" align="center">
+                                <label>
+                                    <i>Email</i>&nbsp;<input id="toggle-email" name="toggle-email" type="checkbox" data-onstyle="success" data-toggle="toggle" disabled>&emsp;
+                                    <i>SMS</i>&nbsp;<input id="toggle-sms" name="toggle-sms" type="checkbox" data-onstyle="success" data-toggle="toggle" disabled>
+                                </label> &emsp;
+                                <button type="button" class="btn btn-lg btn-danger" id="reportBtnNew" disabled="disabled" data-toggle="modal" data-target="#confirmationModalSave">
+                                    @Messages.get("report")
+                                </button>
+                            </div>
+
+
+                        </fieldset>
+                    </form>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <!------------------------------------------------------------FORM SECTION------------------------------------------------------------------------------->
+        <div class="container col-lg-1">
+        </div>
+
+
+    </div> <!-- Ends starter-template -->
+</div> <!-- Ends container-fluid -->
+
+
+<script src='@routes.Assets.at("javascripts/validateEmail.js")' type='text/javascript'></script>
+
+<script type="text/javascript">
+
+    var gps = [];
+    $(document).ready(function() {
+        // jQuery on selecting event type
+        $("#eventType").change(function() {
+            getEvent($('#eventType option:selected').html(), $(this).val());
+        });
+
+        // Groups
+        $('.js-example-basic-multiple').select2().on("change", function(e) {
+            gps = [];
+            $('#select2groups :selected').each(function(i, selected){
+                gps[i] = $(selected).val();
+            });
+            $('#contactGroups').val(gps.toString());
+
+            // if gps empty deactivate email & sms buttons
+            if (gps.length == 0) {
+                // $('#reportButton').prop("disabled", true);
+                // $('#reportButtonSms').prop("disabled", true);
+                //
+                $("#toggle-email").bootstrapToggle('disable')
+                $("#toggle-sms").bootstrapToggle('disable');
+            }
+            else {
+                if (points.length > 0) {
+                    // $('#reportButton').prop("disabled", false);
+                    // $('#reportButtonSms').prop("disabled", false);
+                    //
+                    $("#toggle-email").bootstrapToggle('enable')
+                    $("#toggle-sms").bootstrapToggle('enable');
+                }
+            }
+
+        });
+       });
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#imgPreview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#imgInp").change(function(){
+        readURL(this);
+    });
+
+     var currentEvent = "";
+     var currentEventCode = "";
+     function getEvent(description, code){
+        currentEvent = description;
+	    currentEventCode = code;
+	 }
+
+	 $(".js-example-basic-single").select2({
+		theme : "classic",
+	 });
+
+	 $(".js-example-basic-multiple").select2({
+	    allowClear: true,
+     });
+
+    $("#map").click(function(e) {
+        //
+        if (points.length > 0 && currentEvent!=''){
+            // set hidden lat, lon form fields
+            document.getElementById("lon").setAttribute('value',lon);
+            document.getElementById("lat").setAttribute('value',lat);
+            //
+            if(document.getElementById("contactGroups").value){
+                // $('#reportButton').prop("disabled", false);
+                // $('#reportButtonSms').prop("disabled", false);
+                //
+                $("#toggle-email").bootstrapToggle('enable')
+                $("#toggle-sms").bootstrapToggle('enable');
+            }
+            // $('#reportButtonSave').prop("disabled", false);
+             $('#reportBtnNew').prop("disabled", false);
+        }
+        //
+    });
+
+    $('#notifyDropdown').addClass('active');
+
+</script>
+
+@views.html.footer{
+}
+</body>
+</html>

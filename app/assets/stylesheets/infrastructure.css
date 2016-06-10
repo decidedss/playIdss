@@ -1,0 +1,58 @@
+body {
+    background-color: #1E3251;
+    color: white;
+}
+
+label {
+    color: whitesmoke;
+    text-decoration: none;
+}
+
+.btn-info{
+    padding: 1px 5px !important;
+}
+
+.btn-warning{
+    padding: 1px 5px !important;
+}
+
+.ol-popup-closer {
+	position: absolute;
+	top: 4px;
+	right: 2px;
+	cursor: pointer;
+	padding: 3px;
+	color: #545454;
+}
+
+.ol-popup-closer.add{
+    right: 10px !important;
+}
+
+.ol-popup-closer:hover {
+	color: #151515;
+}
+
+.jumbotron{
+    background-color: #fafafa;
+    height: auto;
+}
+
+.jumbotron label, .jumbotron small{
+    color: black;
+}
+
+.popover{
+    min-width:200px;
+    width: auto;
+}
+
+/* Popover Header */
+.popover-title {
+    font-size: 16px;
+    text-align:center;
+}
+
+.select2-container {
+    color: black;
+}

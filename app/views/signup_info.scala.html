@@ -1,0 +1,159 @@
+@(mForm: Form[Person])
+
+@import play.i18n._
+@import helper._
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("representNewBody")</title>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap2/bootstrap-switch.css' rel="stylesheet">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js'></script>
+    }
+</head>
+<body>
+
+<style>
+    body {
+      background-color: #1e3251;
+      color: white;
+    }
+</style>
+
+<div class="container">
+
+    <div class="row">
+        <div class="container col-lg-1">
+        </div>
+        <div class="container col-lg-10">
+            <a href="/signup/agency" style="float:left; color:white;"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span></a>
+            <div style="float:right;">
+                @if(session.get("lang").contains("en")){
+                <a class="activeLocale loginLocale" href="/lang/en">en</a>
+                &emsp;
+                <a class="loginLocale" href="/lang/el">el</a>
+                }
+
+                @if(session.get("lang").contains("el")){
+                <a class="loginLocale" href="/lang/en">en</a>
+                &emsp;
+                <a class="activeLocale loginLocale" href="/lang/el">el</a>
+                }
+            </div>
+        </div>
+        <div class="container col-lg-1">
+        </div>
+    </div>
+
+    <div class="row" align="center">
+        <h1>@Messages.get("representNewBody")</h1>
+
+        <div class="alert alert-danger" id="alert_template_password" role="alert" style="display: none;" align="center">
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">@Messages.get("close")</span>
+            </button>
+        </div>
+
+        <div class="alert alert-danger" id="alert_template_email" role="alert" style="display: none;" align="center">
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">@Messages.get("close")</span>
+            </button>
+        </div>
+
+    </div>
+
+    <div class="container col-lg-12" align="center">
+        <br/>
+        <h2>@Messages.get("weNeedToKnow")</h2>
+        @helper.form(routes.Application.signup_info) {
+        <br/>
+        <form class="form-signup" >
+            <!--<label for="firstName" class="sr-only">Name</label>-->
+            <input name="firstName" id="firstName" class="form-control" placeholder='@Messages.get("yourname")' style="width:50%">
+            <br/>
+            <!--<label for="lastName" class="sr-only">Surname</label>-->
+            <input name="lastName" id="lastName" class="form-control" placeholder='@Messages.get("yoursurname")'  style="width:50%">
+            <br/>
+            <!--<label for="organization" class="sr-only">Agency</label>-->
+            <input name="organization" id="organization" class="form-control" placeholder='@Messages.get("yourbody")'  style="width:50%" required>
+            <br/>
+            <!--<label for="jobtitle" class="sr-only">Position</label>-->
+            <input name="jobtitle" id="jobtitle" class="form-control" placeholder='@Messages.get("yourposition")'  style="width:50%">
+            <br/>
+            <hr style="width:50%"/>
+            <br/>
+            <!--<label for="userName" class="sr-only">Username</label>-->
+            <input name="userName" id="userName" class="form-control" placeholder='@Messages.get("username")' style="width:50%">
+            <br/>
+            <!--<label for="email" class="sr-only">Email</label>-->
+            <input name="email" id="email" class="form-control" placeholder='@Messages.get("youremail")'  style="width:50%">
+            <br/>
+            <!--<label for="password" class="sr-only">Password</label>-->
+            <input name="password" id="password" class="form-control" placeholder='@Messages.get("password")' style="width:50%">
+            <br/>
+            <!--<label for="password_verify" class="sr-only">Password verify</label>-->
+            <input name="password_verify" id="password_verify" class="form-control" placeholder='@Messages.get("reenterPassword")'  style="width:50%">
+            <br/>
+            <label>
+                <input required type="checkbox" name="my-checkbox" class="switch" data-off-text="NO" data-on-text="YES"> &nbsp; @Messages.get("agreeToTerms")
+            </label>
+            <br/><br/>
+            <button type="submit" class="btn btn-default btn-lg idss-default-btn " style="width:50%"><h4>@Messages.get("iamdone")</h4></button>
+
+        </form>
+        }
+
+    </div>
+
+</div>
+
+<script>
+
+        $("input").prop('required',true);
+        $("select").prop('required',true);
+
+        $("[name='my-checkbox']").bootstrapSwitch();
+        <!--$("#my-checkbox").bootstrapSwitch('onColor', 'danger');-->
+        <!--$("#my-checkbox").bootstrapSwitch('state' ,true);-->
+
+         @if(flash.get("matching_password")=="wrong"){
+            $(alert_template_password).show();
+
+            $("#alert_template_password button").after('@Messages.get("passwordDoesNotMatch")');
+            $('#alert_template_password').fadeIn('slow');
+            $('#alert_template_password .close').click(function(e) {
+                $('#alert_template_password').hide();
+            });
+        }
+
+        @if(flash.get("email")=="wrong"){
+            $(alert_template_email).show();
+
+            $("#alert_template_email button").after('@Messages.get("invalidEmail")');
+            $('#alert_template_email').fadeIn('slow');
+            $('#alert_template_email .close').click(function(e) {
+                $('#alert_template_email').hide();
+            });
+        }
+
+        @if(flash.get("email")=="exists"){
+            $(alert_template_email).show();
+
+            $("#alert_template_email button").after('@Messages.get("emailExists")');
+            $('#alert_template_email').fadeIn('slow');
+            $('#alert_template_email .close').click(function(e) {
+                $('#alert_template_email').hide();
+            });
+        }
+
+
+    </script>
+
+</body>
+
+</html>

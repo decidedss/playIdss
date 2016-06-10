@@ -1,0 +1,66 @@
+@()
+@import play.i18n._
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+        <title>The iDSS</title>
+    }
+</head>
+
+<body>
+
+    @views.html.header {
+    }
+
+    <style>
+        body {
+            background-color: #1E3251;
+            color: white;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="starter-template">
+
+            <div class="row" align="right">
+                <a class="btn btn-primary idss-primary-btn" href="/resources">@Messages.get("resources_navbar")</a>
+            </div>
+
+            <div class="page-header">
+                <h1>@Messages.get("idssTitle")</h1>
+                <!--<hr/>-->
+            </div>
+
+            <div class="row">
+                <div class="container col-lg-4">
+                </div>
+                <div class="container col-lg-4" align="left">
+                    <h2>How can we be of service? </h2><br/>
+                    <!--<hr/>-->
+                    <h4><a href="/view" class="btn btn-default btn-lg idss-default-btn btn-block" role="button">View &nbsp&nbsp<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                    <small> &nbsp;for seeing is believing</small></h4>
+                    <br/><br/>
+                    <h4><a href="/plan" class="btn btn-default btn-lg idss-default-btn btn-block" role="button">Plan &nbsp&nbsp<span class="glyphicon glyphicon-blackboard" aria-hidden="true"></span></a>
+                    <small> &nbsp;a stitch in time (something happens for the good to eliminate or delay a disaster)</small></h4>
+                    <br/><br/>
+                    <h4><a href="/act" class="btn btn-default btn-lg idss-default-btn btn-block" role="button">Act &nbsp&nbsp<span class="glyphicon glyphicon-forward" aria-hidden="true"></span></a>
+                    <small> &nbsp;for time is only now</small></h4>
+                    <br/><br/>
+                </div>
+                <div class="container col-lg-4">
+                </div>
+            </div>
+
+         </div>
+    </div>
+
+
+    @views.html.footer{
+    }
+</body>
+
+</html>
