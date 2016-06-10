@@ -1,0 +1,9 @@
+2016-06-10 13:32:11,797 [INFO] from play.api.libs.concurrent.ActorSystemProvider in pool-5-thread-3 - Starting application default Akka system: application
+2016-06-10 13:32:11,956 [INFO] from play.core.server.NettyServer$ in pool-5-thread-3 - Listening for HTTP on /0:0:0:0:0:0:0:0:9000
+2016-06-10 13:32:20,821 [INFO] from application in ForkJoinPool-1-worker-1 - Creating Pool for datasource 'default'
+2016-06-10 13:32:21,396 [INFO] from play.api.db.DefaultDBApi in ForkJoinPool-1-worker-1 - Database [default] connected at jdbc:postgresql://localhost:15432/gis
+2016-06-10 13:32:22,257 [WARN] from com.avaje.ebeaninternal.server.ddl.CreateTableVisitor in ForkJoinPool-1-worker-1 - Column name [day] is a suspected SQL reserved word for property models.Last2Days.day
+2016-06-10 13:32:22,306 [INFO] from play.api.libs.concurrent.ActorSystemProvider in ForkJoinPool-1-worker-1 - Starting application default Akka system: application
+2016-06-10 13:32:22,360 [INFO] from play.api.Play$ in ForkJoinPool-1-worker-1 - Application started (Dev)
+2016-06-10 13:40:33,865 [INFO] from play.api.libs.concurrent.ActorSystemProvider in pool-5-thread-3 - Shutdown application default Akka system: application
+2016-06-10 13:40:33,913 [INFO] from application in pool-5-thread-3 - Shutting down connection pool.
