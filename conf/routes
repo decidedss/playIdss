@@ -1,0 +1,201 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+POST     /email/:event/:coordinates/:img/:desc/:address        controllers.Application.sendEmail(event: String, coordinates: String, img: String, desc: String, address: String)
+
+# Home page
+GET     /                           controllers.Application.index()
+
+GET     /login                      controllers.Application.login()
+POST    /login                      controllers.Application.authenticate()
+GET     /logout                     controllers.Application.logout()
+#
+GET     /signup/agency              controllers.Application.signup_agency()
+GET     /signup/info                controllers.Application.signup_info()
+POST    /signup/info                controllers.Application.signup_info()
+#
+GET     /signup/agency/members      controllers.User.agencyMembers
+POST    /signup/agency/members      controllers.User.addWithGroup
+#
+GET     /signup/agency/members/update controllers.User.agencyMembers
+POST    /signup/agency/members/update/:key controllers.User.updateAgencyMembers(key: String)
+#
+GET    /signup/agency/share/content/:key    controllers.User.shareAgencyContent(key: Boolean)
+#
+GET     /signup/agency/getPerson/:key    controllers.User.getPersonJson(key: String)
+GET     /signup/agency/deletePerson/:key controllers.User.deletePerson(key: String)
+#
+POST    /signupmail/:key            controllers.User.signupmail(key: String)
+#
+GET     /agency/login               controllers.Application.agency_login()
+POST    /agency/login               controllers.Application.authenticateAgency()
+#
+GET     /password/update            controllers.User.password_update()
+POST    /password/update            controllers.User.passwordmail()
+
+#
+GET     /welcome                    controllers.Welcome.index()
+GET     /maps                       controllers.Maps.index()
+GET     /about                      controllers.Application.about()
+GET     /reporting                  controllers.Reporting.index()
+POST    /reporting                  controllers.Reporting.newReport()
+
+#POST    /event/locationWithImage/:key/:type/:desc/:img  controllers.Reporting.saveLocationWithImage(key: String, type: String, desc: String, img: Integer)
+POST    /event/location/:key/:type/:desc  controllers.Reporting.saveLocation(key: String, type: String, desc: String)
+POST    /addEventType                controllers.Reporting.addEventType()
+
+# Image upload
+GET     /                           controllers.Reporting.index()
+POST    /                           controllers.Reporting.uploadImage()
+#GET     /getImage                   controllers.Reporting.getImage(id: Integer)
+#GET     /getImageByUsername         controllers.Reporting.getImageByUsername(username: String)
+
+
+GET     /idss                       controllers.Idss.index()
+GET     /view                       controllers.Idss.view()
+GET     /plan                       controllers.Idss.plan()
+GET     /act                        controllers.Idss.act()
+
+GET    /measures                    controllers.Measures.getMeasures
+GET    /measures/timesheet          controllers.Measures.timesheet
+GET    /measures/add                controllers.Measures.newMeasure
+POST   /measures/add                controllers.Measures.newMeasure
+GET    /measures/delete/:key        controllers.Measures.deleteMeasure(key: Integer)
+GET    /measures/getMeasure/:key    controllers.Measures.getMeasureById(key: Integer)
+GET    /measures/update             controllers.Measures.updateMeasure
+
+GET    /actions                            controllers.Actions.getActions
+GET    /actions/delete/:key                controllers.Actions.deleteAction(key: Integer)
+GET    /actions/edit                       controllers.Actions.editAction()
+GET    /actions/searchActions              controllers.Actions.searchActions()
+POST   /actions/add                        controllers.Actions.addAction
+GET    /actions/add                        controllers.Actions.addAction
+GET    /actions/getAction/:id              controllers.Actions.getAction(id: Integer)
+GET    /actions/editPhenomenon             controllers.Actions.phenomenonList()
+GET    /phenomenonAction/delete/:key       controllers.Actions.phenomenonDelete(key: Integer)
+GET    /actions/updatePhenomenon           controllers.Actions.updatePhenomenon
+GET    /actions/getPhenomenon/:key         controllers.Actions.getPhenomenonById(key: Integer)
+
+GET    /documents                     controllers.Documents.list
+GET    /documents/search              controllers.Documents.search
+POST   /documents/upload              controllers.Documents.savefile
+GET    /documents/update              controllers.Documents.updatefile
+POST   /documents/addtag              controllers.Documents.addtag
+POST   /documents/delete/:id          controllers.Documents.delete(id: String)
+POST   /documents/download/:id        controllers.Documents.download(id: String)
+#GET   /documents/:key                controllers.Documents.search(key: String)
+
+GET    /profile                     controllers.User.index()
+POST   /profile                     controllers.User.passwordmail_in()
+#
+GET    /profile/info                controllers.User.index()
+POST   /profile/info                controllers.User.updateUserDetails()
+#
+GET    /profile/rename              controllers.User.index()
+POST   /profile/rename              controllers.User.renameAgency()
+#
+#GET   /user/add                    controllers.User.add()
+GET    /user/add                    controllers.User.add()
+POST   /user/add                    controllers.User.add()
+
+GET    /lang/:key                   controllers.Application.changeLanguage(key: String)
+
+GET    /routing                     controllers.Routing.index()
+
+GET    /contacts                    controllers.Contacts.getContacts()
+POST   /contacts                    controllers.Contacts.addContact()
+GET    /contacts/delete/:key        controllers.Contacts.deleteContact(key: Integer)
+GET    /sms/:key/:mobile            controllers.Contacts.twilioSMS(key: String, mobile: String)
+#
+GET    /contacts/groups             controllers.Contacts.getContacts()
+POST   /contacts/groups/:key        controllers.Contacts.addGroup(key: String)
+GET    /contacts/groups/delete/:key controllers.Contacts.deleteGroup(key: String)
+#
+GET    /contacts/update             controllers.Contacts.getContacts()
+POST   /contacts/update             controllers.Contacts.updateContact()
+GET    /contacts/:key               controllers.Contacts.getContactById(key: Integer)
+GET    /contacts/update/alfresco    controllers.Contacts.getContacts()
+POST   /contacts/update/alfresco    controllers.Contacts.updateAlfrescoContact()
+GET    /contacts/alfresco/:key      controllers.Contacts.getContactAlfrescoByUsername(key: String)
+#
+GET    /contacts/notifyContacts     controllers.Contacts.getContacts()
+POST   /contacts/notifyContacts     controllers.Contacts.notifyContacts()
+#
+#POST   /reportingemail              controllers.Reporting.setReportingEmail()
+
+#
+GET   /events                       controllers.Events.index()
+GET   /events/all                   controllers.Events.allEvents()
+POST  /events                       controllers.Events.findEvents()
+GET   /events/update/:status/:id    controllers.Events.update(status: Boolean, id: Integer)
+GET   /events/delete/:id            controllers.Events.delete(id: Integer)
+#
+GET   /events/calendar              controllers.Events.eventCalendarSearch()
+GET   /disasters/calendar           controllers.Events.disasterCalendarSearch()
+#
+GET   /disasters                    controllers.Events.disasters()
+GET   /disasters/edit               controllers.Events.editDisaster()
+#
+#GET   /resources                    controllers.Resources.index()
+GET   /resources/infrastructure     controllers.Resources.infrastructure()
+#
+GET   /resources/machinery                      controllers.Resources.machinery()
+GET   /resources/machinery/edit                 controllers.Resources.machineryList()
+GET   /resources/machinery/update               controllers.Resources.machineryList()
+POST  /resources/machinery/update               controllers.Resources.machineryTypeUpdate()
+POST  /resources/machinery/updateLayer          controllers.Resources.machineryLayerUpdate()
+GET   /resources/machinery/get/:id              controllers.Resources.machineryGetById(id: Integer)
+GET   /resources/machinery/getLayer/:id         controllers.Resources.machineryGetLayerById(id: Integer)
+GET   /resources/machinery/delete/:id           controllers.Resources.machineryTypeDelete(id: Integer)
+GET   /resources/machinery/deleteLayer/:id      controllers.Resources.machineryLayerDelete(id: Integer)
+POST  /resources/machinery/create               controllers.Resources.machineryTypeAdd()
+GET   /resources/machinery/addType              controllers.Resources.machineryAddType()
+GET   /resources/machinery/icon/:id             controllers.Resources.getMachineryIcon(id: String)
+GET   /resources/machinery/thumbnail/:id        controllers.Resources.getMachineryThumbnail(id: String)
+
+#
+GET   /resources/human                          controllers.Resources.human()
+GET   /resources/saveGeom/:key                  controllers.Resources.saveGeometry(key: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+# Forecast
+GET     /forecast                                   controllers.Forecasts.forecast()
+GET     /forecast/getCapacitation/:place            controllers.Forecasts.getForecastCapacitation(place: String)
+GET     /forecast/getPrecipitation/:place           controllers.Forecasts.getForecastPrecipitation(place: String)
+GET     /forecast/getTemperature/:place             controllers.Forecasts.getForecastTemperature(place: String)
+GET     /forecast/getWindDegrees/:place             controllers.Forecasts.getForecastWindDegrees(place: String)
+GET     /forecast/getWindSpeed/:place               controllers.Forecasts.getForecastWindSpeed(place: String)
+
+# Climate
+GET     /climate                                     controllers.Climate.climate()
+GET     /climate/getCapacitation/:place              controllers.Climate.getForecastCapacitation(place: String)
+GET     /climate/getPrecipitation/:place             controllers.Climate.getForecastPrecipitation(place: String)
+GET     /climate/getTemperature/:place               controllers.Climate.getForecastTemperature(place: String)
+GET     /climate/getWindDegrees/:place               controllers.Climate.getForecastWindDegrees(place: String)
+GET     /climate/getWindSpeed/:place                 controllers.Climate.getForecastWindSpeed(place: String)
+GET     /climate/getMeanTemp/:place                  controllers.Climate.getMeanTemp(place: String)
+GET     /climate/getHighTemp/:place                  controllers.Climate.getHighTemp(place: String)
+GET     /climate/getLowTemp/:place                   controllers.Climate.getLowTemp(place: String)
+GET     /climate/getTempHistoric/:place              controllers.Climate.getTempHistoric(place: String)
+GET     /climate/getRainHistoric/:place              controllers.Climate.getRainHistoric(place: String)
+GET     /climate/getWindHistoric/:place              controllers.Climate.getWindHistoric(place: String)
+GET     /climate/getTempCurrentYear/:place           controllers.Climate.getTempCurrentYear(place: String)
+GET     /climate/getPrecipitationCurrentYear/:place  controllers.Climate.getPrecipitationCurrentYear(place: String)
+GET     /climate/getWindSpeedCurrentYear/:place      controllers.Climate.getWindSpeedCurrentYear(place: String)
+GET     /climate/getTempCurrent/:place               controllers.Climate.getTempCurrent(place: String)
+GET     /climate/getRainCurrent/:place               controllers.Climate.getRainCurrent(place: String)
+GET     /climate/getWindDegreeCurrent/:place         controllers.Climate.getWindDegreeCurrent(place: String)
+GET     /climate/getWindSpeedCurrent/:place          controllers.Climate.getWindSpeedCurrent(place: String)
+GET     /climate/getCoordinatesForecast              controllers.Climate.getCoordinatesForecast()
+GET     /climate/getCoordinatesCurrentHistoric       controllers.Climate.getCoordinatesHistoric()
+
+# Traffic
+GET   /traffic                                       controllers.Traffic.traffic()
+GET   /traffic/getCoordinates                        controllers.Traffic.getCoordinates()
+GET   /traffic/getCongestion                         controllers.Traffic.getCongestion()
+
+# Remote Sensing
+GET   /remotesensing                                 controllers.Application.remoteSensing()

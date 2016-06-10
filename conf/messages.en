@@ -1,0 +1,488 @@
+# --------------- navbar -------------------
+gis_navbar=GIS
+osm_navbar=OSM Viewer
+measures_navbar=Measures
+legislation_navbar=Legislation
+routing=Routing
+routing_navbar=Routing
+resources_navbar=Resources Management
+english=English
+greek=Greek
+home=Home
+signup=Sign up
+idssLoginTitle=Login to DSS
+forgotPassword=Forgot your password?
+forgotPasswordUsername=Enter your username
+forgotPasswordSendNew=Send me a new password
+passwordReset=Your password has been reset.
+passwordResetEmail=Please login to
+passwordResetEmailMsg=After the login you can update your profile
+here=here
+with=with
+registeredToGroup=You have been registered to the agency
+passwordUpdateSubject=Password update
+passwordResetMsg=Your new password has been sent to your email address!
+password=Password
+login=Log in
+insertNewBody=Insert of a new Body
+alreadyRegisteredBody=Enter in an already registered Body
+representNewBody=You represent a new Body
+weNeedToKnow=Thus we need to know:
+yourname=Your Name
+yoursurname=Your Surname
+yourbody=Your Body
+yourposition=Your Position
+youremail=Your email
+reenterPassword=Re-enter your password
+iamdone=I am done
+agreeToTerms=I agree to DECIDE terms
+enterCredentials=Enter the credentials
+selectBodySignup=- Select Body -
+error=Error!
+errorBodyExists=It seems your body is already registered in the DSS
+errorBack=Back to Login
+errorIncorrectAgency=The username you are trying to login with, does not belong to the selected agency.
+errorWrongCredentials=The login credentials could not be authenticated. Please try again!
+errorNoSuchUser=There is no registered user with the username
+passwordUpdated=Your password has been successfully updated!
+
+# ---------------- user ---------------------
+logout=Logout
+profile=Profile
+profile_info=Profile Info
+manageMembers=Manage members
+agencyName=Agency name
+change_password=Change your password
+users=Users
+eligibleToView=Eligible to View
+eligibleToEdit=Eligible to Edit
+eligibleTo=Eligible to:
+addMemberInAgency=Add member in agency
+editAgencyMember=Edit member of agency
+usernameExists=Error! The username you are trying to enter is in use by another system user! Please try again.
+invalidEmail=Error! The email address you are trying to enter is in not valid! Please try again.
+passwordDoesNotMatch=Error! The password re-entered does not match the password! Please try again.
+invalidDisplay=Error! The agency name you are trying to enter is already in use by another agency! Please try again.
+emailExists=Error! The email address you are trying to enter is already in use! Please try again.
+#
+add_user=Add User
+save_user=Save User
+shareFlag=Share my content with other agencies
+belongsToAgency=belongs to the agency
+addMembers=Add members
+proceedToWelcome=Proceed
+manageMembers=Manage the members of the agency
+enterNewPassword=Enter new password
+jobTitle=Job title
+phoneLandline=Telephone
+phoneMobile=Mobile
+companyAddress=Company address
+updateProfileDetails=Update details
+
+# -------------- titles --------------------
+measures=Protection measures
+
+# -------------- various -------------------
+please_select=- Please Select -
+search_for=Search for...
+welcome=Welcome
+proceed=proceed with
+event_reporting=Event Reporting
+resources_management=Resources Management
+staff_management=Staff Management
+view=View
+plan=Plan
+act=Act
+manage=Manage
+overviewMap=Overview Map
+mapsAndData=Maps & Data
+mapsSubtitle=View maps and data related to disaster management
+selectLayers=Select one or more layers
+newEvent=New events
+opacity=Opacity
+visibility=Visibility
+noAvailableData=No available data
+
+# -------------- measures ------------------
+click=Click to select
+measure_name=Name
+budget=Budget
+start_date=Start Date
+end_date=End Date
+category=Category
+location=Location
+riskAddressing=Risk addressing
+description=Description
+add_measure=Add measure
+save_measure=Save measure
+edit_measure=Edit protection measure
+selectCategory=Select category
+addInfoMessageMeasure=Please fill in all the following fields concerning the measure you would like to add
+
+# -------------- actions ------------------
+actions=Actions
+newSearch=New search
+id=Id
+phenomenon=Disaster phenomena
+category=Category
+description=Description
+phase=Destructive management phase
+body=Body
+department=Department
+implementingBody=Implementing body
+participatingBody=Participating body
+agency=Agency
+delete=Delete
+deleteHeader=Delete Action
+filterMessage=Search for civil protection actions by selecting:
+tabularFormHeader=Get suggestions on a
+tabularForm=Tabular Form
+noDataMessage=There are not any available data with these selections
+back=Back to main menu
+addAction=Add new action
+save_action=Save action
+noSelection=None of the above
+addInfoMessage=Fill-in the fields that describe the civil protection action you are adding
+selectPhenomenon=Please select a phenomenon
+selectCategory=Please select a category
+selectPhase=Please select a phase
+selectBody=Please select a body
+selectDepartment=Please select a department
+selectImplementingBody=Please select an implementing body
+selectParticipatingBody=Please select a participating body
+addCategory=Please add a category
+addDescription=Please add a description
+addAgency=Please add an agency
+addImplementingBody=Please add implementing body
+addParticipatingBody=Please add participating body
+addBody=Please add body
+addNewPhenomenon=Add other phenomenon
+other=Other
+editAction=Modify action
+editPhenomenon=Edit phenomenon
+
+# ------------- documents ----------------
+documents=Documents
+search_by_tag=Search by tag
+legislation=Documents
+title=Title
+description=Description
+createdBy=Created by
+leadingMessage=Deleting file... (~30sec)
+documentEditButton=Modify document details
+publisher=Publisher
+number=Number
+issuingDate=Issuing date
+tags=Tags
+filterCategory=Filter by criteria
+clearFilters=Clear filters
+uploadLegislation=New Document
+repository=Repository
+common=Common
+filterByCategoryTitle=Search documents based on criteria
+categories=Categories
+
+#--------Routing instruction ---------
+routing=Routing
+NoTurn=No turn,
+GoStraight=Go straight
+TurnSlightRight=Turn slight right
+TurnRight=Turn right
+TurnSharpRight=Turn sharp right
+UTurn= Uturn
+TurnSharpLeft=Turn sharp left
+TurnLeft=Turn left
+TurnSlightLeft=Turn slight left
+ReachViaLocation=Reach via location
+HeadOn=Head on
+EnterRoundAbout=Enter roundabout
+LeaveRoundAbout=Leave roundabout
+StayOnRoundAbout=Stay on roundabout
+StartAtEndOfStreet=Start at end of street
+ReachedYourDestination=Reached your destination
+EnterAgainstAllowedDirection=Enter against allowed direction
+LeaveAgainstAllowedDirection=Leave against allowed direction
+routingSelect2=Select 2 or more points for routing instructions
+routingGetDirections=Get directions
+routingClear=Clear map
+routingInstructions=Routing instructions
+routingFrom=From
+routingTo=To
+routingTotalTime=Total time
+routingTotalDistance=Total distance
+
+#---------------Reporting-------------------
+events=Ειδοποίηση
+notify=Notify
+eventReporting=Event reporting
+disasters=Disasters
+reporting_navbar=Event reporting
+reporting=Reporting
+whatIsHappening=What is happening?
+whereIsHappening=Where exactly?
+reportIt=Report by email
+reportItSms=Report by SMS
+notificationSave=Save
+reportItMyContacts=my contacts
+emailSent=Email Sent
+emailSentModalBody=Email has been sent for
+notificationSaved=The notification has been saved for
+coordinates=Coordinates
+upload=Upload
+addeventtype=Add event type
+uploadimage=Upload image
+addImage=Add image
+eventCode=Event Code
+eventDescription=Event Description
+select2EventPlaceholder=- Select an event type -
+textareaTitle = Enter a short text of event notification
+select2Group=- Select groups -
+groupsToNotify=Select the groups of contacts you want to notify
+emailConfirmation=Are you sure you want to send an email to your contacts?
+smsConfirmation=Are you sure you want to send an SMS to your contacts?
+saveConfirmation=Are you sure you want to save the report?
+reportConfirmation=Are you sure you want to make this report?
+send=Send
+noMatchedGroups=You have not defined your contacts that can be notified
+fromDate=From
+toDate=To
+search=Search
+recentEvents=Recent events
+report=Report
+#
+cityFire=City Fire
+forestFire=Forest Fire
+accident=Technological Accident
+earthquake=Earthquake
+flood=Flood
+other=Other
+no=No idea
+show=Let me show you
+jurisdiction=In my area of jurisdiction
+to=to
+noEvents=There are no events!
+comments=Comments
+forecastYLabel=Hour (day)
+allEvents=All events
+recent3days=Events of the last 3 days
+showAllEvents=Show all events
+
+#------------ Events ----------------
+filterEvents=Filter events
+events=Events
+newreport=New report
+subtitleEvents=View what, where and when it happened
+selectEvent=Select event type
+searchEvent=Search events based on date
+markAsDisaster=Store as a disaster
+markAsDisasterBody=Are you sure you want to mark the event as a disaster?
+deleteEvent=Delete event
+deleteEventBody=Are you sure you want to delete the event?
+deleteDisaster=Delete disaster
+deleteDisasterBody=Are you sure you want to delete the disaster?
+eventTitle=Event Information
+
+#------------ Disasters -------------
+disasters=Disasters
+filterDisasters= Filter disasters
+noDisasters=There are no disasters!
+date=Date
+time=Time
+duration=Disaster duration
+place=Disaster area
+injured=Injuries
+destruction_features=Disaster characteristics
+deaths=Deaths
+infrastructure_impacts=Impacts on infrastructures
+other_impacts=Other impacts
+available_facilities=Allocated means-forces
+measures_taken=List of actions undertaken
+remarks=Remarks
+suggestions=Propositions for response’s improvement
+subtitleDisasters=View where and when serious disaster events happened
+selectDisaster=Select disaster phenomenon
+searchDisaster=Search disaster events based on date
+editBtn=Disaster Description
+disasterTitle=Disaster Information
+disasterComments=Short Description
+reportedBy=Reported by:
+#
+disaster_date=Date-Time
+disaster_duration=Disaster duration
+disaster_area=Disaster area
+disaster_cause=Disaster cause
+disaster_characteristics=Disaster characteristics (Kind, magnitude, extent, etc)
+disaster_injuries=Injuries
+disaster_deaths=Deaths
+disaster_impacts_infrastructure=Impacts on infrastructures
+disaster_impacts_other=Other impacts
+disaster_means_forces=Allocated means/forces
+disaster_action_list=List of actions undertaken
+disaster_remarks=Remarks
+disaster_suggestions=Suggestions for response's improvement
+updateDetails=Update
+
+#-------------idss page---------------
+idssTitle=The iDSS
+
+#-------------FAP------------------
+allocation=Allocation
+
+#-----------My contacts------------
+contacts=Contacts
+mobileExists=This mobile already exists in your contacts!
+mobileWrong=The mobile format you are trying to insert is not correct!
+listContacts=Contact list
+addContact=Add contact
+editContact=Τροποποίηση επaφής
+notifyContacts=Send a text notification to your contacts
+createContactList=Create contact lists
+notifyBySMS=Notify my contacts (by sms)
+notifyByEMAIL=Notify my contacts (by email)
+group=Group
+assignToGroup=Assign to group
+firstname=First name
+username=Username
+lastname=Last name
+name=Name
+email=Email
+mobile=Mobile phone
+profession=Profession
+position=Position
+registeredUser=Registered user
+addGroup=Add a group
+addBtn=Add
+olderMessages=- Older messages -
+contactsNotifyConfirmation=Are you sure you want to send the message to your contacts?
+
+#-----------Machinery------------
+resourcesManagement=Machineries-Means
+subtitleMachinery=Insert and view data related to machineries and means for disasters’ response
+toolsMachinery=Data insert and edit tools
+addPosition=Add the position of the machinery
+machinery=Machinery
+machineries=Machineries
+selectMachinery=-Select a machinery-mean-
+doneButton=Save
+instancesButton=Add/Edit machinery-mean
+instancesButtonView=View machinery-mean
+machineryDetails=Edit machinery details
+typeButton=Add/edit machinery-mean type
+reallocationPoint=Reallocate point
+edit=Edit
+rename=Rename Agency
+vehicleType=Vehicle type
+brand=Brand
+licensePlate=License plate
+horsepower=Horsepower
+seat=No. of seats
+equipment=On-board equipment
+cargo=Cargo type
+capacity=Capacity (in m3)
+driver=Driver
+disaster=Used in disaster events
+equipmentCondition=Equipment condition
+tiresCondition=Tires condition
+notes=Notes
+machineryAvailability=Machinery availability
+yes=Yes
+no=No
+delete=Delete
+machineryType=Machinery types
+machineryTypeTitle=Machinery type
+coordinatesTitle=Coordinates
+addMachineryType=Add new machinery type
+image=Image
+close=Close
+cancel=Cancel
+download=Download
+addDefaultImage=Add default image
+save=Save
+uploadIconInfo=Upload small icon (up to 50px) to represent the machinery type
+update=Update
+instanceEditButton=Edit machinery instance
+forInstance=e.g.
+yourNotes=Notes
+fire=Fire
+needsChecking=Needs checking
+availability=Available
+titleListMine=Machineries-means of the Body I belong to
+titleListOther=Machineries-means of other Bodies
+titleListTypeMine=Machineries-means types of the Body I belong to
+titleListTypeOther=Default machineries-means types
+addMachineryHeader=View and edit machineries-means
+addMachineryTitle=Add machinery
+machineryDetailsTitle=Machinery details
+egDisaster=e.g. Fire
+egBrand=e.g. Fiat
+egLicensePlate=e.g. NHI 2233
+egHorsepower=e.g. 75
+egSeat=e.g. 5
+egEquipmentCondition=Needs checking
+egTiresCondition=Needs checking
+egNotes=Your notes
+saveGeometryMetadata=Save geometry and metadata
+editMachineryTitle=Edit your machinery-mean details
+
+#-----------Infrastructure------------
+pleaseSelectInfrustructure=-Please select an infrastructure or area type-
+infrastructure=Critical infrastructures & areas
+subtitleInfrastructure=Insert and view important data related to disaster management
+toolsInfrastructure=Data insert and edit tools
+addGeometry=Add data on the map
+editGeometry=Edit geometry
+showInformation=Show information
+updateInformation=Update information
+deleteButton=Press delete button then click on drawn geometry
+site=Location
+attributes=Attributes
+geometryInfo=Insert data
+geometryDetails=Geometry details
+
+#-----------Human resources------------
+humanResources=Human resources
+
+#-----------General about climate------------
+current=Current weather conditions
+
+#-----------Historic data------------
+historicMonth=Climatic data of previous months
+historicDay=Climatic data of previous days
+meteoTemperature=Temperature (High, Low, Mean)
+meteoRain=Rain
+meteoWind=Wind speed (average)
+meteoPrecipitation=Precipitation
+meteoYLabel=Month of current year
+meteoYLabelDay=Day of current month
+
+#-----------Forecast------------
+forecast=Weather forecasts
+forecastCapacitation=Forecast capacitation
+forecastPrecipitation=Forecast precipitation
+forecastTemperature=Forecast temperature
+forecastWindDegree=Forecast wind (degree)
+forecastWindSpeed=Forecast wind (speed)
+forecastCaption=Source: Hellenic National Meteorological Service
+
+#-----------Current climate------------
+currentTemperature=Temperature
+currentRain=Rain
+currentWindDegree=Wind (degree)
+currentWindSpeed=Wind (speed)
+
+#-----------Climate------------
+climate=Weather & Climate data
+mapLayers=Wheather map layers
+temperature=Temperature
+wind=Wind
+precipitation=Precipitation
+clouds=Clouds
+seaLevelPressure=Sea level pressure
+weatherStations=Weather stations
+meteoCaption=Displayed data of the meteorological network of the National Observatory of Athens, which can be found on
+
+#-----------Traffic------------
+traffic=Traffic
+
+#--------Remote Sensing--------
+remotesensing=Aerial disasters’ overview

@@ -1,0 +1,60 @@
+# project parameters
+SERVER_PATH=http://160.40.63.119
+ALFRSCO_ATOMPUB_URL=http://160.40.63.119:8080/alfresco/api/-default-/public/cmis/versions/1.1/atom
+#http://160.40.63.119:8080:8080/alfresco/cmisatom this supports CMIS 1.0 and not 1.1
+ALFRSCO_REST_API_URL=http://160.40.63.119:8080/alfresco/s/api
+ALFRSCO_USERNAME=admin
+ALFRSCO_PASSWORD=admin
+#
+GEOSERVER_FEATURETYPES=http://160.40.63.119:8080/geoserver/rest/workspaces/sf/datastores/
+GEOSERVER_USERMAME=admin
+GEOSERVER_PASSWORD=geoserver
+#
+GEOSERVER_OWS=http://160.40.63.119:8080/geoserver/sf/ows?
+GEOSERVER_WMS=http://160.40.63.119:8080/geoserver/wms?
+GEOSERVER_WFS=http://160.40.63.119:8080/geoserver/wfs
+
+#OSRM_SERVER=http://webdev8.it.auth.gr:5000/
+OSRM_SERVER=http://router.project-osrm.org/
+
+# twilio
+twilio_sid=ACbabd8cca802d39fc1b35305faa7cf310
+twilio_token=1178826b2065fd8a14bfc3afeac7e380
+twilio_phone_number=+447481341899
+
+# mail recipient
+mailRecipient=pmalasio@it.auth.gr
+
+# alfresco folders
+alfresco_site = idss
+
+# excluded alfresco groups from listings
+excluded = #ALFRESCO_ADMINISTRATORS#ALFRESCO_SEARCH_ADMINISTRATORS#EMAIL_CONTRIBUTORS#idss_admin#idss_edit#idss_view#SITE_ADMINISTRATORS#site_idss#site_idss_SiteCollaborator#site_idss_SiteConsumer#site_idss_SiteContributor#site_idss_SiteManager#site_swsdp#site_swsdp_SiteCollaborator#site_swsdp_SiteConsumer#site_swsdp_SiteContributor#site_swsdp_SiteManager#site_temp#site_temp_SiteCollaborator#site_temp_SiteConsumer#site_temp_SiteContributor#site_temp_SiteManager#
+
+# ------------------- email settings -----------------
+# old settings
+emailHostname=smtp.googlemail.com
+emailUsername=imet.idss@gmail.com
+emailPassword=decide2015
+
+# new settings
+#emailHostname=filippos.certh.gr
+#emailUsername=decide.dss@certh.gr
+#emailPassword=dfgyhn4867
+
+################################################### Change when dist on server
+
+publicIconUrl = D:/public/uploadedIcons/
+#publicIconUrl = http://160.40.63.119/public/icons/
+
+baseUrl=http://localhost:9000/
+#baseUrl=http://160.40.63.119:9000/
+
+uploadDir=D:/uploadedImages/
+#uploadDir=/var/www/public/images/
+
+publicIconDir=D:/public/uploadedIcons/
+#publicIconDir=/var/www/public/icons/
+
+publicImageUrl = D:/public/uploadedIcons/
+#publicImageUrl = http://160.40.63.119/public/images/
