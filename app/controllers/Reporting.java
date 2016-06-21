@@ -45,7 +45,7 @@ public class Reporting extends Controller {
         if (form.get().image!=null){
             File file = form.get().image.getFile();
             String filename = form.get().image.getFilename();
-            n.setImage(Messages.get("publicImageUrl") + filename);
+            n.setImage(Messages.get("publicImageUrl") + filename.replaceAll(" ", ""));
             saveReportedImage(filename, file);
         }
         n.setInsert_date(LocalDateTime.now());
