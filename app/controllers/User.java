@@ -37,7 +37,9 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import java.io.*;
 import java.time.LocalDateTime;
+import java.util.*;
 
 public class User extends Controller {
 
@@ -427,7 +429,7 @@ public class User extends Controller {
     }
 
 
-    public static ArrayList<Person> getGroupMembers(String shortName) throws IOException{
+    public static ArrayList<Person> getGroupMembers(String shortName) throws IOException {
 
         ArrayList<Person> members = new ArrayList<>();
 
