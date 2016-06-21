@@ -15,15 +15,27 @@ public class DisasterAttributeMapping extends Model {
 
     private String disaster_area;
 
+    private String disaster_area_en;
+
     private String disaster_cause;
+
+    private String disaster_cause_en;
 
     private String disaster_characteristics;
 
+    private String disaster_characteristics_en;
+
     private String disaster_impacts_infrastructure;
+
+    private String disaster_impacts_infrastructure_en;
 
     private String disaster_impacts_other;
 
+    private String disaster_impacts_other_en;
+
     private String disaster_duration;
+
+    private String disaster_duration_en;
 
 
     public String getDisaster_type() {
@@ -80,6 +92,54 @@ public class DisasterAttributeMapping extends Model {
 
     public void setDisaster_duration(String disaster_duration) {
         this.disaster_duration = disaster_duration;
+    }
+
+    public String getDisaster_area_en() {
+        return disaster_area_en;
+    }
+
+    public void setDisaster_area_en(String disaster_area_en) {
+        this.disaster_area_en = disaster_area_en;
+    }
+
+    public String getDisaster_cause_en() {
+        return disaster_cause_en;
+    }
+
+    public void setDisaster_cause_en(String disaster_cause_en) {
+        this.disaster_cause_en = disaster_cause_en;
+    }
+
+    public String getDisaster_characteristics_en() {
+        return disaster_characteristics_en;
+    }
+
+    public void setDisaster_characteristics_en(String disaster_characteristics_en) {
+        this.disaster_characteristics_en = disaster_characteristics_en;
+    }
+
+    public String getDisaster_impacts_infrastructure_en() {
+        return disaster_impacts_infrastructure_en;
+    }
+
+    public void setDisaster_impacts_infrastructure_en(String disaster_impacts_infrastructure_en) {
+        this.disaster_impacts_infrastructure_en = disaster_impacts_infrastructure_en;
+    }
+
+    public String getDisaster_impacts_other_en() {
+        return disaster_impacts_other_en;
+    }
+
+    public void setDisaster_impacts_other_en(String disaster_impacts_other_en) {
+        this.disaster_impacts_other_en = disaster_impacts_other_en;
+    }
+
+    public String getDisaster_duration_en() {
+        return disaster_duration_en;
+    }
+
+    public void setDisaster_duration_en(String disaster_duration_en) {
+        this.disaster_duration_en = disaster_duration_en;
     }
 
     public static Finder<String, DisasterAttributeMapping> find = new Finder<String, DisasterAttributeMapping>(DisasterAttributeMapping.class);

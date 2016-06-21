@@ -478,7 +478,7 @@ $('#btnDelete').on('click', function() {
         var collection = e.target.getFeatures();
         var feature = collection.item(0);
 
-        if(feature.getProperties().agency === agency){
+        if(feature.getProperties().agency === agency || agency === 'ALFRESCO_ADMINISTRATORS' || agency === 'GROUP_ALFRESCO_ADMINISTRATORS'){
             if (feature) {
                     if (feature.getId()) {
                         var db_table = feature.getId().substring(0, feature.getId().indexOf("."));

@@ -102,6 +102,12 @@ function drawMapCurrent() {
             });
 
             $(".head h4").html(feature.get('title'));
+            $(".head-last2days h3").hide();
+
+            document.getElementById("myChartCurrentTemp").style.visibility = "hidden";
+            document.getElementById("myChartCurrentRain").style.visibility = "hidden";
+            document.getElementById("myChartCurrentWindSpeed").style.visibility = "hidden";
+            $(".children h3").hide();
 
             Chart.types.Line.extend({
                 name: "LineAlt",
@@ -259,20 +265,15 @@ function drawMapCurrent() {
                      scaleLabel: "          <%=value%>"
                 });
 
-                document.getElementById("myChartCurrentTemp").style.visibility = "visible";
-                document.getElementById("myChartCurrentRain").style.visibility = "visible";
-                document.getElementById("myChartCurrentWindSpeed").style.visibility = "visible";
-
-                $(".head-last2days h3").hide();
-                $(".children h3").show();
 
                 if(dataWind.length === 0){
                     $(".head-last2days h3").show();
-                    $(".children h3").hide();
+                }else{
+                    document.getElementById("myChartCurrentTemp").style.visibility = "visible";
+                    document.getElementById("myChartCurrentRain").style.visibility = "visible";
+                    document.getElementById("myChartCurrentWindSpeed").style.visibility = "visible";
 
-                    document.getElementById("myChartCurrentTemp").style.visibility = "hidden";
-                    document.getElementById("myChartCurrentRain").style.visibility = "hidden";
-                    document.getElementById("myChartCurrentWindSpeed").style.visibility = "hidden";
+                    $(".children h3").show();
                 }
 
                 }),
@@ -812,6 +813,13 @@ function drawMapHistoricPerDay() {
             });
 
             $(".head h4").html(feature.get('title'));
+            $(".head-histday h3").hide();
+            document.getElementById("myChartTempHistDay").style.visibility = "hidden";
+            document.getElementById("myChartRainHistDay").style.visibility = "hidden";
+            document.getElementById("myChartWindHistDay").style.visibility = "hidden";
+
+            $(".children h3").hide();
+            $(".y-label").hide();
 
             Chart.types.Line.extend({
                 name: "LineAlt",
@@ -996,24 +1004,17 @@ function drawMapHistoricPerDay() {
                     scaleLabel: "          <%=value%>"
                 });
 
-                document.getElementById("myChartTempHistDay").style.visibility = "visible";
-                document.getElementById("myChartRainHistDay").style.visibility = "visible";
-                document.getElementById("myChartWindHistDay").style.visibility = "visible";
-
-                $(".head-histday h3").hide();
-                $(".children h3").show();
-
                 if(dataMeanWind.length === 0){
                     if(lang === "en"){ $(".head-histday h3").html("No available data"); }
                     else if (lang === "el"){ $(".head-histday h3").html("Δεν υπάρχουν διαθέσιμα δεδομένα"); }
 
-                    document.getElementById("myChartTempHistDay").style.visibility = "hidden";
-                    document.getElementById("myChartRainHistDay").style.visibility = "hidden";
-                    document.getElementById("myChartWindHistDay").style.visibility = "hidden";
-
-                    $(".children h3").hide();
                     $(".head-histday h3").show();
-                    $(".y-label").html("");
+                }else{
+                    document.getElementById("myChartTempHistDay").style.visibility = "visible";
+                    document.getElementById("myChartRainHistDay").style.visibility = "visible";
+                    document.getElementById("myChartWindHistDay").style.visibility = "visible";
+                    $(".children h3").show();
+                    $(".y-label").show();
                 }
 
                 }),
@@ -1154,6 +1155,12 @@ function drawMapHistoric() {
             });
 
             $(".head h4").html(feature.get('title'));
+            $(".head-historic h3").hide();
+            $(".children h3").hide();
+            document.getElementById("myChartTempHist").style.visibility = "hidden";
+            document.getElementById("myChartRainHist").style.visibility = "hidden";
+            document.getElementById("myChartWindHist").style.visibility = "hidden";
+            $(".y-label").hide();
 
             Chart.types.Line.extend({
                 name: "LineAlt",
@@ -1332,24 +1339,18 @@ function drawMapHistoric() {
                      scaleLabel: "          <%=value%>"
                 });
 
-                 document.getElementById("myChartTempHist").style.visibility = "visible";
-                 document.getElementById("myChartRainHist").style.visibility = "visible";
-                 document.getElementById("myChartWindHist").style.visibility = "visible";
-
-                $(".head-historic h3").hide();
-                $(".children h3").show();
-
                 if(dataWind.length === 0){
                     if(lang === "en"){ $(".head-historic h3").html("No available data"); }
                     else if (lang === "el"){ $(".head-historic h3").html("Δεν υπάρχουν διαθέσιμα δεδομένα"); }
 
-                    document.getElementById("myChartTempHist").style.visibility = "hidden";
-                    document.getElementById("myChartRainHist").style.visibility = "hidden";
-                    document.getElementById("myChartWindHist").style.visibility = "hidden";
-
-                    $(".children h3").html("");
                     $(".head-historic h3").show();
-                    $(".y-label").html("");
+                }else{
+                    document.getElementById("myChartTempHist").style.visibility = "visible";
+                    document.getElementById("myChartRainHist").style.visibility = "visible";
+                    document.getElementById("myChartWindHist").style.visibility = "visible";
+
+                    $(".children h3").show();
+                    $(".y-label").show();
                 }
 
                 }),

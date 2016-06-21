@@ -571,7 +571,7 @@ $('#btnDelete').on('click', function() {
         var collection = e.target.getFeatures();
         var feature = collection.item(0);
 
-        if(feature.getProperties().agency === agency){
+        if(feature.getProperties().agency === agency || agency === 'GROUP_ALFRESCO_ADMINISTRATORS' || agency === 'ALFRESCO_ADMINISTRATORS'){
             if (feature) {
                 if (feature.getId()) {
                     var db_table = feature.getId().substring(0, feature.getId().indexOf("."));
@@ -645,12 +645,12 @@ $('#btnSelect').on('click', function() {
                   '<div id="popover-content" class="popover-content-preview">' +
                   '<div class="form-group">' +
                   '<small>'+
-                  '<strong>Title:</strong> <span id="popup-layer">'+title+'</span><br/>'+
-                  '<strong>Agency:</strong> <span id="popup-agency">'+agencyGroupname+'</span><br/>'+
-                  '<strong>Date:</strong> <span id="popup-insert_date">'+props.insert_date.split("GMT+0300")[0]+'</span><br/>'+
+                  '<strong>'+ tTitle +':</strong> <span id="popup-layer">'+title+'</span><br/>'+
+                  '<strong>'+ agencyTitle +':</strong> <span id="popup-agency">'+agencyGroupname+'</span><br/>'+
+                  '<strong>'+ dateTitle +':</strong> <span id="popup-insert_date">'+props.insert_date.split("GMT+0300")[0]+'</span><br/>'+
                   '<br/>'+
-                  '<strong>Location:</strong> <span id="popup-site">'+props.site+'</span><br/>'+
-                  '<strong>Attributes:</strong> <span id="popup-attributes">'+props.attributes+'</span><br/>'+
+                  '<strong>'+ locationTitle +':</strong> <span id="popup-site">'+props.site+'</span><br/>'+
+                  '<strong>'+ attributeTitle +'</strong> <span id="popup-attributes">'+props.attributes+'</span><br/>'+
                   '</small>' +
                   '</div>' +
                   '<div>';
@@ -795,3 +795,9 @@ $(function () {
 });
 
 $('#manageDropdown').addClass('active');
+
+var attributeTitle = document.getElementById("attributeTitle").value;
+var locationTitle = document.getElementById("locationTitle").value;
+var tTitle = document.getElementById("tTitle").value;
+var agencyTitle = document.getElementById("agencyTitle").value;
+var dateTitle = document.getElementById("dateTitle").value;

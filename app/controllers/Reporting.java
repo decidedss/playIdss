@@ -4,11 +4,13 @@ import com.twilio.sdk.TwilioRestException;
 import models.*;
 import play.data.Form;
 import play.i18n.Messages;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.File;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,12 +35,13 @@ public class Reporting extends Controller {
             return redirect("/login");
     }
 
-
+    // 100 MB
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 1000 * 1024 * 1024)
     public static Result newReport() throws IOException, TwilioRestException {
 
         Notification n = new Notification();
 
-        Form<UploadImageForm> form = form(UploadImageForm.class).bindFromRequest();
+       Form<UploadImageForm> form = form(UploadImageForm.class).bindFromRequest();
         if (form.get().image!=null){
             File file = form.get().image.getFile();
             String filename = form.get().image.getFilename();

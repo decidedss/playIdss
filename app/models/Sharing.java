@@ -19,6 +19,8 @@ public class Sharing extends Model {
 
     private String agency_displayname;
 
+    // Default value = true
+    @Column(columnDefinition="tinyint(1) default 1")
     private boolean share;
 
     private LocalDateTime insert_date;
@@ -78,6 +80,5 @@ public class Sharing extends Model {
     }
 
     public static void update(Sharing item){item.update();}
-
 
 }

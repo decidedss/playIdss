@@ -317,10 +317,10 @@ public class Contacts extends Controller {
                 if (em.validate(m)){
                     HtmlEmail email = new HtmlEmail();
                     email.setHostName(Messages.get("emailHostname"));
-                    email.setSmtpPort(465);
+                    email.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
+                    email.setStartTLSRequired(true);
                     email.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
                     email.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
-                    email.setSSLOnConnect(true);
                     email.setFrom(Messages.get("emailUsername"));
                     email.setSubject("Notification - iDSS");
                     email.setHtmlMsg(message);

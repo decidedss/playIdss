@@ -30,22 +30,22 @@
 <style>
 
     .myFile {
-    position: absolute;
-    overflow: hidden;
-    float: left;
-    clear: left;
-    height:200px;
-    width:200px;
+        position: absolute;
+        overflow: hidden;
+        float: left;
+        clear: left;
+        height: 200px;
+        width: 200px;
     }
     .myFile input[type="file"] {
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 0;
-    opacity: 0;
-    font-size: 100px;
-    filter: alpha(opacity=0);
-    cursor: pointer;
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        opacity: 0;
+        font-size: 100px;
+        filter: alpha(opacity=0);
+        cursor: pointer;
     }
 
 </style>
@@ -129,18 +129,6 @@
                             </div>
 
 
-                            <!-- Image upload-->
-                            <div class="form-group" align="left">
-                                <p class="text-muted">@Messages.get("uploadimage")</p>
-                                <label class="myFile">
-                                    <img src='@routes.Assets.at("images/image_add.png")' alt=""/>
-                                    <input type="file" title='@Messages.get("uploadimage")' class=""
-                                           accept=".jpg, .png, .bmp" name="image" id="imgInp">
-                                    <img id="imgPreview" src="" alt="" class="img-rounded img-responsive"/>
-                                </label>
-                            </div>
-
-
                             <!-----------------Save Confirmation modal---------------------->
                             <div class="modal fade" id="confirmationModalSave" tabindex="-1" role="dialog"  aria-labelledby="confirmationModalLabelSave">
                                 <div class="modal-dialog" role="document">
@@ -175,8 +163,19 @@
                                 <button type="button" class="btn btn-lg btn-danger" id="reportBtnNew" disabled="disabled" data-toggle="modal" data-target="#confirmationModalSave">
                                     @Messages.get("report")
                                 </button>
-                            </div>
 
+                                <!-- Image upload-->
+                                <div class="form-group" align="left">
+                                    <p class="text-muted">@Messages.get("uploadimage")</p>
+                                    <label class="myFile">
+                                        <img src='@routes.Assets.at("images/image_add.png")' alt=""/>
+                                        <input type="file" title='@Messages.get("uploadimage")' class="" accept="image/*" name="image" id="imgInp">
+                                        <img id="imgPreview" src="" alt="" class="img-rounded img-responsive"/>
+                                    </label>
+                                    <br/>
+                                </div>
+
+                            </div>
 
                         </fieldset>
                     </form>

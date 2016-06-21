@@ -30,7 +30,7 @@ representNewBody=Αντιπροσωπεύετε ένα νέο Φορέα
 weNeedToKnow=Επομένως θέλουμε να ξέρουμε:
 yourname=Το όνομά σας
 yoursurname=Το επώνυμό σας
-yourbody=Το Φορέα σας
+yourbody=Τον Φορέα σας
 yourposition=Τη θέση σας στο Φορέα
 youremail=Το email σας
 reenterPassword=Επανεισαγωγή κωδικού πρόσβασης
@@ -45,7 +45,8 @@ errorIncorrectAgency=Ο κωδικός χρήστης που εισάγετε δ
 errorWrongCredentials=Τα στοιχεία εισόδου δεν μπορούν να ταυτοποιηθούν. Παρακαλώ ξαναπροσπαθήστε!
 errorNoSuchUser=Δεν υπάρχει εγγεγραμμένος χρήστης με το όνομα χρήστη
 passwordUpdated=Ο κωδικός πρόσβασης άλλαξε επιτυχώς!
-
+signupConfirmation=Είναι σωστά τα παραπάνω στοιχεία;
+signupConfirmationUsername=Προσοχή! Μετά τη δημιουργία του λογαριασμού δε θα μπορείτε να αλλάξετε το username σας!
 # ---------------- user ---------------------
 logout=Αποσύνδεση
 profile=Προφίλ χρήστη
@@ -103,6 +104,7 @@ newEvent=Νέα συμβάντα
 opacity=Αδιαφάνεια
 visibility=Ορατότητα
 noAvailableData=Δεν υπάρχουν διαθέσιμα δεδομένα
+baseMaps=Υπόβαθρο
 
 # -------------- measures ------------------
 click=Κλικάρετε για να επιλέξετε
@@ -133,6 +135,7 @@ department=Τμήμα
 implementingBody=Φορείς υλοποίησης
 participatingBody=Συμμετέχοντες φορείς
 agency=Φορέας
+agencyAction=Φορέας που καταχώρησε την ενέργεια
 delete=Διαγραφή
 deleteHeader=Διαγραφή ενέργειας
 tabularFormHeader=Δείτε τις επιλογές σας σε
@@ -441,6 +444,7 @@ site=Τοποθεσία
 attributes=Χαρακτηριστικά
 geometryInfo=Εισαγωγή πληροφοριών
 geometryDetails=Λεπτομέρειες γεωμετρίας
+title=Τίτλος
 
 #-----------Human resources------------
 humanResources=Ανθρώπινοι πόροι
@@ -453,7 +457,7 @@ historicMonth=Κλιματικά δεδομένα προηγούμενων μη�
 historicDay=Κλιματικά δεδομένα προηγούμενων ημερών
 meteoTemperature=Θερμοκρασία (Υψηλή, Χαμηλή, Μέση)
 meteoRain=Βροχόπτωση
-meteoWind=Ταχύτητα ανέμου (Μέση)
+meteoWind=Ταχύτητα ανέμου (Υψηλή, Μέση)
 meteoPrecipitation=Βροχόπτωση
 meteoYLabel=Μήνας του τρέχοντος έτους
 meteoYLabelDay=Ημέρα του τρέχοντος μήνα

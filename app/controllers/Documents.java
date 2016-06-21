@@ -18,12 +18,15 @@ import play.data.DynamicForm;
 import play.data.Form;
 import play.i18n.Messages;
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import java.io.*;
 import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.util.*;
 
 public class Documents extends Controller {
 
@@ -86,6 +89,8 @@ public class Documents extends Controller {
 //        return ok(views.html.upload.render(tags));
 //    }
 
+    // 100 MB
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 1000 * 1024 * 1024)
     public static Result savefile() throws IOException {
 
         Http.MultipartFormData.FilePart doc = request().body().asMultipartFormData().getFile("document");

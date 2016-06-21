@@ -33,14 +33,16 @@ excluded = #ALFRESCO_ADMINISTRATORS#ALFRESCO_SEARCH_ADMINISTRATORS#EMAIL_CONTRIB
 
 # ------------------- email settings -----------------
 # old settings
-emailHostname=smtp.googlemail.com
-emailUsername=imet.idss@gmail.com
-emailPassword=decide2015
+#emailHostname=smtp.googlemail.com
+#emailUsername=imet.idss@gmail.com
+#emailPassword=decide2015
+#emailSmtpPort=465
 
 # new settings
-#emailHostname=filippos.certh.gr
-#emailUsername=decide.dss@certh.gr
-#emailPassword=dfgyhn4867
+emailHostname=filippos.certh.gr
+emailUsername=decide.dss@certh.gr
+emailPassword=dfgyhn4867
+emailSmtpPort=587
 
 ################################################### Change when dist on server
 

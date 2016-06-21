@@ -87,11 +87,17 @@ create table gis.public._contacts_groups (
 create table gis.public._disasters_attribute_mapping (
   disaster_type             varchar(255) not null,
   disaster_area             varchar(255),
+  disaster_area_en          varchar(255),
   disaster_cause            varchar(255),
+  disaster_cause_en         varchar(255),
   disaster_characteristics  varchar(255),
+  disaster_characteristics_en varchar(255),
   disaster_impacts_infrastructure varchar(255),
+  disaster_impacts_infrastructure_en varchar(255),
   disaster_impacts_other    varchar(255),
+  disaster_impacts_other_en varchar(255),
   disaster_duration         varchar(255),
+  disaster_duration_en      varchar(255),
   constraint pk__disasters_attribute_mapping primary key (disaster_type))
 ;
 
@@ -327,7 +333,7 @@ create table gis.public._agency_sharing (
   id                        integer not null,
   agency                    varchar(255),
   agency_displayname        varchar(255),
-  share                     boolean,
+  share                     tinyint(1) default 1,
   insert_date               timestamp,
   constraint pk__agency_sharing primary key (id))
 ;
@@ -395,7 +401,7 @@ create sequence _meteo_last2days_id_seq;
 
 create sequence _machinery_layer_id_seq;
 
-create sequence _machinery_id_seq;
+create sequence _machinery_type_id_seq;
 
 create sequence _measures_id_seq;
 
@@ -524,7 +530,7 @@ drop sequence if exists _meteo_last2days_id_seq;
 
 drop sequence if exists _machinery_layer_id_seq;
 
-drop sequence if exists _machinery_id_seq;
+drop sequence if exists _machinery_type_id_seq;
 
 drop sequence if exists _measures_id_seq;
 

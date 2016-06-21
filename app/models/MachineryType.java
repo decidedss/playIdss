@@ -9,6 +9,7 @@ import play.i18n.Messages;
 import javax.imageio.ImageIO;
 import javax.persistence.*;
 import java.awt.image.BufferedImage;
+import java.io.*;
 import java.io.File;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Table(name="_machinery_type", catalog="gis", schema="public")
 public class MachineryType extends Model {
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="_machinery_id_seq")
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="_machinery_type_id_seq")
     private int id;
 
     private String vehicle_type;

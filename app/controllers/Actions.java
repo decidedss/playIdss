@@ -2,6 +2,7 @@ package controllers;
 
 import com.avaje.ebean.Expr;
 import models.*;
+
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -233,7 +234,7 @@ public class Actions extends Controller {
                 return redirect("/actions");
             }
             else {
-                return ok(views.html.add_action.render(mForm));
+                return redirect("/actions");
             }
         } else
             return redirect("/login");

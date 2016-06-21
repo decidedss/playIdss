@@ -62,13 +62,13 @@ window.onload = function() { document.getElementById("form-machinery").style.dis
                 <button class="btn btn-info btn-xs" id="btnSelect" data-toggle="tooltip" data-placement="top" title='@Messages.get("showInformation")'>
                     <span class="glyphicon glyphicon-new-window"></span>
                 </button> &nbsp;
-                @if(!isAdmin){
-                @if(hasEdit){
+
+                @if(isAdmin || hasEdit){
                 <button class="btn btn-danger btn-xs" id="btnDelete" data-toggle="tooltip" data-placement="top" title='@Messages.get("deleteButton")'>
                     <span class="glyphicon glyphicon-trash"></span>
                 </button>
                 }
-                }
+
                 <br/><br/>
             </div>
 

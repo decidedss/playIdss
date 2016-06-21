@@ -83,7 +83,23 @@ function geodata() {
             }
      }
 
+    // RASTER LAYER
+//    var rasterSource = new ol.source.TileWMS({
+//      url: geoserver_wms,
+//      params: {'LAYERS': 'cite' + ':' + 'xrhseis_teliko', 'TILED': true},
+//      serverType: 'geoserver',
+//    });
+//
+//      var rasterLayer = new ol.layer.Tile({
+//            title: 'Xrhseis ghs',
+//            visible: true,
+//            source: rasterSource,
+//            id: 'xrhseis ghs'
+//        });
+    ////////////////////////////////////////////////////////
+
     allLayerGroups = allLayerGroups.concat(layerGroups);
+//    allLayerGroups = allLayerGroups.concat(rasterLayer);
 
     controlMousePos = new ol.control.MousePosition({
         coordinateFormat: ol.coordinate.createStringXY(4),
@@ -99,6 +115,29 @@ function geodata() {
                ],
        view: view
     });
+
+
+    // RASTER on click
+//    map.on('singleclick', function(evt) {
+//        var viewResolution = /** @type {number} */ (view.getResolution());
+//        var url = rasterSource.getGetFeatureInfoUrl(
+//            evt.coordinate, viewResolution, 'EPSG:3857', {'INFO_FORMAT': infoFormat});
+//       if (url) {
+//               $.ajax({
+//                    url: url,
+//                    type: 'GET',
+//                    crossDomain: true,
+//                    dataType: 'json',
+//                    success: function(data){
+//                        parseResponse(data);
+//                      },
+//                      error: function(data){
+//                        alert("No data!");
+//                      }
+//                });
+//            }
+//      });
+
 
     // Popup information
     map.on('click', function (evt1) {
@@ -189,6 +228,7 @@ function parseResponse(data) {
                    if(values[key] !== null){
                      content = content  + "<strong>"+key +  ":</strong> " + values[key] + "<br/>";
                    }else{
+                     content = content  + "<strong>"+key +  ":</strong> - <br/>";
                      content = content  + "<strong>"+key +  ":</strong> - <br/>";
                    }
 

@@ -24,6 +24,9 @@
 @views.html.header {
 }
 
+<script>
+    var selectPhase = '@Messages.get("selectPhase")';
+</script>
 
 <div class="container-fluid">
     <div class="starter-template">
@@ -69,15 +72,15 @@
                         <select name="phase" required id="phase-s" class="js-example-basic-single select2-container"
                                 style="width: 100%" data-placeholder='@Messages.get("selectPhase")' multiple="multiple">
                             @if(session.get("lang").contains("el")){
-                                @for(phase <- phases) {
-                                    <option class="select2-container" value='@phase.getTitle()'>@phase.getTitle()</option>
-                                }
+                            @for(phase <- phases) {
+                            <option class="select2-container" value='@phase.getTitle()'>@phase.getTitle()</option>
+                            }
                             }
 
                             @if(session.get("lang").contains("en")){
-                                @for(phase <- phases) {
-                                    <option class="select2-container" value='@phase.getTitle_en()'>@phase.getTitle_en()</option>
-                                }
+                            @for(phase <- phases) {
+                            <option class="select2-container" value='@phase.getTitle_en()'>@phase.getTitle_en()</option>
+                            }
                             }
                         </select>
                     </div>
@@ -95,7 +98,7 @@
             </form>
             }
 
-            <!-- Modal add traffic data -->
+            <!-- Modal add actiions -->
             <div class="modal fade" id="myModalNorm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
                  aria-hidden="true" align="center">
                 <div class="modal-dialog">
@@ -148,10 +151,9 @@
                                 <div align="left">
                                     <div class="form-group">
                                         <label for="phase">@Messages.get("phase"):</label><br/>
-                                        <select style="width: 100%" name="phase" required id="phase" class="js-example-basic-single select2-container"
-                                                style="width: 100%" data-placeholder='@Messages.get("selectPhase")' multiple="multiple">
+                                        <select name="phase" required id="phase" class="js-example-basic-multiple" style="width: 100%" multiple="multiple">
                                             @for(phase <- phases) {
-                                            <option class="select2-container" value='@phase.getTitle()'>@phase.getTitle()</option>
+                                                <option class="select2-container" value='@phase.getTitle()'>@phase.getTitle()</option>
                                             }
                                         </select>
                                     </div>
@@ -213,6 +215,22 @@
         </div>
     </div>
 </div>
+
+
+<script type="text/javascript">
+
+
+    $(function() {
+
+         $(".js-example-basic-multiple").select2({
+            allowClear: true,
+            placeholder: selectPhase,
+         });
+
+    }); // End of jQuery
+
+
+</script>
 
 </body>
 </html>

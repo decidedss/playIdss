@@ -64,7 +64,7 @@
                         url: "/documents/delete/"+data.split(",")[0],
                         beforeSend: function (jqXHR, settings) {
                             url = settings.url + "?" + settings.data;
-                            console.log(url);
+                            <!--console.log(url);-->
                         },
                         success :(function(data){
                         loadAjax();
@@ -83,7 +83,7 @@
                         url: "/documents/delete/"+data.split(",")[0],
                         beforeSend: function (jqXHR, settings) {
                             url = settings.url + "?" + settings.data;
-                            console.log(url);
+                            <!--console.log(url);-->
                         },
                         success :(function(data){
                         loadAjax();
@@ -121,7 +121,7 @@
                     for (var c in categories){
                         var options = '@value';
                         if(options.indexOf(categories[c])>0){
-                            console.log(categories[c]);
+                            <!--console.log(categories[c]);-->
                             fill.push(categories[c]);
                         }
                     }
@@ -666,7 +666,7 @@ function loadAjax() {
                     });
                 }
 
-                console.log(cats);
+                <!--console.log(cats);-->
                $('#categories').val(cats.toString());
                $('#categoriesEdit').val(cats.toString());
              });
@@ -687,14 +687,7 @@ function loadAjax() {
                 useCurrent: false,
             });
 
-            $("#datetimepicker8").on("dp.change", function (e) {
-                startDate = e.date._d;
-                $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
-            });
-            $("#datetimepicker9").on("dp.change", function (e) {
-                endDate = e.date._d;
-                $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
-            });
+
             ////////////////////////////////////////////////////////////////////
 
             $('ul.first').bsPhotoGallery({

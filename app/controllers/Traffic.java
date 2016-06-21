@@ -1,6 +1,10 @@
 package controllers;
 
 import models.TrafficWay;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.Minutes;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.xml.sax.SAXException;
@@ -14,6 +18,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Traffic extends Controller {
 
@@ -54,7 +62,7 @@ public class Traffic extends Controller {
         }
     }
 
-    public static Result getCongestion() throws IOException, ParserConfigurationException, SAXException {
+    public static Result getCongestion() throws IOException, ParserConfigurationException, SAXException, ParseException {
         if (session().get("userName") != null) {
             Map<String, String> idCongestion = parseCongestion();
             return ok(Json.toJson(idCongestion));
@@ -63,7 +71,7 @@ public class Traffic extends Controller {
         }
     }
 
-    public static Map<String, String> parseCongestion() throws IOException {
+    public static Map<String, String> parseCongestion() throws IOException, ParseException {
         Map<String, String> idCongestion = new HashMap<String, String>();
 
         //get data
@@ -81,9 +89,17 @@ public class Traffic extends Controller {
 
         JSONArray jsonarray = new JSONArray(jsonData);
 
+        java.util.Date date= new java.util.Date();
+        DateTime dt1 = new DateTime(new Timestamp(date.getTime()));
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         for (int i = 0; i < jsonarray.length(); i++) {
             JSONObject jsonobject = jsonarray.getJSONObject(i);
-            idCongestion.put(jsonobject.getString("Link_id"), jsonobject.getString("Congestion"));
+            DateTime dt2 = new DateTime(format.parse(jsonobject.getString("Timestamp")));
+
+            if(Days.daysBetween(dt2, dt1).getDays() == 0 && Hours.hoursBetween(dt2, dt1).getHours() % 24 == 0 && Minutes.minutesBetween(dt2, dt1).getMinutes() % 60 < 21)
+                idCongestion.put(jsonobject.getString("Link_id"), jsonobject.getString("Congestion"));
         }
 
         return idCongestion;

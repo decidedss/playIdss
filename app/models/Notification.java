@@ -3,6 +3,7 @@ package models;
 
 import com.avaje.ebean.Model;
 import org.apache.commons.lang.StringEscapeUtils;
+import play.mvc.Controller;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -285,13 +286,26 @@ public class Notification extends Model {
         String attr = "";
         DisasterAttributeMapping mapping = DisasterAttributeMapping.find.where().eq("disaster_type", type).findUnique();
         if (mapping!=null){
-            attr =              mapping.getDisaster_duration()
+            //System.out.println(Controller.lang().language());
+            if (Controller.lang().language().equals("el")){
+                attr =  mapping.getDisaster_duration()
                         + "#" + mapping.getDisaster_area()
                         + "#" + mapping.getDisaster_cause()
                         + "#" + mapping.getDisaster_characteristics()
                         + "#" + mapping.getDisaster_impacts_infrastructure()
                         + "#" + mapping.getDisaster_impacts_other()
-                     ;
+                ;
+            }
+            else { // en
+                attr =  mapping.getDisaster_duration_en()
+                        + "#" + mapping.getDisaster_area_en()
+                        + "#" + mapping.getDisaster_cause_en()
+                        + "#" + mapping.getDisaster_characteristics_en()
+                        + "#" + mapping.getDisaster_impacts_infrastructure_en()
+                        + "#" + mapping.getDisaster_impacts_other_en()
+                ;
+            }
+
         }
 
         return StringEscapeUtils.unescapeHtml(attr);

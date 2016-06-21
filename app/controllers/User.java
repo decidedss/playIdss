@@ -394,7 +394,7 @@ public class User extends Controller {
             Sharing s = new Sharing();
             s.setAgency(person.getOrganization().replaceAll(" ", ""));
             s.setAgency_displayname(person.getOrganization());
-            s.setShare(false);
+            s.setShare(true); // default share yes
             s.setInsert_date(LocalDateTime.now());
             Sharing.create(s);
 
@@ -429,7 +429,7 @@ public class User extends Controller {
     }
 
 
-    public static ArrayList<Person> getGroupMembers(String shortName) throws IOException {
+    public static ArrayList<Person> getGroupMembers(String shortName) throws IOException{
 
         ArrayList<Person> members = new ArrayList<>();
 
@@ -631,10 +631,10 @@ public class User extends Controller {
         try {
             HtmlEmail email2 = new HtmlEmail();
             email2.setHostName(Messages.get("emailHostname"));
-            email2.setSmtpPort(465);
+            email2.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
+            email2.setStartTLSRequired(true);
             email2.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
             email2.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
-            email2.setSSLOnConnect(true);
             email2.setFrom(Messages.get("emailUsername"));
             email2.setSubject("[DECIDE] " + Messages.get("passwordUpdateSubject"));
             email2.setHtmlMsg(message);
@@ -649,6 +649,7 @@ public class User extends Controller {
 
     }
 
+    /* When logged out  */
     public static Result passwordmail() throws IOException {
 
         String ticket = Application.loginAlfresco();
@@ -667,22 +668,22 @@ public class User extends Controller {
         Application.ses = repositories.get(0).createSession();
         ItemIterable<QueryResult> query =  Application.ses.query("SELECT * FROM cm:person where cm:userName = '" + userName + "'", false);
         if (query.getTotalNumItems()>0){
-            //RandomPassword rp = new RandomPassword();
-            //String password = rp.generateRandomString();
+            RandomPassword rp = new RandomPassword();
+            String password = rp.generateRandomString();
             Person p = getPerson(requestData.get("userName"));
-            updateUserPassword(p, p.getPassword());
+            updateUserPassword(p, password);
 
             String message = Messages.get("passwordReset")+ "<br/><br/>" +
                     Messages.get("passwordResetEmail") + " <a href='" + Messages.get("baseUrl") + "login'>DECIDE</a> " +  Messages.get("with") + "<br/> " +
                     Messages.get("username") + ": <strong>" + userName + "</strong><br/>" +
-                    Messages.get("password") + ": <strong>" + p.getPassword() + "</strong>";
+                    Messages.get("password") + ": <strong>" + password + "</strong>";
             try {
                 HtmlEmail email2 = new HtmlEmail();
                 email2.setHostName(Messages.get("emailHostname"));
-                email2.setSmtpPort(465);
+                email2.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
+                email2.setStartTLSRequired(true);
                 email2.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
                 email2.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
-                email2.setSSLOnConnect(true);
                 email2.setFrom(Messages.get("emailUsername"));
                 email2.setSubject("[DECIDE] " + Messages.get("passwordUpdateSubject"));
                 email2.setHtmlMsg(message);
@@ -741,10 +742,10 @@ public class User extends Controller {
         try {
             HtmlEmail email2 = new HtmlEmail();
             email2.setHostName(Messages.get("emailHostname"));
-            email2.setSmtpPort(465);
+            email2.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
+            email2.setStartTLSRequired(true);
             email2.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
             email2.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
-            email2.setSSLOnConnect(true);
             email2.setFrom(Messages.get("emailUsername"));
             email2.setSubject("[DECIDE] " + Messages.get("signup"));
             email2.setHtmlMsg(message);

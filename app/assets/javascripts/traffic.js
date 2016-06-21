@@ -72,7 +72,7 @@ function traffic() {
                         feature.setStyle(low);
                     else if(congestions[key] === 'Medium')
                         feature.setStyle(medium);
-                    else
+                    else if(congestions[key] === 'High')
                         feature.setStyle(high);
 
                     trafficVectors[i] = new ol.source.Vector({
@@ -110,5 +110,3 @@ function stopSpinner() {
 $(document).ajaxStop(function () {
     stopSpinner();
 });
-
-setTimeout(stopSpinner, 3000);

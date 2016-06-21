@@ -83,11 +83,11 @@
                                 + '@e.getDisaster_action_list()' + '#'
                                 + '@e.getDisaster_remarks()' + '#'
                                 + '@e.getDisaster_suggestions()' );
-            disaster_attributes.push("@e.getDisasterAttributeMapping()");
+            disaster_attributes.push('@e.getDisasterAttributeMapping()');
         }
 
         var geoserver_ows='@Messages.get("GEOSERVER_OWS")';
-        var dateM = '@Messages.get("date")';
+        var dateM = '@Messages.get("disaster_date")';
         var durationM = '@Messages.get("disaster_duration")';
         var areaM = '@Messages.get("disaster_area")';
         var causeM = '@Messages.get("disaster_cause")';
@@ -232,7 +232,7 @@
                     <input type="hidden" class="form-control" id="id" name="id">
 
                     <!--0-->
-                    <label>@Messages.get("date")</label><br/>
+                    <label>@Messages.get("disaster_date")</label><br/>
                     <div class='input-group date' id='datetimepickerdisaster'>
                     <input type='text' class="form-control" name="disaster_date" id="disaster_date"/>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>

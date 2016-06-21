@@ -45,6 +45,9 @@ errorIncorrectAgency=The username you are trying to login with, does not belong 
 errorWrongCredentials=The login credentials could not be authenticated. Please try again!
 errorNoSuchUser=There is no registered user with the username
 passwordUpdated=Your password has been successfully updated!
+signupConfirmation=Are the above data correct?
+signupConfirmationUsername=Attention! After the account creation you will not be able to alter your username!
+
 
 # ---------------- user ---------------------
 logout=Logout
@@ -102,6 +105,7 @@ newEvent=New events
 opacity=Opacity
 visibility=Visibility
 noAvailableData=No available data
+baseMaps=Base maps
 
 # -------------- measures ------------------
 click=Click to select
@@ -126,12 +130,13 @@ id=Id
 phenomenon=Disaster phenomena
 category=Category
 description=Description
-phase=Destructive management phase
+phase=Disaster management phase
 body=Body
 department=Department
 implementingBody=Implementing body
 participatingBody=Participating body
 agency=Agency
+agencyAction=Agency who entered the action
 delete=Delete
 deleteHeader=Delete Action
 filterMessage=Search for civil protection actions by selecting:
@@ -307,7 +312,7 @@ disasterTitle=Disaster Information
 disasterComments=Short Description
 reportedBy=Reported by:
 #
-disaster_date=Date-Time
+disaster_date=Date
 disaster_duration=Disaster duration
 disaster_area=Disaster area
 disaster_cause=Disaster cause
@@ -438,6 +443,7 @@ site=Location
 attributes=Attributes
 geometryInfo=Insert data
 geometryDetails=Geometry details
+title=Title
 
 #-----------Human resources------------
 humanResources=Human resources
@@ -450,7 +456,7 @@ historicMonth=Climatic data of previous months
 historicDay=Climatic data of previous days
 meteoTemperature=Temperature (High, Low, Mean)
 meteoRain=Rain
-meteoWind=Wind speed (average)
+meteoWind=Wind speed (High, Mean)
 meteoPrecipitation=Precipitation
 meteoYLabel=Month of current year
 meteoYLabelDay=Day of current month

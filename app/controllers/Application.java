@@ -78,59 +78,74 @@ public class Application extends Controller {
     }
 
 
-    public static Result signup_info()  throws IOException{
-        Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest();
 
-        if (mForm.get().getUserName()!="" ){
+    public static Result signup_info() throws IOException{
+        Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest();
+        return ok(views.html.signup_info.render(mForm));
+    }
+
+    public static Result signup_confirmation() throws IOException{
+
+        Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest();
 
             String ticket = loginAlfresco();
             session().put("alf_ticket", ticket);
 
+            // Check if userName exists in Alfresco
+            if (User.getPerson(mForm.get().getUserName()) != null) {
+                flash("alfresco_username", "exists");
+                return redirect("/signup/info");
+            }
             // Validate Password
-            if (!mForm.get().getPassword().equals(mForm.get().getPassword_verify())){
+            if (!mForm.get().getPassword().trim().equals(mForm.get().getPassword_verify().trim())) {
                 flash("matching_password", "wrong");
                 return redirect("/signup/info");
             }
-
             // Validate Email
             Reporting.EmailValidator em = new Reporting.EmailValidator();
-            if (!em.validate(mForm.get().getEmail())){
+            if (!em.validate(mForm.get().getEmail())) {
                 flash("email", "wrong");
                 return redirect("/signup/info");
             }
 
             // Check if email exists in Alfresco - parse all /s/api/people
-            if(User.personExists(mForm.get().getEmail())){
+            if (User.personExists(mForm.get().getEmail())) {
                 flash("email", "exists");
                 return redirect("/signup/info");
             }
 
-            String response = User.addToAlfrescoWithGroup(mForm.get());
-            if (response!=null){
-                // Fill in session
-                session().put("userName", mForm.get().getUserName().trim());
-                Person person = User.getPerson(session().get("userName"));
-                session().put("groups", person.getGroups().toString());
-                session().put("lang", Controller.lang().language());
-                Sharing sh = Sharing.find.where().eq("agency", User.getPersonAgency(person.getUserName()).trim()).findUnique();
-                if (sh!=null) {
-                    session().put("agencyDisplay", sh.getAgency_displayname());
-                }
-                session().put("agency", User.getPersonAgency(person.getUserName()).trim());
-
-                String agency = mForm.get().getOrganization();
-                return ok(views.html.signup_agency_members.render(agency, User.getGroupMembers(agency)));
+            // Check if group name exists in Alfresco
+            if (User.groupExists(mForm.get().getOrganization(), ticket)){
+                flash("agency", "exists");
+                return redirect("/signup/info");
             }
-            else {
-                return ok(views.html.signup_agency_exists.render());
-            }
-        }
-        else {
-            return ok(views.html.signup_info.render(mForm));
-        }
+            //////////////////////////////////////////////////////////////////
 
+            Person person = mForm.get();
+            return ok(views.html.signup_confirmation.render(person));
     }
 
+    public static Result signup_save() throws IOException{
+        Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest();
+        String response = User.addToAlfrescoWithGroup(mForm.get());
+        if (response != null) {
+            // Fill in session
+            session().put("userName", mForm.get().getUserName().trim());
+            Person person = User.getPerson(session().get("userName"));
+            session().put("groups", person.getGroups().toString());
+            session().put("lang", Controller.lang().language());
+            Sharing sh = Sharing.find.where().eq("agency", User.getPersonAgency(person.getUserName()).trim()).findUnique();
+            if (sh != null) {
+                session().put("agencyDisplay", sh.getAgency_displayname());
+            }
+            session().put("agency", User.getPersonAgency(person.getUserName()).trim());
+
+            String agency = mForm.get().getOrganization();
+            return ok(views.html.signup_agency_members.render(agency, User.getGroupMembers(agency)));
+        } else {
+            return ok(views.html.signup_agency_exists.render());
+        }
+    }
 
     public static Result about() throws IOException {
         if (session().get("userName") != null){
@@ -321,10 +336,10 @@ public class Application extends Controller {
         try {
             HtmlEmail email = new HtmlEmail();
             email.setHostName(Messages.get("emailHostname"));
-            email.setSmtpPort(465);
+            email.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
+            email.setStartTLSRequired(true);
             email.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
             email.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
-            email.setSSLOnConnect(true);
             email.setFrom(Messages.get("emailUsername"));
             email.setSubject("Notification - iDSS");
 

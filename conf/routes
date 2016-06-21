@@ -13,7 +13,11 @@ GET     /logout                     controllers.Application.logout()
 #
 GET     /signup/agency              controllers.Application.signup_agency()
 GET     /signup/info                controllers.Application.signup_info()
-POST    /signup/info                controllers.Application.signup_info()
+#POST    /signup/info                controllers.Application.signup_info()
+POST    /signup/info                controllers.Application.signup_confirmation()
+GET     /signup/info/confirmation   controllers.Application.signup_confirmation()
+#GET     /signup/info/save           controllers.Application.signup_save()
+POST    /signup/info/save           controllers.Application.signup_save()
 #
 GET     /signup/agency/members      controllers.User.agencyMembers
 POST    /signup/agency/members      controllers.User.addWithGroup

@@ -79,16 +79,21 @@
                 <button class="btn btn-info btn-xs" id="btnSelect" data-toggle="tooltip" data-placement="top" title='@Messages.get("showInformation")'>
                     <span class="glyphicon glyphicon-new-window"></span>
                 </button> &nbsp;
+
                 @if(!isAdmin){
                 @if(hasEdit){
                 <button class="btn btn-warning btn-xs" id="btnUpdate" data-toggle="tooltip" data-placement="top" title='@Messages.get("updateInformation")'>
                     <span class="glyphicon glyphicon-pencil"></span>
                 </button> &nbsp;
+                }
+                }
+
+                @if(isAdmin || hasEdit){
                 <button class="btn btn-danger btn-xs" id="btnDelete" data-toggle="tooltip" data-placement="top" title='@Messages.get("deleteButton")'>
                     <span class="glyphicon glyphicon-trash"></span>
                 </button> &nbsp;
                 }
-                }
+
                 <br/><br/>
             </div>
 
@@ -96,6 +101,9 @@
             <input id="sharedAgencies" value="@sharedAgencies" type="hidden"/>
             <input id="groupnameAgency" value="@groupnameAgency" type="hidden"/>
             <input id="infrastructureAttributes" value="@infrastructureAttributes" type="hidden"/>
+            <input id="dateTitle" value='@Messages.get("date")' type="hidden"/>
+            <input id="agencyTitle" value='@Messages.get("agency")' type="hidden"/>
+            <input id="tTitle" value='@Messages.get("title")' type="hidden"/>
             <input id="locationTitle" value='@Messages.get("site")' type="hidden"/>
             <input id="attributeTitle" value='@Messages.get("attributes")' type="hidden"/>
 
