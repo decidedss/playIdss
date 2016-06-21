@@ -6,7 +6,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import java.io.IOException;
-import java.util.*;
 
 
 public class Maps extends Controller {

@@ -22,10 +22,8 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 
-import java.io.*;
 import java.math.BigInteger;
 import java.net.URLEncoder;
-import java.util.*;
 
 public class Documents extends Controller {
 

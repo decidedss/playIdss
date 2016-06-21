@@ -9,7 +9,6 @@ import play.i18n.Messages;
 import javax.imageio.ImageIO;
 import javax.persistence.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
 import java.io.File;
 import java.util.List;
 

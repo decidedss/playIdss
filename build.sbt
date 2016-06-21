@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
   "org.avaje.ebeanorm" % "avaje-ebeanorm" % "4.6.2",
   "com.twilio.sdk" % "twilio-java-sdk" % "3.4.5",
   "org.json" % "json" % "20150729",
+  "org.apache.jackrabbit" % "jackrabbit-core" % "2.12.1",
   javaJdbc,
   cache,
   javaWs

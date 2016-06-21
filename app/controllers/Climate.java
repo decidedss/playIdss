@@ -8,7 +8,6 @@ import play.mvc.Result;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 
 public class Climate extends Controller {
 

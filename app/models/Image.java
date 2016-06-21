@@ -5,7 +5,6 @@ import play.data.validation.Constraints;
 import play.i18n.Messages;
 
 import java.io.File;
-import java.io.*;
 import java.time.LocalDateTime;
 
 public class Image extends Model {

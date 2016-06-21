@@ -2,7 +2,6 @@ package controllers;
 
 import com.avaje.ebean.Expr;
 import models.*;
-
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
