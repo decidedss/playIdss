@@ -1,0 +1,87 @@
+@(person: Person)
+
+@import play.i18n._
+@import helper._
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    @views.html.head {
+    <title>@Messages.get("representNewBody")</title>
+    }
+</head>
+<body>
+
+<style>
+    body {
+      background-color: #1e3251;
+      color: white;
+    }
+</style>
+
+<div class="container">
+
+    <div class="row">
+        <div class="container col-lg-1">
+        </div>
+        <div class="container col-lg-10">
+            <a href="/signup/info" style="float:left; color:white;"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span></a>
+            <div style="float:right;">
+                @if(session.get("lang").contains("en")){
+                <a class="activeLocale loginLocale" href="/lang/en">en</a>
+                &emsp;
+                <a class="loginLocale" href="/lang/el">el</a>
+                }
+
+                @if(session.get("lang").contains("el")){
+                <a class="loginLocale" href="/lang/en">en</a>
+                &emsp;
+                <a class="activeLocale loginLocale" href="/lang/el">el</a>
+                }
+            </div>
+        </div>
+        <div class="container col-lg-1">
+        </div>
+    </div>
+
+    <div class="row" align="center">
+        <h1>@Messages.get("representNewBody")</h1>
+    </div>
+
+
+    <div class="container col-lg-12" align="center">
+        @helper.form(routes.Application.signup_save) {
+        <form class="form-signup">
+            <h3>@Messages.get("firstname"): <strong>@person.getFirstName()</strong></h3>
+            <input type="hidden" name="firstName" id="firstName" class="form-control" value="@person.getFirstName()">
+            <h3>@Messages.get("lastname"): <strong>@person.getLastName()</strong></h3>
+            <input type="hidden" name="lastName" id="lastName" class="form-control" value="@person.getLastName()">
+            <h3>@Messages.get("agency"): <strong>@person.getOrganization()</strong></h3>
+            <input type="hidden" name="organization" id="organization" class="form-control" value="@person.getOrganization()">
+            <h3>@Messages.get("position"): <strong>@person.getJobtitle()</strong></h3>
+            <input type="hidden" name="jobtitle" id="jobtitle" class="form-control" value="@person.getJobtitle()">
+            <h3>@Messages.get("username"): <strong>@person.getUserName()</strong></h3>
+            <input type="hidden" name="userName" id="userName" class="form-control" value="@person.getUserName()">
+            <h3>@Messages.get("email"): <strong>@person.getEmail()</strong></h3>
+            <input type="hidden" name="email" id="email" class="form-control" value="@person.getEmail()">
+            <h3>@Messages.get("password"): <strong>@person.getPassword()</strong></h3>
+            <input type="hidden" name="password" id="password" class="form-control" value="@person.getPassword()">
+            <input type="hidden" name="password_verify" id="password_verify" class="form-control" value="@person.getPassword_verify()">
+            <br/>
+            <div style="color:#f39c12">
+                <h2>@Messages.get("signupConfirmation")</h2>
+                <h5>@Messages.get("signupConfirmationUsername")</h5><br/>
+            </div>
+            <a class="btn btn-lg btn-primary idss-primary-btn" href="/signup/info">@Messages.get("no")</a>&emsp;
+            <button type="submit" class="btn btn-lg btn-warning">@Messages.get("yes")</button>
+        </form>
+        }
+
+    </div>
+</div>
+
+</body>
+
+</html>
