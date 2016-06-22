@@ -1,14 +1,16 @@
+var table;
+
 $(document).ready(function() {
-    $('#actionsTbl').DataTable();
+    table = $('#actionsTbl').DataTable();
 
-    $('#actionsTbl tbody .deleteAction').on('click',"input[type='button']",function() {
-        deleteCall(this);
-        location.reload();
+    $('#actionsTbl tbody').on('click',"input[type='button']",function() {
+        delete_edit_Call(this);
+//        location.reload();
     });
 
-    $('#actionsTbl tbody .editAction').on('click',"input[type='button']",function() {
-         editCall(this);
-    });
+//    $('#actionsTbl tbody').on('click',"input[type='button']",function() {
+//         editCall(this);
+//    });
 
     $(".js-example-basic-single").select2({
         theme : "classic",
@@ -60,35 +62,40 @@ function GetPhases(type)
     addPhase[0].value = phaseVal.substring(1);
 }
 
-function deleteCall(but) {
-    var id_actions = but.id.substring(0, but.id.indexOf(','));
+function delete_edit_Call(but) {
+    var action = but.id.substring(0, but.id.indexOf(','));
     var id = but.id.substring(but.id.indexOf(',') + 1, but.id.length);
 
-    $.ajax( {
-        url : "/actions/delete/" + id_actions,
-        success :(function(data){
-            table.row(but.closest('tr')).remove().draw();
-        })
-    });
+    if(action === "delete" || action === "deleteAdmin"){
+        $.ajax( {
+            url : "/actions/delete/" + id,
+            success :(function(data){
+                table.row(but.closest('tr')).remove().draw();
+                location.reload();
+            })
+        });
+    }else{
+        $.ajax( {
+                url : "/actions/getAction/" + id,
+                success :(function(data){
+                    for(var k in data){
+                         $('[id="'+k+'"]').val(data[k]);
+                         if(k === "phenomenon"){
+                            document.getElementById('phenomenon').value=data[k];
+                         }
+                    }
+                 }),
+                 error: (function(result){
+                 }),
+        });
+    }
 }
 
 function editCall(but){
 
     var id = but.id.substring(but.id.indexOf(',') + 1, but.id.length);
 
-    $.ajax( {
-        url : "/actions/getAction/" + id,
-        success :(function(data){
-            for(var k in data){
-                 $('[id="'+k+'"]').val(data[k]);
-                 if(k === "phenomenon"){
-                    document.getElementById('phenomenon').value=data[k];
-                 }
-            }
-         }),
-         error: (function(result){
-         }),
-    });
+
 }
 
 
