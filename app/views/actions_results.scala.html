@@ -42,7 +42,7 @@
             <div id="true" class=@success>
             <div class="alert alert-warning" role="alert" id="delete_alert"  style="display: none">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <strong>Success</strong> Measure deleted!
+                <strong>Success</strong> Action deleted!
             </div>
 
             <table id="actionsTbl" class="table table-hover">
@@ -72,14 +72,15 @@
                     <td>@item.getImplementing_body()</td>
                     <td>@item.getParticipating_body()</td>
                     <td>@item.getAgencyDisplay()</td>
-                    @if(isAdmin && item.getAgency() == "ALFRESCO_ADMINISTRATORS"){
-                    <td class="deleteAction">
-                        <input type="button" id="@item.getId_actions(),@item.getId_actions(),'admin'" value=@Messages.get("delete") class="btn btn-danger btn-sm" />
-                    </td>
 
-                    <td class="editAction">
-                        <input type="button" id="'admin',@item.getId_actions()" value=@Messages.get("edit") data-toggle="modal" data-target="#myModalNormEditAction" class="btn btn-warning btn-sm" />
-                    </td>
+                    @if(isAdmin && item.getAgency() == "ALFRESCO_ADMINISTRATORS"){
+                        <td class="deleteAction">
+                            <input type="button" id="deleteAdmin,@item.getId_actions()" value=@Messages.get("delete") class="btn btn-danger btn-sm" />
+                        </td>
+
+                        <td class="editAction">
+                            <input type="button" id="'admin',@item.getId_actions()" value=@Messages.get("edit") data-toggle="modal" data-target="#myModalNormEditAction" class="btn btn-warning btn-sm" />
+                        </td>
                     }
 
                     @if(isAdmin && item.getAgency() != "ALFRESCO_ADMINISTRATORS"){
@@ -89,13 +90,13 @@
 
                     @if(!isAdmin){
                         @if((isAgencyAdmin || hasEdit) && agency == item.getAgency()){
-                        <td class="deleteAction">
-                            <input type="button" id="@item.getId_actions(),@item.getId_actions(),'noadmin'" value=@Messages.get("delete") class="btn btn-danger btn-sm" />
-                        </td>
+                            <td class="deleteAction">
+                                <input type="button" id="delete,@item.getId_actions()" value=@Messages.get("delete") class="btn btn-danger btn-sm" />
+                            </td>
 
-                        <td class="editAction">
-                            <input type="button" id="'noadmin',@item.getId_actions()" value=@Messages.get("edit") data-toggle="modal" data-target="#myModalNormEditAction" class="btn btn-warning btn-sm" />
-                        </td>
+                            <td class="editAction">
+                                <input type="button" id="'noadmin',@item.getId_actions()" value=@Messages.get("edit") data-toggle="modal" data-target="#myModalNormEditAction" class="btn btn-warning btn-sm" />
+                            </td>
                         }else{
                             <td>-</td>
                             <td>-</td>
