@@ -46,17 +46,17 @@ emailSmtpPort=587
 
 ################################################### Change when dist on server
 
-publicIconUrl = D:/public/uploadedIcons/
-#publicIconUrl = http://160.40.63.119/public/icons/
+#publicIconUrl = D:/public/uploadedIcons/
+publicIconUrl = http://160.40.63.119/public/icons/
 
-baseUrl=http://localhost:9000/
-#baseUrl=http://160.40.63.119:9000/
+#baseUrl=http://localhost:9000/
+baseUrl=http://160.40.63.119:9000/
 
-uploadDir=D:/uploadedImages/
-#uploadDir=/var/www/public/images/
+#uploadDir=D:/uploadedImages/
+uploadDir=/var/www/public/images/
 
-publicIconDir=D:/public/uploadedIcons/
-#publicIconDir=/var/www/public/icons/
+#publicIconDir=D:/public/uploadedIcons/
+publicIconDir=/var/www/public/icons/
 
-publicImageUrl = D:/public/uploadedIcons/
-#publicImageUrl = http://160.40.63.119/public/images/
+#publicImageUrl = D:/public/uploadedIcons/
+publicImageUrl = http://160.40.63.119/public/images/

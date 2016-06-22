@@ -165,6 +165,7 @@ addNewPhenomenon=Add other phenomenon
 other=Other
 editAction=Modify action
 editPhenomenon=Edit phenomenon
+backToActions=Back to Actions
 
 # ------------- documents ----------------
 documents=Documents
