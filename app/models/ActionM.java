@@ -92,11 +92,7 @@ public class ActionM extends Model {
 
     public static List<ActionM> all() { return find.all(); }
 
-    public static void searchActions(){ }
-
-    public static void delete(Integer id){
-        find.ref(id).delete();
-    }
+    public static void delete(Integer id){ find.ref(id).delete(); }
 
     public static void add(ActionM item) {
         item.save();
@@ -104,7 +100,5 @@ public class ActionM extends Model {
 
     public static void update(ActionM item){item.update();}
 
-    public String getAgencyDisplay() {
-        return Sharing.find.where().eq("agency", agency).findUnique().getAgency_displayname();
-    }
+    public String getAgencyDisplay() { return Sharing.find.where().eq("agency", agency).findUnique().getAgency_displayname(); }
 }
