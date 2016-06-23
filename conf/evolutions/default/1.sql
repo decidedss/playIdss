@@ -16,13 +16,6 @@ create table gis.public._actions (
   constraint pk__actions primary key (id))
 ;
 
-create table gis.public._actions_implementing_body (
-  id                        integer not null,
-  title                     varchar(255),
-  agency                    varchar(255),
-  constraint pk__actions_implementing_body primary key (id))
-;
-
 create table gis.public._actions_phase (
   id                        integer not null,
   title                     varchar(255),
@@ -357,8 +350,6 @@ create table gis.public._traffic_way (
 
 create sequence _actions_id_seq;
 
-create sequence _actions_implementing_body_seq;
-
 create sequence _actions_phase_seq;
 
 create sequence _actions_phenomenon_seq;
@@ -424,8 +415,6 @@ create sequence _traffic_way_id_seq;
 
 drop table if exists gis.public._actions cascade;
 
-drop table if exists gis.public._actions_implementing_body cascade;
-
 drop table if exists gis.public._actions_phase cascade;
 
 drop table if exists gis.public._actions_phenomenon cascade;
@@ -485,8 +474,6 @@ drop table if exists gis.public._sms cascade;
 drop table if exists gis.public._traffic_way cascade;
 
 drop sequence if exists _actions_id_seq;
-
-drop sequence if exists _actions_implementing_body_seq;
 
 drop sequence if exists _actions_phase_seq;
 

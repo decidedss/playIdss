@@ -1,14 +1,14 @@
-2016-06-21 14:23:56,180 [INFO] from play.api.libs.concurrent.ActorSystemProvider in pool-21-thread-1 - Starting application default Akka system: application
-2016-06-21 14:23:56,240 [INFO] from play.core.server.NettyServer$ in pool-21-thread-1 - Listening for HTTP on /0:0:0:0:0:0:0:0:9000
-2016-06-21 14:24:11,055 [INFO] from application in ForkJoinPool-2-worker-1 - Creating Pool for datasource 'default'
-2016-06-21 14:24:11,505 [INFO] from play.api.db.DefaultDBApi in ForkJoinPool-2-worker-1 - Database [default] connected at jdbc:postgresql://localhost:15432/gis
-2016-06-21 14:24:12,113 [WARN] from com.avaje.ebeaninternal.server.ddl.CreateTableVisitor in ForkJoinPool-2-worker-1 - Column name [day] is a suspected SQL reserved word for property models.Last2Days.day
-2016-06-21 14:24:12,146 [INFO] from play.api.libs.concurrent.ActorSystemProvider in ForkJoinPool-2-worker-1 - Starting application default Akka system: application
-2016-06-21 14:24:12,205 [INFO] from play.api.Play$ in ForkJoinPool-2-worker-1 - Application started (Dev)
-2016-06-21 14:24:14,698 [INFO] from play.api.libs.concurrent.ActorSystemProvider in application-akka.actor.default-dispatcher-2 - Shutdown application default Akka system: application
-2016-06-21 14:24:14,726 [INFO] from application in application-akka.actor.default-dispatcher-2 - Shutting down connection pool.
-2016-06-21 14:24:14,853 [INFO] from application in application-akka.actor.default-dispatcher-2 - Creating Pool for datasource 'default'
-2016-06-21 14:24:14,978 [INFO] from play.api.db.DefaultDBApi in application-akka.actor.default-dispatcher-2 - Database [default] connected at jdbc:postgresql://localhost:15432/gis
-2016-06-21 14:24:15,132 [WARN] from com.avaje.ebeaninternal.server.ddl.CreateTableVisitor in application-akka.actor.default-dispatcher-2 - Column name [day] is a suspected SQL reserved word for property models.Last2Days.day
-2016-06-21 14:24:15,152 [INFO] from play.api.libs.concurrent.ActorSystemProvider in application-akka.actor.default-dispatcher-2 - Starting application default Akka system: application
-2016-06-21 14:24:15,177 [INFO] from play.api.Play$ in application-akka.actor.default-dispatcher-2 - Application started (Dev)
+2016-06-23 11:04:50,732 [INFO] from play.api.libs.concurrent.ActorSystemProvider in pool-20-thread-5 - Starting application default Akka system: application
+2016-06-23 11:04:50,803 [INFO] from play.core.server.NettyServer$ in pool-20-thread-5 - Listening for HTTP on /0:0:0:0:0:0:0:0:9000
+2016-06-23 11:04:59,183 [INFO] from application in ForkJoinPool-2-worker-1 - Creating Pool for datasource 'default'
+2016-06-23 11:04:59,672 [INFO] from play.api.db.DefaultDBApi in ForkJoinPool-2-worker-1 - Database [default] connected at jdbc:postgresql://localhost:15432/gis
+2016-06-23 11:05:00,092 [WARN] from com.avaje.ebeaninternal.server.ddl.CreateTableVisitor in ForkJoinPool-2-worker-1 - Column name [day] is a suspected SQL reserved word for property models.Last2Days.day
+2016-06-23 11:05:00,254 [INFO] from play.api.libs.concurrent.ActorSystemProvider in ForkJoinPool-2-worker-1 - Starting application default Akka system: application
+2016-06-23 11:05:00,329 [INFO] from play.api.Play$ in ForkJoinPool-2-worker-1 - Application started (Dev)
+2016-06-23 11:05:01,791 [INFO] from play.api.libs.concurrent.ActorSystemProvider in application-akka.actor.default-dispatcher-5 - Shutdown application default Akka system: application
+2016-06-23 11:05:01,813 [INFO] from application in application-akka.actor.default-dispatcher-5 - Shutting down connection pool.
+2016-06-23 11:05:01,888 [INFO] from application in application-akka.actor.default-dispatcher-5 - Creating Pool for datasource 'default'
+2016-06-23 11:05:02,016 [INFO] from play.api.db.DefaultDBApi in application-akka.actor.default-dispatcher-5 - Database [default] connected at jdbc:postgresql://localhost:15432/gis
+2016-06-23 11:05:02,215 [WARN] from com.avaje.ebeaninternal.server.ddl.CreateTableVisitor in application-akka.actor.default-dispatcher-5 - Column name [day] is a suspected SQL reserved word for property models.Last2Days.day
+2016-06-23 11:05:02,233 [INFO] from play.api.libs.concurrent.ActorSystemProvider in application-akka.actor.default-dispatcher-5 - Starting application default Akka system: application
+2016-06-23 11:05:02,259 [INFO] from play.api.Play$ in application-akka.actor.default-dispatcher-5 - Application started (Dev)

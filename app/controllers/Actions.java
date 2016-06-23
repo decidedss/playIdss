@@ -75,11 +75,7 @@ public class Actions extends Controller {
 
             List<ActionsPhenomenon> phenomenon = new ArrayList<ActionsPhenomenon>();
             phenomenon = ActionsPhenomenon.find.findList();
-
-            List<ActionsImplemetingBody> implemetingBodies = new ArrayList<ActionsImplemetingBody>();
-            implemetingBodies = ActionsImplemetingBody.find.findList();
-
-            return ok(views.html.actions.render(phase, phenomenon, implemetingBodies, session().get("agency")));
+            return ok(views.html.actions.render(phase, phenomenon, session().get("agency")));
         }
         else
             return redirect("/login");
