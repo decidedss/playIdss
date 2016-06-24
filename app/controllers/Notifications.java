@@ -4,7 +4,6 @@ import models.Notification;
 import models.Sharing;
 import play.mvc.Controller;
 
-import java.io.IOException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,9 +16,8 @@ public class Notifications extends Controller{
     /**
      * Update notifications
      * @return list of reports
-     * @throws IOException
      */
-    public void getNotificationEvents() throws IOException {
+    public void getNotificationEvents() {
         Date date = new Date();
         List<Notification> agencyDisasters =  Notification.find.where().eq("is_disaster", false).eq("agency", session().get("agency")).orderBy("insert_date desc").findList();
         agencyDisasters.addAll(getSharedEvents());
@@ -42,9 +40,8 @@ public class Notifications extends Controller{
     /**
      * Disasters reported from other agencies that share their content
      * @return list of disasters
-     * @throws IOException
      */
-    public List<Notification> getSharedEvents() throws IOException{
+    public List<Notification> getSharedEvents(){
 
         ArrayList<String> list = new ArrayList<>();
         for (Sharing s: Sharing.all()){

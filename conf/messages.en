@@ -340,7 +340,7 @@ mobileExists=This mobile already exists in your contacts!
 mobileWrong=The mobile format you are trying to insert is not correct!
 listContacts=Contact list
 addContact=Add contact
-editContact=Τροποποίηση επaφής
+editContact=Edit contact
 notifyContacts=Send a text notification to your contacts
 createContactList=Create contact lists
 notifyBySMS=Notify my contacts (by sms)
@@ -493,3 +493,5 @@ traffic=Traffic
 
 #--------Remote Sensing--------
 remotesensing=Aerial disasters’ overview
+
+subjectMailNotify=Notification - iDSS

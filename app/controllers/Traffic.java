@@ -26,7 +26,7 @@ import java.util.*;
 public class Traffic extends Controller {
 
     public static Result traffic() throws IOException, ParserConfigurationException, SAXException {
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             return ok(views.html.traffic.render());
         }else{
             return redirect("/login");
@@ -36,7 +36,7 @@ public class Traffic extends Controller {
 
 
     public static Result getCoordinates() throws IOException, ParserConfigurationException, SAXException {
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             List<TrafficWay> traffic = TrafficWay.find.findList();
             Map<String, List<double[]>> idCoords = new HashMap<String, List<double[]>>();
 
@@ -63,7 +63,7 @@ public class Traffic extends Controller {
     }
 
     public static Result getCongestion() throws IOException, ParserConfigurationException, SAXException, ParseException {
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             Map<String, String> idCongestion = parseCongestion();
             return ok(Json.toJson(idCongestion));
         }else{

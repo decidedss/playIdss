@@ -28,10 +28,10 @@ public class Contacts extends Controller {
 
     static Form<Contact> contactForm = Form.form(Contact.class);
 
-    public static Result getContacts() throws IOException {
+    public static Result getContacts() {
         String username = session().get("userName");
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
 
             // Get history of user's sms
             ArrayList<String> userSmsHistory = new ArrayList<>();
@@ -50,25 +50,26 @@ public class Contacts extends Controller {
             return redirect("/login");
     }
 
-    public static Result getContactById(int id) throws IOException {
+    public static Result getContactById(int id) {
         Contact c = Contact.find.ref(id);
         return ok(Json.toJson(c));
     }
 
-    public static Result getContactAlfrescoByUsername(String username) throws IOException {
+
+    public static Result getContactAlfrescoByUsername(String username) {
         ContactAlfresco ca = ContactAlfresco.find.where().eq("username", username).findUnique();
         if (ca!=null){
             return ok(Json.toJson(ca));
         }
         else return ok("");
-
     }
 
-    public static Result addContact() throws IOException {
+
+    public static Result addContact() {
         String username = session().get("userName");
         Form<Contact> cForm = play.data.Form.form(Contact.class).bindFromRequest();
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
 
             // Validation /////////////////////////////
             // Check current mobile number
@@ -89,17 +90,17 @@ public class Contacts extends Controller {
                 }
             }
             /////////////////////////////////////////
+            return redirect("/contacts");
         }
-        return redirect("/contacts");
+        else return redirect("/login");
     }
 
 
-
-    public static Result updateContact() throws IOException {
+    public static Result updateContact() {
         String username = session().get("userName");
         Form<Contact> cForm = play.data.Form.form(Contact.class).bindFromRequest();
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             // Validation /////////////////////////////
             // Check current mobile number
             List<Contact> existing = Contact.find.where().eq("mobile",  cForm.get().getMobile()).eq("agency", User.getPersonAgency(username).replaceAll(" ", "")).ne("id", cForm.get().getId()).findList();
@@ -118,18 +119,20 @@ public class Contacts extends Controller {
                 }
             }
             /////////////////////////////////////////
-
+            return redirect("/contacts");
         }
-        return redirect("/contacts");
+        else {
+            return redirect("/login");
+        }
     }
 
 
-    public static Result updateAlfrescoContact() throws IOException {
+    public static Result updateAlfrescoContact() {
         String username = session().get("userName");
         Form<ContactAlfresco> caForm = play.data.Form.form(ContactAlfresco.class).bindFromRequest();//new Form<>(ContactAlfresco.class).bindFromRequest();
         ContactAlfresco ca = caForm.get();
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && User.getPersonAgency(session().get("userName"))!=null) {
 
             // Check if already exists in _contact_alfresco
             if (ca.getContact_id()>0){
@@ -145,31 +148,32 @@ public class Contacts extends Controller {
                 ca.setAgency(session().get("agency"));
                 ContactAlfresco.create(ca);
             }
+            return redirect("/contacts");
         }
-        return redirect("/contacts");
+        else {
+            return redirect("/login");
+        }
     }
 
 
     public static Result deleteContact(Integer contactId) {
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             try {
                 Contact.delete(contactId);
-                return redirect("/contacts");
-            }catch (Exception e){
-
+            } catch (Exception e){
+                e.printStackTrace();
             }
-            return badRequest();
-        } else
-            return forbidden();
+            return redirect("/contacts");
+        } else {
+            return redirect("/login");
+        }
     }
 
 
     public static Result twilioSMS(String text, String mobile) throws TwilioRestException {
-        // Here we SMS the text (not the coordinates)
-        String username = session().get("userName");
 
-        if (!username.isEmpty()) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             TwilioRestClient client = new TwilioRestClient(Messages.get("twilio_sid"), Messages.get("twilio_token"));
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -182,7 +186,9 @@ public class Contacts extends Controller {
 
             return ok("SMS sent!");
         }
-        else return badRequest();
+        else {
+            return redirect("/login");
+        }
     }
 
 
@@ -191,8 +197,7 @@ public class Contacts extends Controller {
      * @return
      * @throws IOException
      */
-    public static List<ContactGroup> getContactsGroups() throws IOException {
-        String username = session().get("userName");
+    public static List<ContactGroup> getContactsGroups()  {
 
         // Get all groups for user's agency
         List<ContactGroup> cgList = ContactGroup.find.where().eq("agency", session().get("agency")).findList();
@@ -207,7 +212,7 @@ public class Contacts extends Controller {
      * @throws IOException
      */
 
-    public static List<ContactGroup> getNonEmptyContactGroups() throws IOException {
+    public static List<ContactGroup> getNonEmptyContactGroups() {
         List<Integer> li = new ArrayList<>();
         List<Integer> liAlfresco = new ArrayList<>();
 
@@ -215,7 +220,6 @@ public class Contacts extends Controller {
         for(Contact c: Contact.find.where().eq("agency", session().get("agency")).ne("group_id",Integer.valueOf(0)).select("group_id").setDistinct(true).findList()) {
             li.add(c.getGroup_id());
         }
-//        System.out.println("non empty groups: " + li);
 
         // Get all distinct alfresco contact croups with group_id > 0
         for(ContactAlfresco ca: ContactAlfresco.find.where().eq("agency", session().get("agency")).ne("group_id",Integer.valueOf(0)).select("group_id").setDistinct(true).findList()) {
@@ -225,136 +229,155 @@ public class Contacts extends Controller {
         li.removeAll(liAlfresco);
         li.addAll(liAlfresco);
         Collections.sort(li);
-//        System.out.println(li);
 
         return ContactGroup.find.where().in("id", li).findList();
     }
 
 
-    public static Result addGroup(String groupname) throws IOException {
+    public static Result addGroup(String groupname) {
 
-        String agency = User.getPersonAgency(session().get("userName"));
+        if (session().get("userName") != null && session().get("agency")!=null) {
+            String agency = User.getPersonAgency(session().get("userName"));
 
-        // Add distinct group names for each agency
-        if (ContactGroup.find.where().eq("agency", agency).eq("groupname", groupname).findList().size() == 0) {
+            // Add distinct group names for each agency
+            if (ContactGroup.find.where().eq("agency", agency).eq("groupname", groupname).findList().size() == 0) {
 
-            ContactGroup cg = new ContactGroup();
-            cg.setGroupname(groupname);
-            cg.setAgency(agency);
-            ContactGroup.create(cg);
-            JsonNode n = Json.toJson(cg);
-            return ok(n);
+                ContactGroup cg = new ContactGroup();
+                cg.setGroupname(groupname);
+                cg.setAgency(agency);
+                ContactGroup.create(cg);
+                JsonNode n = Json.toJson(cg);
+                return ok(n);
+            } else {
+                return ok("");
+            }
+        } else {
+            return redirect("/login");
+        }
+    }
+
+
+    public static Result deleteGroup(String groupname) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
+
+            String agency = User.getPersonAgency(session().get("userName"));
+
+            // Delete defined group from agency contacts
+            int id = ContactGroup.find.where().eq("agency", agency).eq("groupname", groupname).findUnique().getId();
+            ContactGroup.delete(id);
+
+            // Update contacts after group deletion with 0 id
+            for (Contact c : Contact.find.where().eq("group_id", id).findList()) {
+                c.setGroup_id(0);
+                c.update();
+            }
+
+            // Update contacts_alfresco after group deletion - delete record from _contacts_alfresco
+            for (ContactAlfresco ca : ContactAlfresco.find.where().eq("group_id", id).findList()) {
+                ca.delete();
+            }
+            return ok("deleted");
         }
         else {
-            return ok("");
+            return redirect("/login");
         }
     }
 
+    public static Result notifyContacts() throws EmailException, TwilioRestException {
 
-    public static Result deleteGroup(String groupname) throws IOException {
-        String agency = User.getPersonAgency(session().get("userName"));
+        if (session().get("userName") != null && session().get("agency")!=null) {
 
-        // Delete defined group from agency contacts
-        int id = ContactGroup.find.where().eq("agency", agency).eq("groupname", groupname).findUnique().getId();
-        ContactGroup.delete(id);
+            DynamicForm requestData = Form.form().bindFromRequest();
 
-        // Update contacts after group deletion with 0 id
-        for (Contact c: Contact.find.where().eq("group_id", id).findList()){
-            c.setGroup_id(0);
-            c.update();
-        }
-
-        // Update contacts_alfresco after group deletion - delete record from _contacts_alfresco
-        for(ContactAlfresco ca: ContactAlfresco.find.where().eq("group_id", id).findList()){
-            ca.delete();
-        }
-        return ok("deleted");
-    }
-
-    public static Result notifyContacts() throws IOException, EmailException, TwilioRestException {
-
-        DynamicForm requestData = Form.form().bindFromRequest();
-
-        // Get contacts for all the groups selected
-        ArrayList<Integer> glist = new ArrayList<>();
-        if (requestData.get("contactGroups")!=""){
-            String groups = requestData.get("contactGroups");
-            ArrayList<String> list = new ArrayList<>(Arrays.asList(groups.split(",")));
-            for (String g: list){ // convert to int
-                if (!g.isEmpty())
-                    glist.add(Integer.parseInt(g));
-            }
-        }
-
-        List<Contact> contacts = new ArrayList<>();
-        List<ContactAlfresco> contactsAlfresco = new ArrayList<>();
-        if (glist.size()>0){
-            contacts = Contact.find.where().in("group_id", glist).eq("agency", session().get("agency")).findList();
-            contactsAlfresco = ContactAlfresco.find.where().in("group_id", glist).eq("agency", session().get("agency")).findList();
-        }
-        for (ContactAlfresco ca: contactsAlfresco){ // merge contacts with alfresco contacts
-            Contact c = new Contact();
-            Person p = User.getPerson(ca.getUsername());
-            if (p!=null){
-                c.setEmail(p.getEmail());
-                c.setMobile(p.getMobile());
-                contacts.add(c);
-            }
-        }
-
-        String message = requestData.get("message-text");
-
-        // Notify by EMAIL **************************************
-        if (requestData.get("toggle-email")!=null){
-
-            // Unique values
-            HashMap<String, String> emails = new HashMap<>();
-            for (Contact c: contacts) {
-                emails.put(c.getEmail(), c.getEmail());
-            }
-            Reporting.EmailValidator em = new Reporting.EmailValidator();
-            for (String m : emails.keySet()) {
-                if (em.validate(m)){
-                    HtmlEmail email = new HtmlEmail();
-                    email.setHostName(Messages.get("emailHostname"));
-                    email.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
-                    email.setStartTLSRequired(true);
-                    email.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
-                    email.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
-                    email.setFrom(Messages.get("emailUsername"));
-                    email.setSubject("Notification - iDSS");
-                    email.setHtmlMsg(message);
-                    email.addTo(m);
-                    email.send();
+            // Get contacts for all the groups selected
+            ArrayList<Integer> glist = new ArrayList<>();
+            if (requestData.get("contactGroups") != "") {
+                String groups = requestData.get("contactGroups");
+                ArrayList<String> list = new ArrayList<>(Arrays.asList(groups.split(",")));
+                for (String g : list) { // convert to int
+                    if (!g.isEmpty())
+                        glist.add(Integer.parseInt(g));
                 }
             }
-        }
 
-        // Notify by SMS **************************************
-        if (requestData.get("toggle-sms")!=null){
-
-            // Unique values
-            HashMap<String, String> mobiles = new HashMap<>();
-            for (Contact c: contacts) {
-                mobiles.put(c.getMobile(), c.getMobile());
+            List<Contact> contacts = new ArrayList<>();
+            List<ContactAlfresco> contactsAlfresco = new ArrayList<>();
+            if (glist.size() > 0) {
+                contacts = Contact.find.where().in("group_id", glist).eq("agency", session().get("agency")).findList();
+                contactsAlfresco = ContactAlfresco.find.where().in("group_id", glist).eq("agency", session().get("agency")).findList();
             }
+            for (ContactAlfresco ca : contactsAlfresco) { // merge contacts with alfresco contacts
+                Contact c = new Contact();
+                Person p = null;
+                try {
+                    p = User.getPerson(ca.getUsername());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-            for (String m : mobiles.keySet()) {
-                if (m.length() == 10) {
-                    twilioSMS(message, m);
+                if (p != null) {
+                    c.setEmail(p.getEmail());
+                    c.setMobile(p.getMobile());
+                    contacts.add(c);
                 }
             }
+
+            String message = requestData.get("message-text");
+
+            // Notify by EMAIL **************************************
+            if (requestData.get("toggle-email") != null) {
+
+                // Unique values
+                HashMap<String, String> emails = new HashMap<>();
+                for (Contact c : contacts) {
+                    emails.put(c.getEmail(), c.getEmail());
+                }
+                Reporting.EmailValidator em = new Reporting.EmailValidator();
+                for (String m : emails.keySet()) {
+                    if (em.validate(m)) {
+                        HtmlEmail email = new HtmlEmail();
+                        email.setHostName(Messages.get("emailHostname"));
+                        email.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
+                        email.setStartTLSRequired(true);
+                        email.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
+                        email.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
+                        email.setFrom(Messages.get("emailUsername"));
+                        email.setSubject(Messages.get("subjectMailNotify"));
+                        email.setHtmlMsg(message);
+                        email.addTo(m);
+                        email.send();
+                    }
+                }
+            }
+
+            // Notify by SMS **************************************
+            if (requestData.get("toggle-sms") != null) {
+
+                // Unique values
+                HashMap<String, String> mobiles = new HashMap<>();
+                for (Contact c : contacts) {
+                    mobiles.put(c.getMobile(), c.getMobile());
+                }
+
+                for (String m : mobiles.keySet()) {
+                    if (m.length() == 10) {
+                        twilioSMS(message, m);
+                    }
+                }
+            }
+
+            // Save message in sms history
+            LocalDateTime today = LocalDateTime.now();
+            Sms s = new Sms();
+            s.setMessage(message);
+            s.setUsername(session().get("userName"));
+            s.setInsert_date(today);
+            Sms.create(s);
+
+            return redirect("/contacts");
+        } else {
+            return redirect("/login");
         }
-
-        // Save message in sms history
-        LocalDateTime today = LocalDateTime.now();
-        Sms s = new Sms();
-        s.setMessage(message);
-        s.setUsername(session().get("userName"));
-        s.setInsert_date(today);
-        Sms.create(s);
-
-        return redirect("/contacts");
     }
 
 

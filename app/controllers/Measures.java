@@ -88,9 +88,10 @@ public class Measures extends Controller {
     /**
      * create timesheet
      * @return list of measures
+     *  @throws IOException
      */
     public static Result timesheet() throws IOException {
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             return ok(views.html.timesheet.render(Measure.all(), session().get("agency"), isAdmin(session().get("userName"))));
         }
         else {
@@ -104,7 +105,7 @@ public class Measures extends Controller {
     public static Result newMeasure() {
         Form<Measure> mForm = play.data.Form.form(Measure.class).bindFromRequest();
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             if (mForm.get().getName()!=null ){
                 Measure.create(mForm.get());
                 return redirect("/measures");
@@ -135,7 +136,7 @@ public class Measures extends Controller {
      */
     public static Result deleteMeasure(Integer measureId) {
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             try {
                 Measure.delete(measureId);
                 return redirect("/measures");
@@ -150,37 +151,45 @@ public class Measures extends Controller {
     /**
      * get measure based on id
      * @return measure
-     * @throws IOException
      */
-    public static Result getMeasureById(int id) throws IOException {
-        Measure m = Measure.find.byId(id);
-        return ok(Json.toJson(m));
+    public static Result getMeasureById(int id) {
+        if (session().get("userName") != null && session().get("agency") != null) {
+
+            Measure m = Measure.find.byId(id);
+            return ok(Json.toJson(m));
+        } else {
+            return redirect("/login");
+        }
     }
 
     /**
      * update a measure's information in database
-     * @throws IOException, ParseException
+     * @throws ParseException
      */
-    public static Result updateMeasure() throws IOException, ParseException {
-        Measure m = new Measure();
-        Form<Measure> form = form(Measure.class).bindFromRequest();
+    public static Result updateMeasure() throws ParseException {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            Measure m = new Measure();
+            Form<Measure> form = form(Measure.class).bindFromRequest();
 
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-        m.setId(Integer.parseInt(form.data().get("id")));
-        m.setName(form.data().get("name"));
-        m.setCategory(form.data().get("category"));
-        m.setLocation(form.data().get("location"));
-        m.setDescription(form.data().get("description"));
-        m.setRiskaddressing(form.data().get("riskaddressing"));
-        m.setBudget(form.data().get("budget"));
-        m.setStartdate(formatter.parse(form.data().get("startdate")));
-        m.setEnddate(formatter.parse(form.data().get("enddate")));
-        m.setAgency(form.data().get("agency"));
+            m.setId(Integer.parseInt(form.data().get("id")));
+            m.setName(form.data().get("name"));
+            m.setCategory(form.data().get("category"));
+            m.setLocation(form.data().get("location"));
+            m.setDescription(form.data().get("description"));
+            m.setRiskaddressing(form.data().get("riskaddressing"));
+            m.setBudget(form.data().get("budget"));
+            m.setStartdate(formatter.parse(form.data().get("startdate")));
+            m.setEnddate(formatter.parse(form.data().get("enddate")));
+            m.setAgency(form.data().get("agency"));
 
-        Measure.update(form.get());
+            Measure.update(form.get());
 
-        return redirect("/measures");
+            return redirect("/measures");
+        } else {
+            return redirect("/login");
+        }
     }
 }
 

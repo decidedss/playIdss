@@ -43,12 +43,12 @@ import java.util.*;
 
 public class User extends Controller {
 
-    public static Result index() throws IOException{
-        if (session().get("userName") != null) {
+    public static Result index() throws IOException {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
             // Get all Data from user
             HttpClient httpClient = HttpClientBuilder.create().build();
-            String url = Messages.get("ALFRSCO_REST_API_URL") +"/people/"+session().get("userName") +"?alf_ticket="+session().get("alf_ticket");
+            String url = Messages.get("ALFRSCO_REST_API_URL") + "/people/" + session().get("userName") + "?alf_ticket=" + session().get("alf_ticket");
             HttpGet httpget = new HttpGet(url);
             HttpResponse response = httpClient.execute(httpget);
             StringBuilder sb = new StringBuilder();
@@ -70,9 +70,8 @@ public class User extends Controller {
             boolean share = s.isShare();
             String sharingGroupName = s.getAgency_displayname();
             return ok(views.html.person.render(person, sharingGroupName, "", isAdmin(session().get("userName")), share));
-        }
-        else
-            return  redirect("/login");
+        } else
+            return redirect("/login");
     }
 
     public static Result agencyMembers() throws IOException {
@@ -83,81 +82,77 @@ public class User extends Controller {
 
         // Visible to the idss_admin (administrator of the current agency)
         // If the idss_admin is member of the group-agency can view the list of members except for himself
-        if (session().get("userName")!=null && agencyAdmin.getGroups().contains("GROUP_"+session().get("agency")) & agencyAdmin.getGroups().contains("GROUP_idss_admin")  ) {
-           String sharingDisplayName = Sharing.find.where().eq("agency", session().get("agency").replaceAll(" ", "")).findUnique().getAgency_displayname();
-           return ok(views.html.signup_agency_members.render(sharingDisplayName, members));
-        }
-        else
+        if (session().get("userName") != null && agencyAdmin.getGroups().contains("GROUP_" + session().get("agency")) & agencyAdmin.getGroups().contains("GROUP_idss_admin")) {
+            String sharingDisplayName = Sharing.find.where().eq("agency", session().get("agency").replaceAll(" ", "")).findUnique().getAgency_displayname();
+            return ok(views.html.signup_agency_members.render(sharingDisplayName, members));
+        } else
             return redirect("/login");
     }
 
     public static Result password_update() {
         Form<Email> eForm = play.data.Form.form(Email.class).bindFromRequest();
-        if (session().get("userName")!=null)
+        if (session().get("userName") != null)
             return redirect("/welcome");
         else
             return ok(views.html.password_update.render(""));
     }
 
 
-    public static Result add() throws IOException{
+    public static Result add() throws IOException {
         Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest(); // new
 
-         if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
-             if (mForm.get().getUserName()!="" ){
-                 String response = addToAlfresco(mForm.get());
-                 if (response!=null){
-                     return redirect("/welcome");
-                 }
-                 else {
-                     return badRequest("fail!");
-                 }
-             }
-             else {
-                 return ok(views.html.addPerson.render(mForm));
-             }
+            if (mForm.get().getUserName() != "") {
+                String response = addToAlfresco(mForm.get());
+                if (response != null) {
+                    return redirect("/welcome");
+                } else {
+                    return badRequest("fail!");
+                }
+            } else {
+                return ok(views.html.addPerson.render(mForm));
+            }
+        } else {
+            return redirect("/login");
         }
-        else {
-             return redirect("/login");
-         }
 
     }
 
     public static Result addWithGroup() throws IOException {
-        Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest();
-        Person p = mForm.get();
-        ArrayList<String> gr = new ArrayList<>();
-        String group = session().get("agency");
-        gr.add("GROUP_" + group);
-
-        if(!p.getView().isEmpty())
-            gr.add("GROUP_"+ p.getView());
-        if(!p.getEdit().isEmpty())
-            gr.add("GROUP_"+ p.getEdit());
-        p.setGroups(gr);
-        RandomPassword rp = new RandomPassword();
-        String password = rp.generateRandomString();
-        p.setPassword(password);
-        //
-
-
-        // Check if email exists in Alfresco - parse all /s/api/people
-        if(User.personExists(mForm.get().getEmail())){
-            flash("email", "exists");
-            return redirect("/signup/agency/members");
-        }
 
         // If there is a logged in user
-        if (session().get("userName")!=null){
+        if (session().get("userName") != null && session().get("agency") != null) {
+
+            Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest();
+            Person p = mForm.get();
+            ArrayList<String> gr = new ArrayList<>();
+            String group = session().get("agency");
+            gr.add("GROUP_" + group);
+
+            if (!p.getView().isEmpty())
+                gr.add("GROUP_" + p.getView());
+            if (!p.getEdit().isEmpty())
+                gr.add("GROUP_" + p.getEdit());
+            p.setGroups(gr);
+            RandomPassword rp = new RandomPassword();
+            String password = rp.generateRandomString();
+            p.setPassword(password);
+
+            // Check if email exists in Alfresco - parse all /s/api/people
+            if (User.personExists(mForm.get().getEmail())) {
+                System.out.println("coms here");
+                flash("email", "exists");
+                return redirect("/signup/agency/members");
+            }
 
             // If email entered is valid
             Reporting.EmailValidator em = new Reporting.EmailValidator();
             if (em.validate(mForm.get().getEmail())) { // If is valid
 
-                String response =  User.addToAlfresco(p);
+                String response = User.addToAlfresco(p);
                 // If username doesn't exist in Alfresco already add them
-                if (response!="exists") {
+                if (response != "exists") {
 
                     // Update the rest of the alfresco agency user details
                     updateAgencyMember(mForm);
@@ -165,35 +160,32 @@ public class User extends Controller {
                     // Send email to the user just added
                     signupmail(p.getUserName());
                     return ok(views.html.signup_agency_members.render(Sharing.find.where().eq("agency", session().get("agency").replaceAll(" ", "")).findUnique().getAgency_displayname(), User.getGroupMembers(group)));
-                }
-                else {
+                } else {
                     flash("username", "exists");
                     return redirect("/signup/agency/members");
                 }
 
-            }
-            else {  // If email is not valid
+            } else {  // If email is not valid
                 flash("email", "wrong");
                 return redirect("/signup/agency/members");
             }
-        }
-        else {
+        } else {
             return redirect("/logout");
         }
     }
 
     // With or without groups
-    public static String addToAlfresco(Person p) throws IOException{
+    public static String addToAlfresco(Person p) throws IOException {
 
         JsonNode n = Json.toJson(p);
         String str = n.toString();
 
         // Check if username already exists in Alfresco
         HttpClient httpClient = HttpClientBuilder.create().build();
-        String getUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/" + p.getUserName()+ "?alf_ticket=" + session().get("alf_ticket");
+        String getUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/" + p.getUserName() + "?alf_ticket=" + session().get("alf_ticket");
         HttpGet httpget = new HttpGet(getUrl);
         HttpResponse responseUsername = httpClient.execute(httpget);
-        if (responseUsername.getStatusLine().getStatusCode()!= 200){ // username does not exist
+        if (responseUsername.getStatusLine().getStatusCode() != 200) { // username does not exist
             String response = null;
             String postUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people?alf_ticket=" + session().get("alf_ticket");
             HttpPost post = new HttpPost(postUrl);
@@ -202,23 +194,22 @@ public class User extends Controller {
                 post.setEntity(params);
                 post.setHeader("Content-Type", "application/json; charset=utf-8");
                 response = null;
-                while (response == null){
+                while (response == null) {
                     response = httpClient.execute(post, new BasicResponseHandler());
-               }
+                }
 
             } catch (Exception e) {
-                    e.printStackTrace();
+                e.printStackTrace();
             }
 //            System.out.println("RESPONSE:" + response);
             return response;
-        }
-        else { // username EXISTS already in Alfresco
+        } else { // username EXISTS already in Alfresco
             return "exists";
         }
 
     }
 
-    public static Boolean addGroupToAlfresco(String groupname) throws IOException{
+    public static Boolean addGroupToAlfresco(String groupname) throws IOException {
 
         boolean addedGroup = false;
 
@@ -229,7 +220,7 @@ public class User extends Controller {
         HttpResponse response = httpClient.execute(httpget);
         // System.out.println("Status code ==> " + response.getStatusLine().getStatusCode());
 
-        if (response.getStatusLine().getStatusCode() != 200){ // if code != 200 it means that it does not already exist (should be 404)
+        if (response.getStatusLine().getStatusCode() != 200) { // if code != 200 it means that it does not already exist (should be 404)
 
             Group group = new Group();
             group.setAuthorityType("GROUP");
@@ -240,7 +231,7 @@ public class User extends Controller {
             String str = n.toString();
 
             String res = null;
-            String postUrl = Messages.get("ALFRSCO_REST_API_URL") + "/rootgroups/" +  groupname.replaceAll(" ", "") + "?alf_ticket=" + session().get("alf_ticket");
+            String postUrl = Messages.get("ALFRSCO_REST_API_URL") + "/rootgroups/" + groupname.replaceAll(" ", "") + "?alf_ticket=" + session().get("alf_ticket");
             HttpPost post = new HttpPost(postUrl);
             StringEntity params = new StringEntity(str, "UTF-8");
             try {
@@ -248,7 +239,7 @@ public class User extends Controller {
                 post.setHeader("Content-Type", "application/json; charset=utf-8");
                 HttpClient httpClientGroup = HttpClientBuilder.create().build();
                 addedGroup = true;
-                while (res == null){
+                while (res == null) {
                     res = httpClientGroup.execute(post, new BasicResponseHandler());
                 }
 
@@ -289,7 +280,7 @@ public class User extends Controller {
             post.setEntity(params);
             post.setHeader("Content-Type", "application/json; charset=utf-8");
             HttpClient httpClientGroup = HttpClientBuilder.create().build();
-            while (res == null){
+            while (res == null) {
                 res = httpClientGroup.execute(post, new BasicResponseHandler());
             }
 
@@ -360,13 +351,14 @@ public class User extends Controller {
         return groups;
     }
 
-        /**
-         * First adds group to alfresco, then person to this group
-         * @param p
-         * @return
-         * @throws IOException
-         */
-    public static String addToAlfrescoWithGroup(Person p) throws IOException{
+    /**
+     * First adds group to alfresco, then person to this group
+     *
+     * @param p
+     * @return
+     * @throws IOException
+     */
+    public static String addToAlfrescoWithGroup(Person p) throws IOException {
 
         // Trim empty characters - not sure if needed
         Person person = p; // trimmed person
@@ -380,7 +372,7 @@ public class User extends Controller {
 
         ArrayList<String> gr = new ArrayList<>();
         // Here get agency info and create group
-        if(addGroupToAlfresco(person.getOrganization())){ // If added now move forward
+        if (addGroupToAlfresco(person.getOrganization())) { // If added now move forward
             gr.add("GROUP_" + person.getOrganization().replaceAll(" ", ""));
             gr.add("GROUP_idss_admin");
             gr.add("GROUP_idss_view");
@@ -416,7 +408,7 @@ public class User extends Controller {
 
             HttpClient httpClient = HttpClientBuilder.create().build();
             response = null;
-            while (response == null){
+            while (response == null) {
                 response = httpClient.execute(post, new BasicResponseHandler());
             }
 
@@ -429,7 +421,7 @@ public class User extends Controller {
     }
 
 
-    public static ArrayList<Person> getGroupMembers(String shortName) throws IOException{
+    public static ArrayList<Person> getGroupMembers(String shortName) throws IOException {
 
         ArrayList<Person> members = new ArrayList<>();
 
@@ -450,7 +442,7 @@ public class User extends Controller {
         String json = sb.toString();
         JsonNode result = Json.parse(json);
 //        System.out.println(json);
-        if (result.get("data")!=null) {
+        if (result.get("data") != null) {
             for (JsonNode n : result.get("data")) {
                 Person p = getPerson(n.get("shortName").textValue());
                 members.add(p);
@@ -461,25 +453,28 @@ public class User extends Controller {
     }
 
     /**
-     *
      * @param shortName is the name of the group to check if exists
      * @return true or false if group/agency was found in Alfresco
      * @throws IOException
      */
-    public static boolean groupExists(String shortName, String alf_ticket) throws IOException{
+    public static boolean groupExists(String shortName, String alf_ticket) {
         HttpClient httpClient = HttpClientBuilder.create().build();
         String getUrl = Messages.get("ALFRSCO_REST_API_URL") + "/groups/" + shortName.replaceAll(" ", "") + "?alf_ticket=" + alf_ticket;
         HttpGet httpget = new HttpGet(getUrl);
-        HttpResponse response = httpClient.execute(httpget);
-        if (response.getStatusLine().getStatusCode()==200)
-            return true;
-        else
-            return false;
+        try {
+            HttpResponse response = httpClient.execute(httpget);
+            if (response.getStatusLine().getStatusCode() == 200)
+                return true;
+            else
+                return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 
     /**
-     *
      * @param email check if person exists in Alfresco with the given email
      * @return true or false if person was found in Alfresco
      * @throws IOException
@@ -500,8 +495,9 @@ public class User extends Controller {
         br.close();
         String json = sb.toString();
         JsonNode result = Json.parse(json);
+
         for (JsonNode n : result.get("people")) {
-            if (n.get("email").textValue().equals(email)){
+            if (n.get("email").textValue().equals(email) || email.equals(getPerson(session().get("userName")).getEmail())) {
                 return true;
             }
         }
@@ -509,38 +505,46 @@ public class User extends Controller {
     }
 
 
-    public static Result getPersonJson(String userName) throws  IOException {
-        Person p = getPerson(userName);
+    public static Result getPersonJson(String userName) throws IOException {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            Person p = getPerson(userName);
 
-        return ok(Json.toJson(p));
+            return ok(Json.toJson(p));
+        } else {
+            return redirect("/login");
+        }
     }
 
-    public static Result deletePerson(String userName) throws  IOException {
+    public static Result deletePerson(String userName) throws IOException {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
-        String status = "";
+            String status = "";
 
-        String deleteUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/"+ userName +"?alf_ticket=" + session().get("alf_ticket");
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpDelete httpDelete = new HttpDelete(deleteUrl);
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
+            String deleteUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/" + userName + "?alf_ticket=" + session().get("alf_ticket");
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpDelete httpDelete = new HttpDelete(deleteUrl);
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
 
-        httpDelete.setHeader("Content-Type", "application/json; charset=utf-8");
+            httpDelete.setHeader("Content-Type", "application/json; charset=utf-8");
 
-        try {
-            HttpResponse response = httpClient.execute(httpDelete);
-            HttpEntity respEntity = response.getEntity();
+            try {
+                HttpResponse response = httpClient.execute(httpDelete);
+                HttpEntity respEntity = response.getEntity();
 
-            if (respEntity != null) {
-                // EntityUtils to get the response content
-                String content =  EntityUtils.toString(respEntity);
-                status = String.valueOf(response.getStatusLine().getStatusCode());
+                if (respEntity != null) {
+                    // EntityUtils to get the response content
+                    String content = EntityUtils.toString(respEntity);
+                    status = String.valueOf(response.getStatusLine().getStatusCode());
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            return ok(Json.toJson(status));
+        } else {
+            return redirect("/login");
         }
-        return ok(Json.toJson(status));
     }
 
     public static Person getPerson(String userName) throws IOException {
@@ -550,10 +554,9 @@ public class User extends Controller {
         HttpGet httpget = new HttpGet(getUrl);
         HttpResponse response = httpClient.execute(httpget);
 
-        if (response.getStatusLine().getStatusCode() != 200){
+        if (response.getStatusLine().getStatusCode() != 200) {
             return null;
-        }
-        else {
+        } else {
             StringBuilder sb = new StringBuilder();
             DataInputStream in = new DataInputStream(response.getEntity().getContent());
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -563,7 +566,7 @@ public class User extends Controller {
             in.close();
             br.close();
             String json = sb.toString();
-            String person_without_groups = json.substring(0, json.indexOf("groups")-3);
+            String person_without_groups = json.substring(0, json.indexOf("groups") - 3);
             person_without_groups = person_without_groups + "} }";
 
             JsonNode result = Json.parse(json);
@@ -583,29 +586,40 @@ public class User extends Controller {
         }
     }
 
-    public static String getPersonAgency(String username) throws IOException {
-        ArrayList<String> groups = getPerson(username).getGroups();
-        String agency;
-//        System.out.println(groups);
+    public static String getPersonAgency(String username) {
+        try {
+            if (getPerson(username) != null) {
+                ArrayList<String> groups = getPerson(username).getGroups();
+                String agency;
 
-        if (groups.contains("GROUP_idss_view"))
-            groups.remove("GROUP_idss_view");
-        if (groups.contains("GROUP_idss_edit"))
-            groups.remove("GROUP_idss_edit");
-        if (groups.contains("GROUP_idss_admin"))
-            groups.remove("GROUP_idss_admin");
+                if (groups.contains("GROUP_idss_view"))
+                    groups.remove("GROUP_idss_view");
+                if (groups.contains("GROUP_idss_edit"))
+                    groups.remove("GROUP_idss_edit");
+                if (groups.contains("GROUP_idss_admin"))
+                    groups.remove("GROUP_idss_admin");
 
-        agency = groups.get(0).replace("GROUP_", "");
-//        System.out.println(agency);
-        return agency;
+                agency = groups.get(0).replace("GROUP_", "");
+                return agency;
+            } else { // if session expired probably
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
+    // super admin
     public static boolean isAdmin(String username) throws IOException {
-        if (session().get("userName")!=null) {
-            ArrayList<String> groups = getPerson(username).getGroups();
-
-            if (groups.contains("GROUP_ALFRESCO_ADMINISTRATORS")) {
-                return true;
+        if (session().get("userName") != null && session().get("agency") != null) {
+            ArrayList<String> groups = new ArrayList<>();
+            if(getPerson(username)!=null){
+                groups = getPerson(username).getGroups();
+                if (groups.contains("GROUP_ALFRESCO_ADMINISTRATORS")) {
+                    return true;
+                }
             }
         }
         return false;
@@ -618,34 +632,38 @@ public class User extends Controller {
 
     // Password update from the profile page of the user
     public static Result passwordmail_in() throws IOException {
-        Form<Password> pForm = play.data.Form.form(Password.class).bindFromRequest();
-        HashMap<String, String> data = (HashMap<String, String>) pForm.data();
-        String password = data.get("password");
-        Person p = getPerson(session().get("userName"));
-        updateUserPassword(getPerson(session().get("userName")), password);
+        if (session().get("userName") != null && session().get("agency") != null) {
+            Form<Password> pForm = play.data.Form.form(Password.class).bindFromRequest();
+            HashMap<String, String> data = (HashMap<String, String>) pForm.data();
+            String password = data.get("password");
+            Person p = getPerson(session().get("userName"));
+            updateUserPassword(getPerson(session().get("userName")), password);
 
-        String message =  Messages.get("passwordReset") + "<br/><br/>" +
-                Messages.get("passwordResetEmail") + " <a href='" + Messages.get("baseUrl") + "login'>DECIDE</a> "+ Messages.get("with")+ "<br/> " +
-                Messages.get("username") + ": <strong>" + session().get("userName") + "</strong><br/>" +
-                Messages.get("password") +": <strong>" + password + "</strong>";
-        try {
-            HtmlEmail email2 = new HtmlEmail();
-            email2.setHostName(Messages.get("emailHostname"));
-            email2.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
-            email2.setStartTLSRequired(true);
-            email2.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
-            email2.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
-            email2.setFrom(Messages.get("emailUsername"));
-            email2.setSubject("[DECIDE] " + Messages.get("passwordUpdateSubject"));
-            email2.setHtmlMsg(message);
-            email2.addTo(p.getEmail());
-            email2.send();
-        } catch (EmailException e) {
-            e.printStackTrace();
+            String message = Messages.get("passwordReset") + "<br/><br/>" +
+                    Messages.get("passwordResetEmail") + " <a href='" + Messages.get("baseUrl") + "login'>DECIDE</a> " + Messages.get("with") + "<br/> " +
+                    Messages.get("username") + ": <strong>" + session().get("userName") + "</strong><br/>" +
+                    Messages.get("password") + ": <strong>" + password + "</strong>";
+            try {
+                HtmlEmail email2 = new HtmlEmail();
+                email2.setHostName(Messages.get("emailHostname"));
+                email2.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
+                email2.setStartTLSRequired(true);
+                email2.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
+                email2.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
+                email2.setFrom(Messages.get("emailUsername"));
+                email2.setSubject("[DECIDE] " + Messages.get("passwordUpdateSubject"));
+                email2.setHtmlMsg(message);
+                email2.addTo(p.getEmail());
+                email2.send();
+            } catch (EmailException e) {
+                e.printStackTrace();
+            }
+
+            Sharing share = Sharing.find.where().eq("agency", getPersonAgency(session().get("userName"))).findUnique();
+            return ok(views.html.person.render(p, share.getAgency_displayname(), Messages.get("passwordUpdated"), isAdmin(session().get("userName")), share.isShare()));
+        } else {
+            return redirect("/login");
         }
-
-        Sharing share = Sharing.find.where().eq("agency", getPersonAgency(session().get("userName"))).findUnique();
-        return ok(views.html.person.render(p, share.getAgency_displayname(), Messages.get("passwordUpdated"), isAdmin(session().get("userName")), share.isShare()));
 
     }
 
@@ -666,15 +684,15 @@ public class User extends Controller {
         parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
         List<Repository> repositories = factory.getRepositories(parameter);
         Application.ses = repositories.get(0).createSession();
-        ItemIterable<QueryResult> query =  Application.ses.query("SELECT * FROM cm:person where cm:userName = '" + userName + "'", false);
-        if (query.getTotalNumItems()>0){
+        ItemIterable<QueryResult> query = Application.ses.query("SELECT * FROM cm:person where cm:userName = '" + userName + "'", false);
+        if (query.getTotalNumItems() > 0) {
             RandomPassword rp = new RandomPassword();
             String password = rp.generateRandomString();
             Person p = getPerson(requestData.get("userName"));
             updateUserPassword(p, password);
 
-            String message = Messages.get("passwordReset")+ "<br/><br/>" +
-                    Messages.get("passwordResetEmail") + " <a href='" + Messages.get("baseUrl") + "login'>DECIDE</a> " +  Messages.get("with") + "<br/> " +
+            String message = Messages.get("passwordReset") + "<br/><br/>" +
+                    Messages.get("passwordResetEmail") + " <a href='" + Messages.get("baseUrl") + "login'>DECIDE</a> " + Messages.get("with") + "<br/> " +
                     Messages.get("username") + ": <strong>" + userName + "</strong><br/>" +
                     Messages.get("password") + ": <strong>" + password + "</strong>";
             try {
@@ -693,8 +711,7 @@ public class User extends Controller {
                 e.printStackTrace();
             }
 
-        }
-        else{
+        } else {
             return ok(views.html.password_update.render("No account with the username " + requestData.get("userName") + " has been found!"));
         }
 
@@ -704,58 +721,67 @@ public class User extends Controller {
     }
 
     public static Result renameAgency() throws IOException {
-        DynamicForm requestData = Form.form().bindFromRequest();
 
-        // Check if entered agency display name is in use by another agency
-        List<Sharing> existing = Sharing.find.where().ne("agency", session().get("agency")).eq("agency_displayname", requestData.get("agencyName")).findList();
-        if (existing.size()>0){
-            flash("agencydisplay", "exists");
+        if (session().get("userName") != null && session().get("agency") != null) {
+            DynamicForm requestData = Form.form().bindFromRequest();
+
+            // Check if entered agency display name is in use by another agency
+            List<Sharing> existing = Sharing.find.where().ne("agency", session().get("agency")).eq("agency_displayname", requestData.get("agencyName")).findList();
+            if (existing.size() > 0) {
+                flash("agencydisplay", "exists");
+                return redirect("/profile");
+            }
+
+            Sharing s = Sharing.find.where().eq("agency", session().get("agency")).findUnique();
+            if (s != null) {
+                s.setAgency_displayname(requestData.get("agencyName"));
+                s.update();
+                session().put("agencyDisplay", requestData.get("agencyName"));
+            }
             return redirect("/profile");
+        } else {
+            return redirect("/login");
         }
-
-        Sharing s = Sharing.find.where().eq("agency", session().get("agency")).findUnique();
-        if (s!=null){
-            s.setAgency_displayname(requestData.get("agencyName"));
-            s.update();
-            session().put("agencyDisplay",requestData.get("agencyName"));
-        }
-        return redirect("/profile");
     }
 
     public static Result signupmail(String username) throws IOException {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
-        Person p = getPerson(username);
-        if (p.getPassword().isEmpty()){
-            RandomPassword rp = new RandomPassword();
-            String password = rp.generateRandomString();
-            p.setPassword(password);
-        }
-        updateUserPassword(p, p.getPassword());
-        Sharing s = Sharing.find.where().eq("agency",getPersonAgency(username)).findUnique();
-        String agencyDisplay = s.getAgency_displayname();
-        String message = Messages.get("registeredToGroup") +" '" + agencyDisplay + "'. <br/><br/>" +
-                         Messages.get("passwordResetEmail")+" <a href='" + Messages.get("baseUrl") + "agency/login'>DECIDE</a> " + Messages.get("with") + "<br/> " +
-                         "Agency: <strong>" + agencyDisplay + "</strong><br/>" +
-                         Messages.get("username")+": <strong>" + p.getUserName() + "</strong><br/>" +
-                         Messages.get("password")+": <strong>" + p.getPassword() + "</strong><br/><br/>" +
-                         "<small>"+ Messages.get("passwordResetEmailMsg") +" <a href='" + Messages.get("baseUrl") + "profile'>" + Messages.get("here") + "</a>.</small>";
-        try {
-            HtmlEmail email2 = new HtmlEmail();
-            email2.setHostName(Messages.get("emailHostname"));
-            email2.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
-            email2.setStartTLSRequired(true);
-            email2.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
-            email2.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
-            email2.setFrom(Messages.get("emailUsername"));
-            email2.setSubject("[DECIDE] " + Messages.get("signup"));
-            email2.setHtmlMsg(message);
-            email2.addTo(p.getEmail());
-            email2.send();
-        } catch (EmailException e) {
-            e.printStackTrace();
-        }
+            Person p = getPerson(username);
+            if (p.getPassword().isEmpty()) {
+                RandomPassword rp = new RandomPassword();
+                String password = rp.generateRandomString();
+                p.setPassword(password);
+            }
+            updateUserPassword(p, p.getPassword());
+            Sharing s = Sharing.find.where().eq("agency", getPersonAgency(username)).findUnique();
+            String agencyDisplay = s.getAgency_displayname();
+            String message = Messages.get("registeredToGroup") + " '" + agencyDisplay + "'. <br/><br/>" +
+                    Messages.get("passwordResetEmail") + " <a href='" + Messages.get("baseUrl") + "agency/login'>DECIDE</a> " + Messages.get("with") + "<br/> " +
+                    "Agency: <strong>" + agencyDisplay + "</strong><br/>" +
+                    Messages.get("username") + ": <strong>" + p.getUserName() + "</strong><br/>" +
+                    Messages.get("password") + ": <strong>" + p.getPassword() + "</strong><br/><br/>" +
+                    "<small>" + Messages.get("passwordResetEmailMsg") + " <a href='" + Messages.get("baseUrl") + "profile'>" + Messages.get("here") + "</a>.</small>";
+            try {
+                HtmlEmail email2 = new HtmlEmail();
+                email2.setHostName(Messages.get("emailHostname"));
+                email2.setSmtpPort(Integer.parseInt(Messages.get("emailSmtpPort")));
+                email2.setStartTLSRequired(true);
+                email2.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
+                email2.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
+                email2.setFrom(Messages.get("emailUsername"));
+                email2.setSubject("[DECIDE] " + Messages.get("signup"));
+                email2.setHtmlMsg(message);
+                email2.addTo(p.getEmail());
+                email2.send();
+            } catch (EmailException e) {
+                e.printStackTrace();
+            }
 
-        return redirect("/signup/agency/members");
+            return redirect("/signup/agency/members");
+        } else {
+            return redirect("/login");
+        }
     }
 
 
@@ -765,7 +791,7 @@ public class User extends Controller {
         String str = n.toString();
 
         String response = null;
-        String postUrl = Messages.get("ALFRSCO_REST_API_URL") + "/person/changepassword/" + p.getUserName()+"?alf_ticket=" + session().get("alf_ticket");
+        String postUrl = Messages.get("ALFRSCO_REST_API_URL") + "/person/changepassword/" + p.getUserName() + "?alf_ticket=" + session().get("alf_ticket");
         HttpPost post = new HttpPost(postUrl);
         StringEntity params = new StringEntity(str, "UTF-8");
 
@@ -774,7 +800,7 @@ public class User extends Controller {
             post.setHeader("Content-Type", "application/json; charset=utf-8");
             HttpClient httpClient = HttpClientBuilder.create().build();
             response = null;
-            while (response == null){
+            while (response == null) {
                 response = httpClient.execute(post, new BasicResponseHandler());
             }
 
@@ -784,66 +810,77 @@ public class User extends Controller {
 
     }
 
-    public static Result updateAgencyMembers(String agency) throws IOException{
+    public static Result updateAgencyMembers(String agency) throws IOException {
 
-        Form<Person> pForm = play.data.Form.form(Person.class).bindFromRequest();
-        Person p = pForm.get();
-        ArrayList<String> groups = getPerson(p.getUserName()).getGroups();
+        if (session().get("userName") != null && session().get("agency") != null) {
+            Form<Person> pForm = play.data.Form.form(Person.class).bindFromRequest();
+            Person p = pForm.get();
+            ArrayList<String> groups = getPerson(p.getUserName()).getGroups();
 
-        // Update person with new group
-        // http://docs.alfresco.com/5.0/references/RESTful-GroupsChildrenPost.html
-        if (!p.getView().isEmpty() && !groups.contains(p.getView())){
-            updateUserGroup("idss_view", p.getUserName());
-            groups.add(p.getView());
-        }
-        if (!p.getEdit().isEmpty() && !groups.contains(p.getEdit())){
-            updateUserGroup("idss_edit", p.getUserName());
-            groups.add(p.getEdit());
-        }
-        //
-        // Delete group from person
-        // http://docs.alfresco.com/5.0/references/RESTful-GroupsChildrenDelete.html
-        if (p.getView().isEmpty() && groups.contains("GROUP_idss_view")){
-            deleteGroupFromUser("idss_view", p.getUserName());
-            groups.remove(groups.indexOf("GROUP_idss_view"));
-        }
-        if (p.getEdit().isEmpty() && groups.contains("GROUP_idss_edit")){
-            deleteGroupFromUser("idss_edit", p.getUserName());
-            groups.remove(groups.indexOf("GROUP_idss_edit"));
-        }
-        //
-        // System.out.println(groups);
-        p.setGroups(groups);
-        ////////////////////////////
-        JsonNode n = Json.toJson(p);
-        String str = n.toString();
 
-        // -------------------------------------------------------------- Finally update person details
-        String response = null;
-        String putUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/"+ p.getUserName() +"?alf_ticket=" + session().get("alf_ticket");
-        HttpPut put = new HttpPut(putUrl);
-        StringEntity params = new StringEntity(str, "UTF-8");
-
-        try {
-            put.setEntity(params);
-            put.setHeader("Content-Type", "application/json; charset=utf-8");
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            response = null;
-            while (response == null){
-                response = httpClient.execute(put, new BasicResponseHandler());
-//                System.out.println(response);
+            // Check if email exists in Alfresco - parse all /s/api/people
+            if (User.personExists(p.getEmail())) {
+                flash("email", "exists");
+                return redirect("/signup/agency/members");
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            // Update person with new group
+            // http://docs.alfresco.com/5.0/references/RESTful-GroupsChildrenPost.html
+            if (!p.getView().isEmpty() && !groups.contains(p.getView())) {
+                updateUserGroup("idss_view", p.getUserName());
+                groups.add(p.getView());
+            }
+            if (!p.getEdit().isEmpty() && !groups.contains(p.getEdit())) {
+                updateUserGroup("idss_edit", p.getUserName());
+                groups.add(p.getEdit());
+            }
+            //
+            // Delete group from person
+            // http://docs.alfresco.com/5.0/references/RESTful-GroupsChildrenDelete.html
+            if (p.getView().isEmpty() && groups.contains("GROUP_idss_view")) {
+                deleteGroupFromUser("idss_view", p.getUserName());
+                groups.remove(groups.indexOf("GROUP_idss_view"));
+            }
+            if (p.getEdit().isEmpty() && groups.contains("GROUP_idss_edit")) {
+                deleteGroupFromUser("idss_edit", p.getUserName());
+                groups.remove(groups.indexOf("GROUP_idss_edit"));
+            }
+            //
+            // System.out.println(groups);
+            p.setGroups(groups);
+            ////////////////////////////
+            JsonNode n = Json.toJson(p);
+            String str = n.toString();
 
-        return redirect("/signup/agency/members");
+            // -------------------------------------------------------------- Finally update person details
+            String response = null;
+            String putUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/" + p.getUserName() + "?alf_ticket=" + session().get("alf_ticket");
+            HttpPut put = new HttpPut(putUrl);
+            StringEntity params = new StringEntity(str, "UTF-8");
+
+            try {
+                put.setEntity(params);
+                put.setHeader("Content-Type", "application/json; charset=utf-8");
+                HttpClient httpClient = HttpClientBuilder.create().build();
+                response = null;
+                while (response == null) {
+                    response = httpClient.execute(put, new BasicResponseHandler());
+//                System.out.println(response);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return redirect("/signup/agency/members");
+        } else {
+            return redirect("/login");
+        }
     }
 
-    // Update the grops of the specified user
+    // Update the groups of the specified user
     public static void updateUserGroup(String group, String userName) {
-        String postUrl = Messages.get("ALFRSCO_REST_API_URL") + "/groups/"+ group +  "/children/" + userName +"?alf_ticket=" + session().get("alf_ticket");
+        String postUrl = Messages.get("ALFRSCO_REST_API_URL") + "/groups/" + group + "/children/" + userName + "?alf_ticket=" + session().get("alf_ticket");
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(postUrl);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -861,7 +898,7 @@ public class User extends Controller {
 
             if (respEntity != null) {
                 // EntityUtils to get the response content
-                String content =  EntityUtils.toString(respEntity);
+                String content = EntityUtils.toString(respEntity);
                 System.out.println("updateUserGroup response: " + response.getStatusLine().getStatusCode());
             }
         } catch (ClientProtocolException e) {
@@ -869,11 +906,12 @@ public class User extends Controller {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
 
-    public static void deleteGroupFromUser(String group, String userName){
-        String deleteUrl = Messages.get("ALFRSCO_REST_API_URL") + "/groups/"+ group +  "/children/" + userName +"?alf_ticket=" + session().get("alf_ticket");
+    public static void deleteGroupFromUser(String group, String userName) {
+        String deleteUrl = Messages.get("ALFRSCO_REST_API_URL") + "/groups/" + group + "/children/" + userName + "?alf_ticket=" + session().get("alf_ticket");
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpDelete httpDelete = new HttpDelete(deleteUrl);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -886,7 +924,7 @@ public class User extends Controller {
 
             if (respEntity != null) {
                 // EntityUtils to get the response content
-                String content =  EntityUtils.toString(respEntity);
+                String content = EntityUtils.toString(respEntity);
                 System.out.println("deleteGroupFromUser response: " + response.getStatusLine().getStatusCode());
             }
         } catch (ClientProtocolException e) {
@@ -896,43 +934,55 @@ public class User extends Controller {
         }
     }
 
-    public static Result updateUserDetails() throws IOException{
+    public static Result updateUserDetails() throws IOException {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
-        Form<Person> pForm = play.data.Form.form(Person.class).bindFromRequest();
-        Person p = pForm.get();
-        JsonNode n = Json.toJson(p);
-        String str = n.toString();
+            Form<Person> pForm = play.data.Form.form(Person.class).bindFromRequest();
+            Person p = pForm.get();
 
-        String response = null;
-        String putUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/"+ session().get("userName") +"?alf_ticket=" + session().get("alf_ticket");
-        HttpPut put = new HttpPut(putUrl);
-        StringEntity params = new StringEntity(str, "UTF-8");
 
-        try {
-            put.setEntity(params);
-            put.setHeader("Content-Type", "application/json; charset=utf-8");
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            response = null;
-            while (response == null){
-                response = httpClient.execute(put, new BasicResponseHandler());
-//                System.out.println(response);
+            // Check if email exists in Alfresco - parse all /s/api/people
+            if (User.personExists(p.getEmail())) {
+                flash("email", "exists");
+                return redirect("/profile");
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            JsonNode n = Json.toJson(p);
+            String str = n.toString();
 
-        return redirect("/profile");
+            String response = null;
+            String putUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/" + session().get("userName") + "?alf_ticket=" + session().get("alf_ticket");
+            HttpPut put = new HttpPut(putUrl);
+            StringEntity params = new StringEntity(str, "UTF-8");
+
+            try {
+                put.setEntity(params);
+                put.setHeader("Content-Type", "application/json; charset=utf-8");
+                HttpClient httpClient = HttpClientBuilder.create().build();
+                response = null;
+                while (response == null) {
+                    response = httpClient.execute(put, new BasicResponseHandler());
+//                System.out.println(response);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return redirect("/profile");
+        } else {
+            return redirect("/login");
+        }
     }
 
     // Internal method to update user details (e.g. after adding a new agency member)
-    public static void updateAgencyMember(Form<Person> pForm) throws IOException{
+    public static void updateAgencyMember(Form<Person> pForm) throws IOException {
         Person p = pForm.get();
         JsonNode n = Json.toJson(p);
         String str = n.toString();
 
         String response = null;
-        String putUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/"+ p.getUserName() +"?alf_ticket=" + session().get("alf_ticket");
+        String putUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people/" + p.getUserName() + "?alf_ticket=" + session().get("alf_ticket");
         HttpPut put = new HttpPut(putUrl);
         StringEntity params = new StringEntity(str, "UTF-8");
 
@@ -941,7 +991,7 @@ public class User extends Controller {
             put.setHeader("Content-Type", "application/json; charset=utf-8");
             HttpClient httpClient = HttpClientBuilder.create().build();
             response = null;
-            while (response == null){
+            while (response == null) {
                 response = httpClient.execute(put, new BasicResponseHandler());
 //                System.out.println(response);
             }
@@ -950,7 +1000,6 @@ public class User extends Controller {
             e.printStackTrace();
         }
     }
-
 
 
     /**
@@ -960,21 +1009,20 @@ public class User extends Controller {
         List<Contact> data = new ArrayList<Contact>();
 
         String agency = "";
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
             try {
                 // If the logged in user has the role ALFRESCO_ADMINISTRATORS show all contacts
-                if (isAdmin(session().get("userName"))){
+                if (isAdmin(session().get("userName"))) {
                     List<Contact> all = Contact.find.all();
                     return all;
-                }
-                else {
+                } else {
                     // Get contacts from DB table _contacts filtered with "agency" ----------------------------
                     agency = session().get("agency");
-                    if (!agency.isEmpty()){
+                    if (!agency.isEmpty()) {
                         List<Contact> cList = Contact.find.where().eq("agency", agency).findList();
-                        if (!cList.isEmpty()){
-                            for (Contact c: cList){
+                        if (!cList.isEmpty()) {
+                            for (Contact c : cList) {
                                 data.add(c);
                             }
                         }
@@ -982,8 +1030,8 @@ public class User extends Controller {
 
                     // Get alfresco agency members --------------------------------------------------------
                     List<Person> pList = getGroupMembers(agency);
-                    if (!pList.isEmpty()){
-                        for (Person p: pList){
+                    if (!pList.isEmpty()) {
+                        for (Person p : pList) {
                             // Matching between Person and Contact
                             Contact c = new Contact();
                             c.setEmail(p.getEmail());
@@ -998,16 +1046,16 @@ public class User extends Controller {
                             // Get if any group for alfresco user (table _contacts_alfreso)
                             // @TODO Later on we might have multiple groups per contact (to change unique result)
                             ContactAlfresco ca = ContactAlfresco.find.where().eq("username", p.getUserName()).findUnique();
-                            if (ca!=null){
+                            if (ca != null) {
                                 c.setGroup_id(ca.getGroup_id());
                             }
-                            if (!p.getUserName().equals(session().get("userName"))){ // remove the logged in user from the list
+                            if (!p.getUserName().equals(session().get("userName"))) { // remove the logged in user from the list
                                 data.add(c);
                             }
                         }
                     }
                 }
-            }catch (IOException io) {
+            } catch (IOException io) {
                 io.printStackTrace();
             }
 
@@ -1016,17 +1064,22 @@ public class User extends Controller {
     }
 
 
-    public static Result shareAgencyContent(boolean share) throws IOException{
-        List<Sharing> sh =  Sharing.find.where().eq("agency", getPersonAgency(session().get("userName")).replaceAll(" ", "")).findList(); // Trim empty characters
-        if (sh.size()>0){
-            for (Sharing s: sh){
-                s.setShare(share);
-                Sharing.update(s);
-            }
-            return ok("updated");
+    public static Result shareAgencyContent(boolean share)  {
+        if (session().get("userName") != null && session().get("agency") != null) {
+
+            List<Sharing> sh = Sharing.find.where().eq("agency", getPersonAgency(session().get("userName")).replaceAll(" ", "")).findList(); // Trim empty characters
+            if (sh.size() > 0) {
+                for (Sharing s : sh) {
+                    s.setShare(share);
+                    Sharing.update(s);
+                }
+                return ok("updated");
+            } else
+                return ok("fail");
+
+        } else {
+            return redirect("/login");
         }
-        else
-            return ok("fail");
     }
 
 

@@ -75,7 +75,9 @@
 
                     <a class="btn btn-default idss-default-btn" title='@Messages.get("rename")' data-toggle="modal" data-target="#myModalNorm">@Messages.get("rename")</a><br/>
                 </div>
+                <br/> <br/>
             }
+
 
             @helper.form(routes.User.passwordmail_in) {
                 <form>
@@ -86,6 +88,7 @@
                     <br>
                     <button class="btn btn-warning" type="submit" style="float:left;">@Messages.get("change_password")</button>
                 </form>
+            <br/>
             }
             <br/><br/><br/>
             <div class="alert alert-warning" id="alert_template" role="alert" style="display: none;">
@@ -97,10 +100,17 @@
         </div>
 
         <div class="container col-lg-6">
+            <div class="alert alert-danger" id="alert_template_email" role="alert" style="display: none;">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">@Messages.get("close")</span>
+                </button>
+            </div>
+
             @helper.form(routes.User.updateUserDetails()) {
             <form>
                 <label>@Messages.get("username")</label>
-                <input type="text" class="form-control" name="userName" value='@person.getUserName()'>
+                <input type="text" class="form-control" name="userName" value='@person.getUserName()' readonly>
                 <label>@Messages.get("firstname")</label>
                 <input type="text" class="form-control" name="firstName" value='@person.getFirstName()'>
                 <label>@Messages.get("lastname")</label>
@@ -182,6 +192,18 @@
                 $('#alert_template_display').hide();
             });
         }
+
+
+         @if(flash.get("email")=="exists"){
+            $(alert_template_email).show();
+
+            $("#alert_template_email button").after('@Messages.get("emailExists")');
+            $('#alert_template_email').fadeIn('slow');
+            $('#alert_template_email .close').click(function(e) {
+                $('#alert_template_email').hide();
+            });
+        }
+
 
           $(function() {
             $('#toggle-one').change(function() {

@@ -69,7 +69,7 @@ public class Actions extends Controller {
      */
     public static Result getActions() throws IOException {
         Form<ActionM> mForm = play.data.Form.form(ActionM.class).bindFromRequest();
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             List<ActionsPhase> phase = new ArrayList<ActionsPhase>();
             phase = ActionsPhase.find.findList();
 
@@ -88,7 +88,7 @@ public class Actions extends Controller {
      */
     public static Result searchActions() throws IOException {
         Form<ActionM> mForm = play.data.Form.form(ActionM.class).bindFromRequest();
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
             String phases = mForm.data().get("phases");
             String phenomenon = mForm.data().get("phenomenon");
@@ -129,7 +129,7 @@ public class Actions extends Controller {
      */
     public static Result deleteAction(Integer id) {
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             try {
                 ActionM.delete(id);
                 return redirect("/actions");
@@ -145,45 +145,62 @@ public class Actions extends Controller {
      * Edit action
      */
     public static Result editAction() {
-        Form<ActionM> form = play.data.Form.form(ActionM.class).bindFromRequest();
+        if (session().get("userName") != null && session().get("agency") != null) {
+            Form<ActionM> form = play.data.Form.form(ActionM.class).bindFromRequest();
 
-        ActionM action = new ActionM();
+            ActionM action = new ActionM();
 
-        action.setId_actions(Integer.parseInt(form.data().get("id_actions")));
-        String phases = form.data().get("phases");
-        action.setPhase(phases.replace(",", ", "));
+            action.setId_actions(Integer.parseInt(form.data().get("id_actions")));
+            String phases = form.data().get("phases");
+            action.setPhase(phases.replace(",", ", "));
 
-        if(form.data().get("phenomenon").equals("other"))
-            action.setPhenomenon(form.data().get("phenomenonOther"));
-        else
-            action.setPhenomenon(form.data().get("phenomenon"));
+            if (form.data().get("phenomenon").equals("other"))
+                action.setPhenomenon(form.data().get("phenomenonOther"));
+            else
+                action.setPhenomenon(form.data().get("phenomenon"));
 
-        action.setCategory(form.data().get("category"));
-        action.setDescription(form.data().get("description"));
+            action.setCategory(form.data().get("category"));
+            action.setDescription(form.data().get("description"));
 
-        if(form.data().get("body") == ""){ action.setBody("-"); }
-        else { action.setBody(form.data().get("body")); }
+            if (form.data().get("body") == "") {
+                action.setBody("-");
+            } else {
+                action.setBody(form.data().get("body"));
+            }
 
-        if(form.data().get("implementing_body") == ""){ action.setImplementing_body("-"); }
-        else { action.setImplementing_body(form.data().get("implementing_body")); }
+            if (form.data().get("implementing_body") == "") {
+                action.setImplementing_body("-");
+            } else {
+                action.setImplementing_body(form.data().get("implementing_body"));
+            }
 
-        if(form.data().get("participating_body") == ""){ action.setParticipating_body("-"); }
-        else { action.setParticipating_body(form.data().get("participating_body")); }
+            if (form.data().get("participating_body") == "") {
+                action.setParticipating_body("-");
+            } else {
+                action.setParticipating_body(form.data().get("participating_body"));
+            }
 
-        if(form.data().get("phenomenon").equals("other"))
-            ActionsPhenomenon.add(play.data.Form.form(ActionM.class).bindFromRequest().data().get("phenomenonOther"), play.data.Form.form(ActionM.class).bindFromRequest().data().get("agency"));
-        else
-            ActionsPhenomenon.add(play.data.Form.form(ActionM.class).bindFromRequest().data().get("phenomenon"), play.data.Form.form(ActionM.class).bindFromRequest().data().get("agency"));
+            if (form.data().get("phenomenon").equals("other"))
+                ActionsPhenomenon.add(play.data.Form.form(ActionM.class).bindFromRequest().data().get("phenomenonOther"), play.data.Form.form(ActionM.class).bindFromRequest().data().get("agency"));
+            else
+                ActionsPhenomenon.add(play.data.Form.form(ActionM.class).bindFromRequest().data().get("phenomenon"), play.data.Form.form(ActionM.class).bindFromRequest().data().get("agency"));
 
 
-        ActionM.update(action);
+            ActionM.update(action);
 
-        return redirect("/actions");
+            return redirect("/actions");
+        } else {
+            return  redirect("/login");
+        }
     }
 
-    public static Result getAction(int id) throws IOException {
-        ActionM m = ActionM.find.byId(id);
-        return ok(Json.toJson(m));
+    public static Result getAction(int id)  {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            ActionM m = ActionM.find.byId(id);
+            return ok(Json.toJson(m));
+        } else {
+            return redirect("/login");
+        }
     }
 
     /**
@@ -193,7 +210,7 @@ public class Actions extends Controller {
 
         Form<ActionM> mForm = play.data.Form.form(ActionM.class).bindFromRequest();
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             if (mForm.get().getPhenomenon() !=null ){
                 Form<ActionM> form = play.data.Form.form(ActionM.class).bindFromRequest();
                 ActionM action = new ActionM();
@@ -242,7 +259,7 @@ public class Actions extends Controller {
      * @throws IOException
      */
     public static Result phenomenonList() throws IOException {
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
             List<ActionsPhenomenon> phenomenon = new ArrayList<ActionsPhenomenon>();
             phenomenon = ActionsPhenomenon.find.findList();
@@ -258,7 +275,7 @@ public class Actions extends Controller {
      */
     public static Result phenomenonDelete(Integer id) {
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             try {
                 ActionsPhenomenon.delete(id);
                 return redirect("/actions/editPhenomenon");
@@ -267,34 +284,41 @@ public class Actions extends Controller {
             }
             return badRequest();
         } else
-            return forbidden();
+            return redirect("/login");
     }
 
     /**
      * update the title of a phenomenon in database
-     * @throws IOException, ParseException
+     * @throws ParseException
      */
-    public static Result updatePhenomenon() throws IOException, ParseException {
-        ActionsPhenomenon m = new ActionsPhenomenon();
-        Form<ActionsPhenomenon> form = form(ActionsPhenomenon.class).bindFromRequest();
+    public static Result updatePhenomenon() throws ParseException {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            ActionsPhenomenon m = new ActionsPhenomenon();
+            Form<ActionsPhenomenon> form = form(ActionsPhenomenon.class).bindFromRequest();
 
-        m.setId(Integer.parseInt(form.data().get("id")));
-        m.setTitle(form.data().get("title"));
-        m.setAgency(form.data().get("agency"));
+            m.setId(Integer.parseInt(form.data().get("id")));
+            m.setTitle(form.data().get("title"));
+            m.setAgency(form.data().get("agency"));
 
-        ActionsPhenomenon.update(form.get());
+            ActionsPhenomenon.update(form.get());
 
-        return redirect("/actions/editPhenomenon");
+            return redirect("/actions/editPhenomenon");
+        } else {
+            return redirect("/login");
+        }
     }
 
     /**
      * get phenomenon based on id
      * @return phenomenon
-     * @throws IOException
      */
-    public static Result getPhenomenonById(int id) throws IOException {
-        ActionsPhenomenon m = ActionsPhenomenon.find.byId(id);
-        return ok(Json.toJson(m));
+    public static Result getPhenomenonById(int id) {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            ActionsPhenomenon m = ActionsPhenomenon.find.byId(id);
+            return ok(Json.toJson(m));
+        } else {
+            return redirect("/login");
+        }
     }
 
 

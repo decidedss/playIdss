@@ -8,8 +8,6 @@
     <title>@Messages.get("climate")</title>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/climate.js")'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
-    <script src="http://openlayers.org/api/OpenLayers.js"></script>
-
     <link rel="stylesheet" media='screen' href='@routes.Assets.at("stylesheets/climate.css")'>
     <link rel="stylesheet" href="//rawgithub.com/Caged/d3-tip/master/examples/example-styles.css">
     }
@@ -22,200 +20,193 @@
 }
 
 <div class="container-fluid">
-
     <div class="starter-template">
+
+        @if(session.get("lang").contains("el")){
+        <input class="lang" value="el" type="hidden"/>
+        }
+        @if(session.get("lang").contains("en")){
+        <input class="lang" value="en" type="hidden"/>
+        }
 
         <h1>@Messages.get("climate")</h1><br/>
 
         <div class="row">
-            <div class="panel-heading">
-                <ul class="nav nav-tabs navbar-left">
-                    <li class="active"><a href="#tab1default" data-toggle="tab">@Messages.get("current")</a></li>
-                    <li><a href="#tab2default" data-toggle="tab">@Messages.get("forecast")</a></li>
-                    <li><a href="#tab3default" data-toggle="tab">@Messages.get("historicMonth")</a></li>
-                    <li><a href="#tab4default" data-toggle="tab">@Messages.get("historicDay")</a></li>
-                </ul>
-            </div>
-            <div>
-
-                <br/><br/><br/>
-
-                @if(session.get("lang").contains("el")){
-                <input class="lang" value="el" type="hidden"/>
-                }
-                @if(session.get("lang").contains("en")){
-                <input class="lang" value="en" type="hidden"/>
-                }
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel with-nav-tabs panel-default">
-                            <div class="panel-body">
-                                <div class="tab-content">
-                                    <!--Content about climate-->
-                                    <div class="tab-pane fade in active" id="tab1default">
-                                        <div class="row">
-                                            <div class="container col-lg-6">
-                                                <div id="mapLast2days" class="mapLast2days"
-                                                     style="height:100%;position: relative;">
-                                                    <div id="popupLast2days"></div>
-                                                </div>
-                                                <div align="left">@Messages.get("meteoCaption")&nbsp;<a href="http://meteo.gr" target="_blank">meteo.gr</a></div>
-                                                <br/>
-                                            </div>
-
-                                            <div class="container col-lg-6" id="chartsResultsLast2days">
-                                                <div class="head">
-                                                    <h4></h4> <br/>
-                                                </div>
-
-                                                <div class="head-last2days">
-                                                    <h3>@Messages.get("noAvailableData")</h3>
-                                                </div>
-
-                                                <div class="children">
-                                                    <h3>@Messages.get("currentTemperature")</h3>
-                                                    <canvas id="myChartCurrentTemp" width="900" height="250"></canvas>
-
-                                                    <h3>@Messages.get("currentRain")</h3>
-                                                    <canvas id="myChartCurrentRain" width="900" height="250"></canvas>
-
-                                                    <h3>@Messages.get("currentWindSpeed")</h3>
-                                                    <canvas id="myChartCurrentWindSpeed" width="900" height="250"></canvas>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!--Content about forecast-->
-                                    <div class="tab-pane fade" id="tab2default">
-                                        <div class="row">
-                                            <div class="container col-lg-6">
-                                                <div id="map" class="map" style="height:100%;position: relative;">
-                                                    <div id="popupForecast"></div>
-                                                </div>
-                                                <div align="left"><a href="http://www.hnms.gr/" target="_blank">@Messages.get("forecastCaption")</a></div>
-                                                <br/>
-                                            </div>
-
-                                            <div class="container col-lg-6" id="chartsResults">
-                                                <div class="head">
-                                                    <h4></h4> <br/>
-                                                </div>
-
-                                                <h3>@Messages.get("forecastCapacitation")</h3>
-                                                <canvas id="myChartCapacitation" width="900" height="250"></canvas>
-                                                <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
-
-                                                <h3>@Messages.get("forecastPrecipitation")</h3>
-                                                <canvas id="myChartPrecipitation" width="900" height="250"></canvas>
-                                                <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
-
-                                                <h3>@Messages.get("forecastTemperature")</h3>
-                                                <canvas id="myChartTemp" width="900" height="250"></canvas>
-                                                <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
-
-                                                <h3>@Messages.get("forecastWindDegree")</h3>
-                                                <canvas id="myChartWindDegree" width="900" height="250"></canvas>
-                                                <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
-
-                                                <h3>@Messages.get("forecastWindSpeed")</h3>
-                                                <canvas id="myChartWindSpeed" width="900" height="250"></canvas>
-                                                <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!--Content about historic data month-->
-                                    <div class="tab-pane fade" id="tab3default">
-                                        <div class="row">
-                                            <div class="container col-lg-6">
-                                                <div id="mapHistoric" class="mapHistoric"
-                                                     style="height:100%;position: relative;">
-                                                    <div id="popupHistoric"></div>
-                                                </div>
-                                                <div align="left">@Messages.get("meteoCaption")&nbsp;<a href="http://meteo.gr" target="_blank">meteo.gr</a></div>
-                                                <br/>
-                                            </div>
-
-                                            <div class="container col-lg-6" id="chartsResultsHistoric">
-                                                <div class="head">
-                                                    <h4></h4> <br/>
-                                                </div>
-
-                                                <div class="head-historic"> <h3>@Messages.get("noAvailableData")</h3> </div>
-
-                                                <div class="children">
-                                                    <h3>@Messages.get("meteoTemperature")</h3>
-                                                    <canvas id="myChartTempHist" width="900" height="250"></canvas>
-                                                    <div class="y-label">@Messages.get("meteoYLabel")</div>
-                                                    <br/>
-
-                                                    <h3>@Messages.get("meteoRain")</h3>
-                                                    <canvas id="myChartRainHist" width="900" height="250"></canvas>
-                                                    <div class="y-label">@Messages.get("meteoYLabel")</div>
-                                                    <br/>
-
-                                                    <h3>@Messages.get("meteoWind")</h3>
-                                                    <canvas id="myChartWindHist" width="900" height="250"></canvas>
-                                                    <div class="y-label">@Messages.get("meteoYLabel")</div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!--Content about historic data day-->
-                                    <div class="tab-pane fade" id="tab4default">
-                                        <div class="row">
-                                            <div class="container col-lg-6">
-                                                <div id="mapHistoricDay" class="mapHistoricDay"
-                                                     style="height:100%;position: relative;">
-                                                    <div id="popupHistoricDay"></div>
-                                                </div>
-                                                <div align="left">@Messages.get("meteoCaption")&nbsp;<a href="http://meteo.gr" target="_blank">meteo.gr</a></div>
-                                                <br/>
-                                            </div>
-
-                                            <div class="container col-lg-6" id="chartsResultsHistoricDay">
-                                                <div class="head">
-                                                    <h4></h4> <br/>
-                                                </div>
-
-                                                <div class="head-histday"> <h3>@Messages.get("noAvailableData")</h3> </div>
-
-                                                <div class="children">
-                                                    <h3>@Messages.get("meteoTemperature")</h3>
-                                                    <canvas id="myChartTempHistDay" width="900" height="250"></canvas>
-                                                    <div class="y-label">@Messages.get("meteoYLabelDay")</div>
-                                                    <br/>
-
-                                                    <h3>@Messages.get("meteoRain")</h3>
-                                                    <canvas id="myChartRainHistDay" width="900" height="250"></canvas>
-                                                    <div class="y-label">@Messages.get("meteoYLabelDay")</div>
-                                                    <br/>
-
-                                                    <h3>@Messages.get("meteoWind")</h3>
-                                                    <canvas id="myChartWindHistDay" width="900" height="250"></canvas>
-                                                    <div class="y-label">@Messages.get("meteoYLabelDay")</div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ul class="nav nav-tabs nav-justified">
+                <li class="active"><a href="#tab1default" data-toggle="tab">@Messages.get("current")</a></li>
+                <li><a href="#tab2default" data-toggle="tab">@Messages.get("forecast")</a></li>
+                <li><a href="#tab3default" data-toggle="tab">@Messages.get("historicMonth")</a></li>
+                <li><a href="#tab4default" data-toggle="tab">@Messages.get("historicDay")</a></li>
+            </ul>
         </div>
 
-        @views.html.footer{
-        }
+         <div class="row">
+                <div class="panel with-nav-tabs panel-default">
+                    <div class="panel-body">
+                        <div class="tab-content">
+
+                            <!--Content about climate-->
+                            <div class="tab-pane fade in active" id="tab1default">
+                                <div class="row">
+                                    <div class="container col-lg-6">
+                                        <div id="mapLast2days" class="mapLast2days" style="height:100%;position: relative;">
+                                            <div id="popupLast2days"></div>
+                                        </div>
+                                        <div align="left">@Messages.get("meteoCaption")&nbsp;<a href="http://meteo.gr" target="_blank">meteo.gr</a></div>
+                                        <br/>
+                                    </div>
+                                    <div class="container col-lg-6" id="chartsResultsLast2days">
+                                        <div class="head">
+                                            <h4></h4> <br/>
+                                        </div>
+
+                                        <div class="head-last2days">
+                                            <h3>@Messages.get("noAvailableData")</h3>
+                                        </div>
+
+                                        <div class="children">
+                                            <h3>@Messages.get("currentTemperature")</h3>
+                                            <canvas id="myChartCurrentTemp" width="900" height="250"></canvas>
+
+                                            <h3>@Messages.get("currentRain")</h3>
+                                            <canvas id="myChartCurrentRain" width="900" height="250"></canvas>
+
+                                            <h3>@Messages.get("currentWindSpeed")</h3>
+                                            <canvas id="myChartCurrentWindSpeed" width="900" height="250"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Content about forecast-->
+                            <div class="tab-pane fade" id="tab2default">
+                                <div class="row">
+                                    <div class="container col-lg-6">
+                                        <div id="map" class="map" style="height:100%;position: relative;">
+                                            <div id="popupForecast"></div>
+                                        </div>
+                                        <div align="left"><a href="http://www.hnms.gr/" target="_blank">@Messages.get("forecastCaption")</a></div>
+                                        <br/>
+                                    </div>
+
+                                    <div class="container col-lg-6" id="chartsResults">
+                                        <div class="head">
+                                            <h4></h4> <br/>
+                                        </div>
+
+                                        <h3>@Messages.get("forecastCapacitation")</h3>
+                                            <canvas id="myChartCapacitation" width="900" height="250"></canvas>
+                                        <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
+
+                                        <h3>@Messages.get("forecastPrecipitation")</h3>
+                                        <canvas id="myChartPrecipitation" width="900" height="250"></canvas>
+                                        <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
+
+                                        <h3>@Messages.get("forecastTemperature")</h3>
+                                        <canvas id="myChartTemp" width="900" height="250"></canvas>
+                                        <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
+
+                                        <h3>@Messages.get("forecastWindDegree")</h3>
+                                        <canvas id="myChartWindDegree" width="900" height="250"></canvas>
+                                        <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
+
+                                        <h3>@Messages.get("forecastWindSpeed")</h3>
+                                        <canvas id="myChartWindSpeed" width="900" height="250"></canvas>
+                                        <div class="y-label-forecast">@Messages.get("forecastYLabel")</div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Content about historic data month-->
+                            <div class="tab-pane fade" id="tab3default">
+                                <div class="row">
+                                    <div class="container col-lg-6">
+                                        <div id="mapHistoric" class="mapHistoric"
+                                             style="height:100%;position: relative;">
+                                            <div id="popupHistoric"></div>
+                                        </div>
+                                        <div align="left">@Messages.get("meteoCaption")&nbsp;<a href="http://meteo.gr" target="_blank">meteo.gr</a></div>
+                                        <br/>
+                                    </div>
+
+                                    <div class="container col-lg-6" id="chartsResultsHistoric">
+                                        <div class="head">
+                                            <h4></h4> <br/>
+                                        </div>
+
+                                        <div class="head-historic"> <h3>@Messages.get("noAvailableData")</h3> </div>
+
+                                        <div class="children">
+                                            <h3>@Messages.get("meteoTemperature")</h3>
+                                            <canvas id="myChartTempHist" width="900" height="250"></canvas>
+                                            <div class="y-label">@Messages.get("meteoYLabel")</div>
+                                            <br/>
+
+                                            <h3>@Messages.get("meteoRain")</h3>
+                                            <canvas id="myChartRainHist" width="900" height="250"></canvas>
+                                            <div class="y-label">@Messages.get("meteoYLabel")</div>
+                                            <br/>
+
+                                            <h3>@Messages.get("meteoWind")</h3>
+                                            <canvas id="myChartWindHist" width="900" height="250"></canvas>
+                                            <div class="y-label">@Messages.get("meteoYLabel")</div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Content about historic data day-->
+                            <div class="tab-pane fade" id="tab4default">
+                                <div class="row">
+                                    <div class="container col-lg-6">
+                                        <div id="mapHistoricDay" class="mapHistoricDay"
+                                             style="height:100%;position: relative;">
+                                            <div id="popupHistoricDay"></div>
+                                        </div>
+                                        <div align="left">@Messages.get("meteoCaption")&nbsp;<a href="http://meteo.gr" target="_blank">meteo.gr</a></div>
+                                        <br/>
+                                    </div>
+
+                                    <div class="container col-lg-6" id="chartsResultsHistoricDay">
+                                        <div class="head">
+                                            <h4></h4> <br/>
+                                        </div>
+
+                                        <div class="head-histday"> <h3>@Messages.get("noAvailableData")</h3> </div>
+
+                                        <div class="children">
+                                            <h3>@Messages.get("meteoTemperature")</h3>
+                                            <canvas id="myChartTempHistDay" width="900" height="250"></canvas>
+                                            <div class="y-label">@Messages.get("meteoYLabelDay")</div>
+                                            <br/>
+
+                                            <h3>@Messages.get("meteoRain")</h3>
+                                            <canvas id="myChartRainHistDay" width="900" height="250"></canvas>
+                                            <div class="y-label">@Messages.get("meteoYLabelDay")</div>
+                                            <br/>
+
+                                            <h3>@Messages.get("meteoWind")</h3>
+                                            <canvas id="myChartWindHistDay" width="900" height="250"></canvas>
+                                            <div class="y-label">@Messages.get("meteoYLabelDay")</div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                <!--</div>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+@views.html.footer{
+}
 
 </body>
 </html>

@@ -5,15 +5,14 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Climate extends Controller {
 
-    public static Result climate() throws IOException {
-        if (session().get("userName") != null) {
+    public static Result climate() {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             Notifications notifications = new Notifications();
             notifications.getNotificationEvents();
             return ok(views.html.climate.render("iDSS weather data"));
@@ -28,7 +27,7 @@ public class Climate extends Controller {
      * @return map of places-coordinates
      */
     public static Result getCoordinatesForecast(){
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<Double, Double>> geodataCoords = new HashMap<String, Map<Double, Double>>();
 
@@ -48,7 +47,7 @@ public class Climate extends Controller {
      * @return map of places-coordinates
      */
     public static Result getCoordinatesHistoric(){
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodataHist = MeteoStations.find.findList();
             Map<String, Map<Double, Double>> geodataCoordsHist = new HashMap<String, Map<Double, Double>>();
 
@@ -66,10 +65,9 @@ public class Climate extends Controller {
     /**
      * Get current temperature
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getTempCurrent(String location) throws IOException {
-        if (session().get("userName") != null) {
+    public static Result getTempCurrent(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<String, Double>> temp = new HashMap<String, Map<String, Double>>();
 
@@ -97,10 +95,9 @@ public class Climate extends Controller {
     /**
      * Get current rain-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getRainCurrent(String location) throws IOException {
-        if (session().get("userName") != null) {
+    public static Result getRainCurrent(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<String, Double>> temp = new HashMap<String, Map<String, Double>>();
 
@@ -127,10 +124,9 @@ public class Climate extends Controller {
     /**
      * Get current wind-speed-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getWindSpeedCurrent(String location) throws IOException {
-        if (session().get("userName") != null) {
+    public static Result getWindSpeedCurrent(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<String, Double>> temp = new HashMap<String, Map<String, Double>>();
 
@@ -158,10 +154,9 @@ public class Climate extends Controller {
     /**
      * Get current wind-degree-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getWindDegreeCurrent(String location) throws IOException {
-        if (session().get("userName") != null) {
+    public static Result getWindDegreeCurrent(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<String, String>> temp = new HashMap<String, Map<String, String>>();
 
@@ -187,10 +182,9 @@ public class Climate extends Controller {
     /**
      * Get forecast capacitation-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getForecastCapacitation(String location) throws IOException {
-        if (session().get("userName") != null) {
+    public static Result getForecastCapacitation(String location){
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<String, Double>> precipitation = new HashMap<String, Map<String, Double>>();
 
@@ -215,10 +209,9 @@ public class Climate extends Controller {
     /**
      * Get forecast precipitation-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getForecastPrecipitation(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastPrecipitation(String location){
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<String, Double>> precipitation = new HashMap<String, Map<String, Double>>();
 
@@ -242,10 +235,9 @@ public class Climate extends Controller {
     /**
      * Get forecast temperature-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getForecastTemperature(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastTemperature(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<String, Double>> temperature = new HashMap<String, Map<String, Double>>();
 
@@ -269,10 +261,9 @@ public class Climate extends Controller {
     /**
      * Get forecast wind-degree-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getForecastWindDegrees(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastWindDegrees(String location){
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<String, Double>> temperature = new HashMap<String, Map<String, Double>>();
 
@@ -296,10 +287,9 @@ public class Climate extends Controller {
     /**
      * Get forecast wind-speed-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getForecastWindSpeed(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastWindSpeed(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<String, Double>> temperature = new HashMap<String, Map<String, Double>>();
 
@@ -323,10 +313,9 @@ public class Climate extends Controller {
     /**
      * Get historic mean-temp information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getMeanTemp(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getMeanTemp(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<Integer, Double>> meanTemp = new HashMap<String, Map<Integer, Double>>();
 
@@ -350,10 +339,9 @@ public class Climate extends Controller {
     /**
      * Get historic high-temp information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getHighTemp(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getHighTemp(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<Integer, Double>> highTemp = new HashMap<String, Map<Integer, Double>>();
 
@@ -377,10 +365,9 @@ public class Climate extends Controller {
     /**
      * Get historic low-temp information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getLowTemp(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getLowTemp(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<Integer, Double>> lowTemp = new HashMap<String, Map<Integer, Double>>();
 
@@ -404,10 +391,9 @@ public class Climate extends Controller {
     /**
      * Get current year temp-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getTempCurrentYear(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getTempCurrentYear(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<String, String>> temp = new HashMap<String, Map<String, String>>();
 
@@ -435,10 +421,9 @@ public class Climate extends Controller {
     /**
      * Get current year precipitation-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getPrecipitationCurrentYear(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getPrecipitationCurrentYear(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<String, Double>> rainfall = new HashMap<String, Map<String, Double>>();
 
@@ -466,10 +451,9 @@ public class Climate extends Controller {
     /**
      * Get current year wind-speed-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getWindSpeedCurrentYear(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getWindSpeedCurrentYear(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<String, Double>> wind = new HashMap<String, Map<String, Double>>();
 
@@ -497,10 +481,9 @@ public class Climate extends Controller {
     /**
      * Get historic temp-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getTempHistoric(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getTempHistoric(String location) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<Integer, String>> temp = new HashMap<String, Map<Integer, String>>();
 
@@ -525,10 +508,9 @@ public class Climate extends Controller {
     /**
      * Get historic rain-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getRainHistoric(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getRainHistoric(String location){
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<Integer, Double>> rain = new HashMap<String, Map<Integer, Double>>();
 
@@ -552,10 +534,9 @@ public class Climate extends Controller {
     /**
      * Get historic wind-related information
      * @return get map with data related to specific location
-     * @throws IOException
      */
-    public static Result getWindHistoric(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getWindHistoric(String location){
+        if (session().get("userName") != null && session().get("agency")!=null) {
             List<MeteoStations> geodata = MeteoStations.find.findList();
             Map<String, Map<Integer, String>> wind = new HashMap<String, Map<Integer, String>>();
 

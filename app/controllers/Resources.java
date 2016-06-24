@@ -19,7 +19,7 @@ public class Resources extends Controller {
 
 
     public static Result index() {
-        if (session().get("userName") != null){
+        if (session().get("userName") != null && session().get("agency") != null) {
             return ok(views.html.resources.render());
         }
         else
@@ -88,7 +88,7 @@ public class Resources extends Controller {
     }
 
     public static Result infrastructure() throws IOException{
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             List<InfrastructureMapping> layers = InfrastructureMapping.all();
             List<String> layersIds = new ArrayList<String>();
             for(InfrastructureMapping l : layers){
@@ -137,7 +137,7 @@ public class Resources extends Controller {
     }
 
     public static Result machinery() throws IOException {
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             Map<String, String> groupnameAgency = new HashMap<String, String>();
             List<Sharing> contactGroups = new ArrayList<Sharing>();
             contactGroups = Sharing.find.findList();
@@ -153,7 +153,7 @@ public class Resources extends Controller {
     }
 
     public static Result human() {
-        if (session().get("userName") != null)
+        if (session().get("userName") != null && session().get("agency") != null)
             return ok(views.html.human.render());
         else
             return redirect("/login");
@@ -161,7 +161,7 @@ public class Resources extends Controller {
 
     public static Result saveGeometry(String geojson){
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             String result = geojson.replaceAll("\\\\", "");
 
             JsonNode node = Json.parse(result);
@@ -177,39 +177,39 @@ public class Resources extends Controller {
      * @throws IOException
      */
     public static Result machineryList() throws IOException {
-        List<MachineryType> machineryTypes = new ArrayList<MachineryType>();
-        List<MachineryLayer> MachineryLayers = new ArrayList<MachineryLayer>();
+        if (session().get("userName") != null && session().get("agency") != null) {
+            List<MachineryType> machineryTypes = new ArrayList<MachineryType>();
+            List<MachineryLayer> MachineryLayers = new ArrayList<MachineryLayer>();
 
-        if(isAdmin(session().get("userName"))){
-            machineryTypes = MachineryType.find.findList();
-            MachineryLayers = MachineryLayer.find.findList();
-        }else{
-            machineryTypes.addAll(MachineryType.find.where().eq("agency", User.getPersonAgency(Application.session().get("userName"))).findList());
-            machineryTypes.addAll(MachineryType.find.where().eq("agency", "ALFRESCO_ADMINISTRATORS").findList());
+            if(isAdmin(session().get("userName"))){
+                machineryTypes = MachineryType.find.findList();
+                MachineryLayers = MachineryLayer.find.findList();
+            }else{
+                machineryTypes.addAll(MachineryType.find.where().eq("agency", User.getPersonAgency(Application.session().get("userName"))).findList());
+                machineryTypes.addAll(MachineryType.find.where().eq("agency", "ALFRESCO_ADMINISTRATORS").findList());
 
-            MachineryLayers = MachineryLayer.find.where().eq("agency", User.getPersonAgency(Application.session().get("userName"))).findList();
-        }
+                MachineryLayers = MachineryLayer.find.where().eq("agency", User.getPersonAgency(Application.session().get("userName"))).findList();
+            }
 
-        Map<Integer, String> idType = new HashMap<Integer, String>();
-        for(MachineryType mt: machineryTypes) {
-            idType.put(mt.getId(), mt.getVehicle_type());
-        }
+            Map<Integer, String> idType = new HashMap<Integer, String>();
+            for(MachineryType mt: machineryTypes) {
+                idType.put(mt.getId(), mt.getVehicle_type());
+            }
 
-        List<MachineryLayer> machineryLayersOther = new ArrayList<MachineryLayer>();
-        for(String agency : getSharedAgencies()){
-            List<MachineryLayer> list = MachineryLayer.find.where().eq("agency", agency).findList();
-            machineryLayersOther.addAll(list);
-        }
+            List<MachineryLayer> machineryLayersOther = new ArrayList<MachineryLayer>();
+            for(String agency : getSharedAgencies()){
+                List<MachineryLayer> list = MachineryLayer.find.where().eq("agency", agency).findList();
+                machineryLayersOther.addAll(list);
+            }
 
-        Map<String, String> groupnameAgency = new HashMap<String, String>();
-        List<Sharing> contactGroups = new ArrayList<Sharing>();
-        contactGroups = Sharing.find.findList();
+            Map<String, String> groupnameAgency = new HashMap<String, String>();
+            List<Sharing> contactGroups = new ArrayList<Sharing>();
+            contactGroups = Sharing.find.findList();
 
-        for(Sharing contact : contactGroups){
-            groupnameAgency.put(contact.getAgency(), contact.getAgency_displayname());
-        }
+            for(Sharing contact : contactGroups){
+                groupnameAgency.put(contact.getAgency(), contact.getAgency_displayname());
+            }
 
-        if (session().get("userName") != null) {
             return ok(views.html.addMachinery.render(machineryTypes, MachineryLayers, machineryLayersOther, idType, isAdmin(session().get("userName")), hasEdit(session().get("userName")), isAgencyAdmin(session().get("userName")), groupnameAgency));
         }
         else
@@ -228,7 +228,7 @@ public class Resources extends Controller {
             idType.put(mt.getId(), mt.getVehicle_type());
         }
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
             List<MachineryType> machineryTypes = new ArrayList<MachineryType>();
             List<MachineryType> machineryTypesAgency = new ArrayList<MachineryType>();
@@ -250,39 +250,44 @@ public class Resources extends Controller {
      * @throws IOException
      */
     public static Result machineryTypeAdd() throws IOException{
-        Form<Reporting.UploadImageForm> mForm = form(Reporting.UploadImageForm.class).bindFromRequest();
+        if (session().get("userName") != null && session().get("agency") != null) {
 
-        if (mForm.hasErrors()) {
-            List<MachineryType> machineryList = MachineryType.find.where().eq("agency", User.getPersonAgency(Application.session().get("userName"))).findList();
-            Map<Integer, String> idType = new HashMap<Integer, String>();
-            for(MachineryType mt: machineryList){
-                idType.put(mt.getId(), mt.getVehicle_type());
+            Form<Reporting.UploadImageForm> mForm = form(Reporting.UploadImageForm.class).bindFromRequest();
+
+            if (mForm.hasErrors()) {
+                List<MachineryType> machineryList = MachineryType.find.where().eq("agency", User.getPersonAgency(Application.session().get("userName"))).findList();
+                Map<Integer, String> idType = new HashMap<Integer, String>();
+                for (MachineryType mt : machineryList) {
+                    idType.put(mt.getId(), mt.getVehicle_type());
+                }
+
+                List<MachineryLayer> machineryLayersOther = new ArrayList<MachineryLayer>();
+                for (String agency : getSharedAgencies()) {
+                    List<MachineryLayer> list = MachineryLayer.find.where().eq("agency", agency).findList();
+                    machineryLayersOther.addAll(list);
+                }
+
+                Map<String, String> groupnameAgency = new HashMap<String, String>();
+                List<Sharing> contactGroups = new ArrayList<Sharing>();
+                contactGroups = Sharing.find.findList();
+
+                for (Sharing contact : contactGroups) {
+                    groupnameAgency.put(contact.getAgency(), contact.getAgency_displayname());
+                }
+
+                return badRequest(views.html.addMachinery.render(MachineryType.userMachinery(), MachineryLayer.userMachinery(), machineryLayersOther, idType, isAdmin(session().get("userName")), hasEdit(session().get("userName")), isAgencyAdmin(session().get("userName")), groupnameAgency));
+            } else {
+                new MachineryType(
+                        mForm.get().image.getFilename(),
+                        mForm.get().image.getFile(),
+                        session().get("userName"),
+                        mForm.data().get("vehicle_type")
+                );
+
+                return redirect("/resources/machinery/addType");
             }
-
-            List<MachineryLayer> machineryLayersOther = new ArrayList<MachineryLayer>();
-            for(String agency : getSharedAgencies()){
-                List<MachineryLayer> list = MachineryLayer.find.where().eq("agency", agency).findList();
-                machineryLayersOther.addAll(list);
-            }
-
-            Map<String, String> groupnameAgency = new HashMap<String, String>();
-            List<Sharing> contactGroups = new ArrayList<Sharing>();
-            contactGroups = Sharing.find.findList();
-
-            for(Sharing contact : contactGroups){
-                groupnameAgency.put(contact.getAgency(), contact.getAgency_displayname());
-            }
-
-            return badRequest(views.html.addMachinery.render(MachineryType.userMachinery(), MachineryLayer.userMachinery(), machineryLayersOther, idType, isAdmin(session().get("userName")), hasEdit(session().get("userName")), isAgencyAdmin(session().get("userName")), groupnameAgency));
         } else {
-            new MachineryType(
-                    mForm.get().image.getFilename(),
-                    mForm.get().image.getFile(),
-                    session().get("userName"),
-                    mForm.data().get("vehicle_type")
-            );
-
-            return redirect("/resources/machinery/addType");
+            return redirect("/login");
         }
     }
 
@@ -291,21 +296,25 @@ public class Resources extends Controller {
      * @throws IOException
      */
     public static Result machineryTypeUpdate() throws IOException {
-        MachineryType m = new MachineryType();
+        if (session().get("userName") != null && session().get("agency") != null) {
+            MachineryType m = new MachineryType();
 
-        Form<Reporting.UploadImageForm> form = form(Reporting.UploadImageForm.class).bindFromRequest();
+            Form<Reporting.UploadImageForm> form = form(Reporting.UploadImageForm.class).bindFromRequest();
 
-        m.setId(Integer.parseInt(form.data().get("id")));
-        m.setVehicle_type(form.data().get("vehicle_type"));
-        m.setUsername(session().get("userName"));
-        m.setAgency(User.getPersonAgency(session().get("userName")));
+            m.setId(Integer.parseInt(form.data().get("id")));
+            m.setVehicle_type(form.data().get("vehicle_type"));
+            m.setUsername(session().get("userName"));
+            m.setAgency(User.getPersonAgency(session().get("userName")));
 
-        if (form.hasErrors()) { // image is missing
-            MachineryType.update(null, null, m);
+            if (form.hasErrors()) { // image is missing
+                MachineryType.update(null, null, m);
+            } else {
+                MachineryType.update(form.get().image.getFilename(), form.get().image.getFile(), m);
+            }
+            return redirect("/resources/machinery/addType");
         } else {
-            MachineryType.update(form.get().image.getFilename(), form.get().image.getFile(), m);
+            return redirect("/login");
         }
-        return redirect("/resources/machinery/addType");
     }
 
     /**
@@ -313,7 +322,7 @@ public class Resources extends Controller {
      * @throws IOException
      */
     public static Result machineryTypeDelete(Integer contactId) {
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             try {
                 MachineryType.delete(contactId);
                 return redirect("/resources/machinery/addType");
@@ -327,32 +336,35 @@ public class Resources extends Controller {
 
     /**
      * Update a machinery instance
-     * @throws IOException
      */
-    public static Result machineryLayerUpdate() throws IOException {
-        MachineryLayer m = new MachineryLayer();
+    public static Result machineryLayerUpdate() {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            MachineryLayer m = new MachineryLayer();
 
-        Form<MachineryLayer> form = form(MachineryLayer.class).bindFromRequest();
-        m.setBhp(form.data().get("bhp"));
-        m.setId(Integer.parseInt(form.data().get("id")));
-        m.setBrand(form.data().get("brand"));
-        m.setLicence_plate(form.data().get("licence_plate"));
-        m.setSeats(form.data().get("seats"));
-        m.setEquipment(form.data().get("equipment"));
-        m.setCargo_type(form.data().get("cargo_type"));
-        m.setCapacity_m3(form.data().get("capacity_m3"));
-        m.setDriver(form.data().get("driver"));
-        m.setDisaster_type(form.data().get("disaster_type"));
-        m.setMachinery_status(form.data().get("machinery_status"));
-        m.setTires_status(form.data().get("tires_status"));
-        m.setNotes(form.data().get("notes"));
-        m.setUsername(session().get("userName"));
-        m.setAgency(User.getPersonAgency(session().get("userName")));
-        m.setAvailability(form.data().get("availability"));
+            Form<MachineryLayer> form = form(MachineryLayer.class).bindFromRequest();
+            m.setBhp(form.data().get("bhp"));
+            m.setId(Integer.parseInt(form.data().get("id")));
+            m.setBrand(form.data().get("brand"));
+            m.setLicence_plate(form.data().get("licence_plate"));
+            m.setSeats(form.data().get("seats"));
+            m.setEquipment(form.data().get("equipment"));
+            m.setCargo_type(form.data().get("cargo_type"));
+            m.setCapacity_m3(form.data().get("capacity_m3"));
+            m.setDriver(form.data().get("driver"));
+            m.setDisaster_type(form.data().get("disaster_type"));
+            m.setMachinery_status(form.data().get("machinery_status"));
+            m.setTires_status(form.data().get("tires_status"));
+            m.setNotes(form.data().get("notes"));
+            m.setUsername(session().get("userName"));
+            m.setAgency(User.getPersonAgency(session().get("userName")));
+            m.setAvailability(form.data().get("availability"));
 
-        MachineryLayer.updateLayer(m);
+            MachineryLayer.updateLayer(m);
 
-        return redirect("/resources/machinery/edit");
+            return redirect("/resources/machinery/edit");
+        } else {
+            return redirect("/login");
+        }
     }
 
     /**
@@ -360,7 +372,7 @@ public class Resources extends Controller {
      */
     public static Result machineryLayerDelete(Integer contactId) {
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             try {
                 MachineryLayer.deleteLayer(contactId);
                 return redirect("/resources/machinery/edit");
@@ -369,27 +381,33 @@ public class Resources extends Controller {
             }
             return badRequest();
         } else
-            return forbidden();
+            return redirect("/login");
     }
 
     /**
      * Get a machinery type based on a defined id
      * @return Machinery type
-     * @throws IOException
      */
-    public static Result machineryGetById(int id) throws IOException {
-        MachineryType m = MachineryType.find.byId(id);
-        return ok(Json.toJson(m));
+    public static Result machineryGetById(int id)  {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            MachineryType m = MachineryType.find.byId(id);
+            return ok(Json.toJson(m));
+        } else {
+            return redirect("/login");
+        }
     }
 
     /**
      * Get a machinery instance based on a defined id
      * @return Machinery instance
-     * @throws IOException
      */
-    public static Result machineryGetLayerById(int id) throws IOException {
-        MachineryLayer m = MachineryLayer.find.byId(id);
-        return ok(Json.toJson(m));
+    public static Result machineryGetLayerById(int id) {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            MachineryLayer m = MachineryLayer.find.byId(id);
+            return ok(Json.toJson(m));
+        } else {
+            return redirect("/login");
+        }
     }
 
     /**
@@ -397,17 +415,25 @@ public class Resources extends Controller {
      * @return Machinery's type icon
      */
     public static Result getMachineryIcon(String id){
-        String icon = MachineryType.find.byId(Integer.parseInt(id)).getIcon();
-        return ok(icon);
+        if (session().get("userName") != null && session().get("agency") != null) {
+            String icon = MachineryType.find.byId(Integer.parseInt(id)).getIcon();
+            return ok(icon);
+        } else {
+            return redirect("/login");
+        }
     }
 
     /**
      * Get a machinery's type thumbnail based on a defined id
      * @return Machinery's type thumbnail
      */
-    public static Result getMachineryThumbnail(String id) throws IOException {
-        String thumbnail = MachineryType.find.byId(Integer.parseInt(id)).getThumbnail();
-        return ok(thumbnail);
+    public static Result getMachineryThumbnail(String id)  {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            String thumbnail = MachineryType.find.byId(Integer.parseInt(id)).getThumbnail();
+            return ok(thumbnail);
+        } else {
+            return redirect("/login");
+        }
     }
 
 }

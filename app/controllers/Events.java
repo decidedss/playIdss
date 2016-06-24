@@ -15,19 +15,15 @@ import java.util.List;
 public class Events extends Controller {
 
     public static Result index() throws IOException {
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             session().put("days", "3");
-//            if (User.isAdmin(session().get("userName"))){
-//                return ok(views.html.events.render(Notification.allEvents(), EventType.all(), new ArrayList<>(), "", ""));
-//            }
-//            else {
+
                 // Get notifications from sharing agency and myself
                 List<String> agencies = new ArrayList<>();
                 agencies.add(User.getPersonAgency(session().get("userName")));
                 for (Sharing s: Sharing.find.all()){
                     if (User.groupExists(s.getAgency(), session().get("alf_ticket")) && s.isShare()){
                         agencies.add(s.getAgency());
-//
                     }
                 }
                 List<Notification> notifications = Notification.find.where().eq("is_disaster", false).in("agency", agencies).orderBy("insert_date desc").setMaxRows(10).findList();
@@ -40,33 +36,26 @@ public class Events extends Controller {
                     }
                 }
                 return ok(views.html.events.render(last3daysNotifications, EventType.all(), notifications, "", ""));
-//            }
-
         }
         else {
             return redirect("/login");
         }
     }
 
-    public static Result allEvents() throws IOException {
-        if (session().get("userName") != null) {
+    public static Result allEvents() {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             session().put("days", "all");
-//            if (User.isAdmin(session().get("userName"))){
-//                return ok(views.html.events.render(Notification.allEvents(), EventType.all(), new ArrayList<>(), "", ""));
-//            }
-//            else {
-                // Get notifications from sharing agency and myself
-                List<String> agencies = new ArrayList<>();
-                agencies.add(User.getPersonAgency(session().get("userName")));
-                for (Sharing s: Sharing.find.all()){
-                    if (User.groupExists(s.getAgency(), session().get("alf_ticket")) && s.isShare()){
-                        agencies.add(s.getAgency());
-//
-                    }
+
+            // Get notifications from sharing agency and myself
+            List<String> agencies = new ArrayList<>();
+            agencies.add(User.getPersonAgency(session().get("userName")));
+            for (Sharing s: Sharing.find.all()){
+                if (User.groupExists(s.getAgency(), session().get("alf_ticket")) && s.isShare()){
+                    agencies.add(s.getAgency());
                 }
-                List<Notification> notifications = Notification.find.where().eq("is_disaster", false).in("agency", agencies).orderBy("insert_date desc").setMaxRows(10).findList();
-                return ok(views.html.events.render(getAgencyEvents(), EventType.all(), notifications, "", ""));
-            //}
+            }
+            List<Notification> notifications = Notification.find.where().eq("is_disaster", false).in("agency", agencies).orderBy("insert_date desc").setMaxRows(10).findList();
+            return ok(views.html.events.render(getAgencyEvents(), EventType.all(), notifications, "", ""));
         }
         else {
             return redirect("/login");
@@ -74,14 +63,8 @@ public class Events extends Controller {
     }
 
     public static Result disasters() throws  IOException {
-        if (session().get("userName") != null) {
-//            if (User.isAdmin(session().get("userName"))){
-//                return ok(views.html.disasters.render(Notification.allDisasters(),  EventType.all(), "", "", DisasterAttributeMapping.all()));
-//            }
-//            else {
-                return ok(views.html.disasters.render(getAgencyDisasters(),  EventType.all(), "", "", DisasterAttributeMapping.all()));
-//            }
-
+        if (session().get("userName") != null && session().get("agency")!=null) {
+            return ok(views.html.disasters.render(getAgencyDisasters(),  EventType.all(), "", "", DisasterAttributeMapping.all()));
         }
         else {
             return redirect("/login");
@@ -89,13 +72,17 @@ public class Events extends Controller {
     }
 
     public static Result editDisaster() {
-        Form<Notification> dForm = play.data.Form.form(Notification.class).bindFromRequest();
-        Notification disaster = dForm.get();
-        disaster.update();
-        return redirect("/disasters");
+        if (session().get("userName") != null && session().get("agency")!=null) {
+            Form<Notification> dForm = play.data.Form.form(Notification.class).bindFromRequest();
+            Notification disaster = dForm.get();
+            disaster.update();
+            return redirect("/disasters");
+        } else {
+            return redirect("/login");
+        }
     }
 
-    public static Result findEvents() throws IOException {
+    public static Result findEvents() {
         Form<DayRange> dayRangeFormForm = play.data.Form.form(DayRange.class).bindFromRequest();
         /**
          * We assume that the number of days clicked on the range slider will always be positive
@@ -105,13 +92,14 @@ public class Events extends Controller {
 
         List<Notification> filteredEvents = new ArrayList<>();
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null  && session().get("agency")!=null) {
             List<Notification> allEvents = getAgencyEvents();
 
             for (Notification event : allEvents)
                 if (event.getInsert_date().isEqual(LocalDateTime.now()) || event.getInsert_date().isBefore(LocalDateTime.now()))
                     if ((int) ChronoUnit.DAYS.between(event.getInsert_date(), LocalDateTime.now()) <= days)
                         filteredEvents.add(event);
+
             session().put("days", days + " days");
             return ok(views.html.events.render(filteredEvents,  EventType.all(), null, "", ""));
         }
@@ -120,9 +108,9 @@ public class Events extends Controller {
         }
     }
 
-    public static Result eventCalendarSearch() throws IOException, ParseException {
+    public static Result eventCalendarSearch() throws ParseException {
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null  && session().get("agency")!=null) {
             Form<Calendar> cForm = play.data.Form.form(Calendar.class).bindFromRequest();
             String from = cForm.get().getFrom();
             String to = cForm.get().getTo();
@@ -152,9 +140,9 @@ public class Events extends Controller {
     }
 
 
-    public static Result disasterCalendarSearch() throws IOException, ParseException {
+    public static Result disasterCalendarSearch() throws ParseException {
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
             Form<Calendar> cForm = play.data.Form.form(Calendar.class).bindFromRequest();
             String from = cForm.get().getFrom();
             String to = cForm.get().getTo();
@@ -180,7 +168,6 @@ public class Events extends Controller {
                         filteredList.add(n);
                     }
                 }
-
             }
 
             return ok(views.html.disasters.render(filteredList,  EventType.all(), from, to, DisasterAttributeMapping.all()));
@@ -217,9 +204,8 @@ public class Events extends Controller {
     /**
      * Agency's events merged with shared events
      * @return list of reports
-     * @throws IOException
      */
-    public static List<Notification> getAgencyEvents() throws IOException{
+    public static List<Notification> getAgencyEvents(){
         List<Notification> agencyEvents =  Notification.find.where().eq("agency", session().get("agency")).eq("is_disaster",false).findList();
         agencyEvents.addAll(getSharedEvents());
         Notifications notifications = new Notifications();
@@ -230,9 +216,8 @@ public class Events extends Controller {
     /**
      * Agency's disasters @TODO merge with shared disasters
      * @return list of disasters
-     * @throws IOException
      */
-    public static List<Notification> getAgencyDisasters() throws IOException{
+    public static List<Notification> getAgencyDisasters(){
 
         List<Notification> agencyDisasters =  Notification.find.where().eq("agency", session().get("agency")).eq("is_disaster",true).findList();
         agencyDisasters.addAll(getSharedDisasters());
@@ -242,9 +227,8 @@ public class Events extends Controller {
     /**
      * Events reported from other agencies that share their content
      * @return list of reports
-     * @throws IOException
      */
-    public static List<Notification> getSharedEvents() throws IOException{
+    public static List<Notification> getSharedEvents(){
 
         ArrayList<String> list = new ArrayList<>();
         for (Sharing s: Sharing.all()){
@@ -261,13 +245,11 @@ public class Events extends Controller {
     }
 
 
-
     /**
      * Disasters reported from other agencies that share their content
      * @return list of disasters
-     * @throws IOException
      */
-    public static List<Notification> getSharedDisasters() throws IOException{
+    public static List<Notification> getSharedDisasters(){
 
         ArrayList<String> list = new ArrayList<>();
         for (Sharing s: Sharing.all()){
@@ -285,26 +267,36 @@ public class Events extends Controller {
 
 
     // Mark as disaster
-    public static Result update(boolean status, Integer id) throws IOException{
-        Notification n = Notification.find.byId(id);
-        n.setIs_disaster(status);
-        n.update();
-        Notifications notifications = new Notifications();
-        notifications.getNotificationEvents();
+    public static Result update(boolean status, Integer id) {
 
-        return ok("update");
+        if (session().get("userName") != null && session().get("agency")!=null) {
+
+            Notification n = Notification.find.byId(id);
+            n.setIs_disaster(status);
+            n.update();
+            Notifications notifications = new Notifications();
+            notifications.getNotificationEvents();
+
+            return ok("update");
+        } else {
+            return redirect("/login");
+        }
     }
 
 
-
     // Delete event (_notifications) from DB
-    public static Result delete(Integer id) throws IOException{
-        Notification n = Notification.find.byId(id);
-        n.delete();
-        Notifications notifications = new Notifications();
-        notifications.getNotificationEvents();
+    public static Result delete(Integer id) {
+        if (session().get("userName") != null && session().get("agency")!=null) {
 
-        return ok("delete");
+            Notification n = Notification.find.byId(id);
+            n.delete();
+            Notifications notifications = new Notifications();
+            notifications.getNotificationEvents();
+
+            return ok("delete");
+        } else {
+            return redirect("/login");
+        }
     }
 
 

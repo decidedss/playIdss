@@ -341,7 +341,7 @@ public class Application extends Controller {
             email.setCharset(org.apache.commons.mail.EmailConstants.UTF_8);
             email.setAuthenticator(new DefaultAuthenticator(Messages.get("emailUsername"), Messages.get("emailPassword")));
             email.setFrom(Messages.get("emailUsername"));
-            email.setSubject("Notification - iDSS");
+            email.setSubject(Messages.get("subjectMailNotify"));
 
             String img ="";
             if (!image.isEmpty()){

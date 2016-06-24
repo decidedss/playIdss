@@ -22,11 +22,11 @@ import static play.data.Form.form;
 
 public class Reporting extends Controller {
 
-    public static Result index() throws IOException {
+    public static Result index() {
 
         Contacts.getNonEmptyContactGroups();
 
-        if (session().get("userName") != null) {
+        if (session().get("userName") != null && session().get("agency") != null) {
             Notifications notifications = new Notifications();
             notifications.getNotificationEvents();
             return ok(views.html.reporting.render(form(UploadImageForm.class), EventType.all(), Contacts.getNonEmptyContactGroups()));
@@ -38,94 +38,98 @@ public class Reporting extends Controller {
     // 100 MB
     @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 1000 * 1024 * 1024)
     public static Result newReport() throws IOException, TwilioRestException {
+        if (session().get("userName") != null && session().get("agency") != null) {
 
-        Notification n = new Notification();
+            Notification n = new Notification();
 
-       Form<UploadImageForm> form = form(UploadImageForm.class).bindFromRequest();
-        if (form.get().image!=null){
-            File file = form.get().image.getFile();
-            String filename = form.get().image.getFilename();
-            n.setImage(Messages.get("publicImageUrl") + filename.replaceAll(" ", ""));
-            saveReportedImage(filename, file);
-        }
-        n.setInsert_date(LocalDateTime.now());
-        n.setUsername(session().get("userName"));
-        n.setAgency(session().get("agency"));
-
-        n.setIs_disaster(false);
-        n.setType(form.data().get("type"));
-        n.setDescr(form.data().get("descr"));
-
-        if (!form.data().get("lat").isEmpty()) n.setLat(Double.parseDouble(form.data().get("lat")));
-        if (!form.data().get("lon").isEmpty()) n.setLon(Double.parseDouble(form.data().get("lon")));
-
-        // Save notification to database
-        Notification.create(n);
-
-        // Get contacts for all the groups selected
-        ArrayList<Integer> glist = new ArrayList<>();
-        if (form.data().get("contactGroups")!=""){
-            String groups = form.data().get("contactGroups");
-            ArrayList<String> list = new ArrayList<>(Arrays.asList(groups.split(",")));
-            for (String g: list){ // convert to int
-                if (!g.isEmpty())
-                    glist.add(Integer.parseInt(g));
+            Form<UploadImageForm> form = form(UploadImageForm.class).bindFromRequest();
+            if (form.get().image != null) {
+                File file = form.get().image.getFile();
+                String filename = form.get().image.getFilename();
+                n.setImage(Messages.get("publicImageUrl") + filename.replaceAll(" ", ""));
+                saveReportedImage(filename, file);
             }
+            n.setInsert_date(LocalDateTime.now());
+            n.setUsername(session().get("userName"));
+            n.setAgency(session().get("agency"));
+
+            n.setIs_disaster(false);
+            n.setType(form.data().get("type"));
+            n.setDescr(form.data().get("descr"));
+
+            if (!form.data().get("lat").isEmpty()) n.setLat(Double.parseDouble(form.data().get("lat")));
+            if (!form.data().get("lon").isEmpty()) n.setLon(Double.parseDouble(form.data().get("lon")));
+
+            // Save notification to database
+            Notification.create(n);
+
+            // Get contacts for all the groups selected
+            ArrayList<Integer> glist = new ArrayList<>();
+            if (form.data().get("contactGroups") != "") {
+                String groups = form.data().get("contactGroups");
+                ArrayList<String> list = new ArrayList<>(Arrays.asList(groups.split(",")));
+                for (String g : list) { // convert to int
+                    if (!g.isEmpty())
+                        glist.add(Integer.parseInt(g));
+                }
 //             System.out.println(glist);
-        }
-        List<Contact> contacts = new ArrayList<>();
-        List<ContactAlfresco> contactsAlfresco = new ArrayList<>();
-        if (glist.size()>0){
-            contacts = Contact.find.where().in("group_id", glist).eq("agency", session().get("agency")).findList();
-            contactsAlfresco = ContactAlfresco.find.where().in("group_id", glist).eq("agency", session().get("agency")).findList();
-        }
-        for (ContactAlfresco ca: contactsAlfresco){ // merge contacts with alfresco contacts
-            Contact c = new Contact();
-            Person p = User.getPerson(ca.getUsername());
-            if (p!=null){
-                c.setEmail(p.getEmail());
-                c.setMobile(p.getMobile());
-                contacts.add(c);
             }
-        }
-
-        // Report by EMAIL **************************************
-        if (form.data().get("toggle-email")!=null){
-
-            EmailValidator em = new EmailValidator();
-
-            for (Contact c: contacts){
-                if (em.validate(c.getEmail())){
-                    Application.sendEmail(Messages.get("event_reporting") + ": " +
-                                    (session().get("lang").equals("el")? EventType.find.where().eq("code",form.data().get("type")).findUnique().getDescription():EventType.find.where().eq("code",form.data().get("type")).findUnique().getDescription_en()),
-                            form.data().get("lat") + ", " + form.data().get("lon"),
-                            n.getImage()==null? "" : n.getImage(),
-                            form.data().get("descr"),
-                            c.getEmail());
-                }
+            List<Contact> contacts = new ArrayList<>();
+            List<ContactAlfresco> contactsAlfresco = new ArrayList<>();
+            if (glist.size() > 0) {
+                contacts = Contact.find.where().in("group_id", glist).eq("agency", session().get("agency")).findList();
+                contactsAlfresco = ContactAlfresco.find.where().in("group_id", glist).eq("agency", session().get("agency")).findList();
             }
-        }
-        // Report by SMS **************************************
-        if (form.data().get("toggle-sms")!=null)
-        {
-            for (Contact c: contacts){
-                if (c.getMobile().length() == 10) { // @TODO will need some validation for mobile number (maybe on insert in the contact form)
-                    String agencyDisplayName = Sharing.find.where().eq("agency", session().get("agency")).findUnique().getAgency_displayname();
-                    String message = Messages.get("agency") + ": " + agencyDisplayName  + ", " + Messages.get("reporting_navbar") + ": ";
-                    if (session().get("lang").equals("el"))
-                        message = message + EventType.find.where().eq("code",form.data().get("type")).findUnique().getDescription() + ", ";
-                    else
-                        message = message + EventType.find.where().eq("code",form.data().get("type")).findUnique().getDescription_en() + ", ";
-
-                    message = message + Messages.get("coordinates") + ": [" + form.data().get("lat").substring(0,8) + "," + form.data().get("lon").substring(0,8) + "], ";
-                    message = message + Messages.get("comments") + ": " +  form.data().get("descr");
-                    Contacts.twilioSMS(message, c.getMobile());
+            for (ContactAlfresco ca : contactsAlfresco) { // merge contacts with alfresco contacts
+                Contact c = new Contact();
+                Person p = User.getPerson(ca.getUsername());
+                if (p != null) {
+                    c.setEmail(p.getEmail());
+                    c.setMobile(p.getMobile());
+                    contacts.add(c);
                 }
             }
 
+            // Report by EMAIL **************************************
+            if (form.data().get("toggle-email") != null) {
+
+                EmailValidator em = new EmailValidator();
+
+                for (Contact c : contacts) {
+                    if (em.validate(c.getEmail())) {
+                        Application.sendEmail(Messages.get("event_reporting") + ": " +
+                                        (session().get("lang").equals("el") ? EventType.find.where().eq("code", form.data().get("type")).findUnique().getDescription() : EventType.find.where().eq("code", form.data().get("type")).findUnique().getDescription_en()),
+                                form.data().get("lat") + ", " + form.data().get("lon"),
+                                n.getImage() == null ? "" : n.getImage(),
+                                form.data().get("descr"),
+                                c.getEmail());
+                    }
+                }
+            }
+            // Report by SMS **************************************
+            if (form.data().get("toggle-sms") != null) {
+                for (Contact c : contacts) {
+                    if (c.getMobile().length() == 10) { // @TODO will need some validation for mobile number (maybe on insert in the contact form)
+                        String agencyDisplayName = Sharing.find.where().eq("agency", session().get("agency")).findUnique().getAgency_displayname();
+                        String message = Messages.get("agency") + ": " + agencyDisplayName + ", " + Messages.get("reporting_navbar") + ": ";
+                        if (session().get("lang").equals("el"))
+                            message = message + EventType.find.where().eq("code", form.data().get("type")).findUnique().getDescription() + ", ";
+                        else
+                            message = message + EventType.find.where().eq("code", form.data().get("type")).findUnique().getDescription_en() + ", ";
+
+                        message = message + Messages.get("coordinates") + ": [" + form.data().get("lat").substring(0, 8) + "," + form.data().get("lon").substring(0, 8) + "], ";
+                        message = message + Messages.get("comments") + ": " + form.data().get("descr");
+                        Contacts.twilioSMS(message, c.getMobile());
+                    }
+                }
+
+            }
+
+            return redirect("/reporting");
+        } else {
+            return redirect("/login");
         }
 
-        return redirect("/reporting");
     }
 
 
@@ -151,21 +155,25 @@ public class Reporting extends Controller {
 
 
 
-    public static Result saveLocation(String location, String eventType, String description) throws IOException {
-        Notification loc = new Notification();
-        Double lat = Double.valueOf(location.substring(location.indexOf(",")+1));
-        Double lon = Double.valueOf(location.substring(0, location.indexOf(",")));
-        loc.setLat(lat);
-        loc.setLon(lon);
-        loc.setInsert_date(LocalDateTime.now());
-        loc.setType(eventType);
-        loc.setUsername(session().get("userName"));
-        loc.setAgency(User.getPersonAgency(session().get("userName")));
-        loc.setDescr(description);
-        loc.setIs_disaster(false);
-        Notification.create(loc);
+    public static Result saveLocation(String location, String eventType, String description)  {
+        if (session().get("userName") != null && session().get("agency") != null) {
+            Notification loc = new Notification();
+            Double lat = Double.valueOf(location.substring(location.indexOf(",") + 1));
+            Double lon = Double.valueOf(location.substring(0, location.indexOf(",")));
+            loc.setLat(lat);
+            loc.setLon(lon);
+            loc.setInsert_date(LocalDateTime.now());
+            loc.setType(eventType);
+            loc.setUsername(session().get("userName"));
+            loc.setAgency(User.getPersonAgency(session().get("userName")));
+            loc.setDescr(description);
+            loc.setIs_disaster(false);
+            Notification.create(loc);
 
-        return ok(location);
+            return ok(location);
+        } else {
+            return redirect("/login");
+        }
     }
 
     public static Result addEventType() throws IOException  {
@@ -190,20 +198,25 @@ public class Reporting extends Controller {
 
 
     public static Result uploadImage() throws IOException {
-        Form<UploadImageForm> form = form(UploadImageForm.class).bindFromRequest();
+        if (session().get("userName") != null && session().get("agency") != null) {
+            Form<UploadImageForm> form = form(UploadImageForm.class).bindFromRequest();
 
-        if (form.hasErrors()) {
-            return badRequest(views.html.reporting.render(form,  null, null));
+            if (form.hasErrors()) {
+                return badRequest(views.html.reporting.render(form, null, null));
 
-        } else {
-            new Image(
-                    form.get().image.getFilename(),
-                    form.get().image.getFile(),
-                    session().get("userName")
-            );
+            } else {
+                new Image(
+                        form.get().image.getFilename(),
+                        form.get().image.getFile(),
+                        session().get("userName")
+                );
 
-            flash("success", "File uploaded.");
-            return redirect(routes.Reporting.index());
+                flash("success", "File uploaded.");
+                return redirect(routes.Reporting.index());
+            }
+        }
+        else {
+            return redirect("/login");
         }
     }
 
@@ -217,14 +230,9 @@ public class Reporting extends Controller {
             Http.MultipartFormData data = request().body().asMultipartFormData();
             image = data.getFile("image");
 
-//            if (image == null) {
-//                return "File is missing.";
-//            }
-
             return null;
         }
     }
-
 
 
     public static class EmailValidator {
@@ -239,6 +247,7 @@ public class Reporting extends Controller {
         public EmailValidator() {
             pattern = Pattern.compile(EMAIL_PATTERN);
         }
+
 
         /**
          * Validate hex with regular expression

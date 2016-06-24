@@ -494,3 +494,5 @@ traffic=Κυκλοφορία
 
 #--------Remote Sensing--------
 remotesensing=Εναέρια επισκόπηση καταστροφών
+
+subjectMailNotify=Ειδοποίηση - iDSS

@@ -11,6 +11,7 @@
         <script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
         <script src="//cdn.datatables.net/plug-ins/1.10.8/integration/bootstrap/3/dataTables.bootstrap.js"></script>
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" media='screen' href='@routes.Assets.at("stylesheets/agency_members.css")'>
 
         <title>@Messages.get("manageMembers")</title>
     }
@@ -81,30 +82,6 @@
 @views.html.header {
 }
 
-<style>
-    body {
-      background-color: #1e3251;
-      color: white;
-    }
-
-     label {
-        color: whitesmoke;
-        text-decoration: none;
-    }
-
-    .pagination > .disabled > span, .pagination > .disabled > span:hover, .pagination > .disabled > span:focus, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
-        background-color: #15a689;
-    }
-
-    td {
-        color: black;
-    }
-
-    .modal-content {
-        color: #1e3251;
-    }
-</style>
-
     <div class="container">
 
         <div class="container col-lg-12">
@@ -130,16 +107,11 @@
                 </button>
             </div>
 
-            <div align="left">
+            <div class="row">
                 <!-- Button trigger modal -->
-                <button class="btn btn-primary btn-lg idss-primary-btn" data-toggle="modal" data-target="#myModalNorm">
-                    @Messages.get("addMembers")
-                </button>
+                <button class="btn btn-primary btn-lg idss-primary-btn" data-toggle="modal" data-target="#myModalNorm">@Messages.get("addMembers")</button>
             </div>
             <br/><br/>
-
-
-
 
             <div style="text-align: left;">
 

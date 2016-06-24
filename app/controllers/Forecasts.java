@@ -5,7 +5,6 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +12,9 @@ import java.util.TreeMap;
 
 public class Forecasts extends Controller {
 
-    public static Result forecast() throws IOException {
-        if (session().get("userName") != null) {
+    public static Result forecast()  {
+        if (session().get("userName") != null && session().get("agency") != null) {
+
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<Double, Double>> geodataCoords = new HashMap<String, Map<Double, Double>>();
 
@@ -42,8 +42,9 @@ public class Forecasts extends Controller {
             return  redirect("/login");
     }
 
-    public static Result getForecastCapacitation(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastCapacitation(String location) {
+        if (session().get("userName") != null && session().get("agency") != null) {
+
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<Integer, Double>> precipitation = new HashMap<String, Map<Integer, Double>>();
 
@@ -65,8 +66,9 @@ public class Forecasts extends Controller {
         }
     }
 
-    public static Result getForecastPrecipitation(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastPrecipitation(String location){
+        if (session().get("userName") != null && session().get("agency") != null) {
+
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<Integer, Double>> precipitation = new HashMap<String, Map<Integer, Double>>();
 
@@ -88,8 +90,9 @@ public class Forecasts extends Controller {
         }
     }
 
-    public static Result getForecastTemperature(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastTemperature(String location) {
+        if (session().get("userName") != null && session().get("agency") != null) {
+
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<Integer, Double>> temperature = new HashMap<String, Map<Integer, Double>>();
 
@@ -111,8 +114,9 @@ public class Forecasts extends Controller {
         }
     }
 
-    public static Result getForecastWindDegrees(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastWindDegrees(String location) {
+        if (session().get("userName") != null && session().get("agency") != null) {
+
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<Integer, Double>> temperature = new HashMap<String, Map<Integer, Double>>();
 
@@ -134,8 +138,9 @@ public class Forecasts extends Controller {
         }
     }
 
-    public static Result getForecastWindSpeed(String location) throws IOException{
-        if (session().get("userName") != null) {
+    public static Result getForecastWindSpeed(String location) {
+        if (session().get("userName") != null && session().get("agency") != null) {
+
             List<ForecastStations> geodata = ForecastStations.find.findList();
             Map<String, Map<Integer, Double>> temperature = new HashMap<String, Map<Integer, Double>>();
 
