@@ -1,6 +1,6 @@
 # project parameters
 SERVER_PATH=http://160.40.63.119
-ALFRSCO_ATOMPUB_URL=http://160.40.63.119:8080/alfresco/api/-default-/public/cmis/versions/1.1/atom
+ALFRSCO_ATOMPUB_URL=http://160.40.63.119:8080/alfresco/api/-default-/public/cmis/versions/1.0/atom
 #http://160.40.63.119:8080:8080/alfresco/cmisatom this supports CMIS 1.0 and not 1.1
 ALFRSCO_REST_API_URL=http://160.40.63.119:8080/alfresco/s/api
 ALFRSCO_USERNAME=admin

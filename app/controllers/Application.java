@@ -3,7 +3,10 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Person;
 import models.Sharing;
-import org.apache.chemistry.opencmis.client.api.*;
+import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.client.api.QueryResult;
+import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
@@ -29,7 +32,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static play.data.Form.form;
@@ -61,7 +63,7 @@ public class Application extends Controller {
 
 
     public static Result agency_login() throws IOException {
-        String ticket = loginAlfresco();
+        String ticket = loginAlfresco(Messages.get("ALFRSCO_USERNAME"), Messages.get("ALFRSCO_PASSWORD"));
         // Logout from previous session
         Application.logout();
         session().put("lang", Controller.lang().language());
@@ -88,7 +90,7 @@ public class Application extends Controller {
 
         Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest();
 
-            String ticket = loginAlfresco();
+            String ticket = loginAlfresco(Messages.get("ALFRSCO_USERNAME"), Messages.get("ALFRSCO_PASSWORD"));
             session().put("alf_ticket", ticket);
 
             // Check if userName exists in Alfresco
@@ -162,7 +164,32 @@ public class Application extends Controller {
      * @return
      * @throws IOException
      */
-    public static String loginAlfresco() throws IOException {
+    public static String loginAlfresco(String u, String p) throws IOException {
+
+        String loginUrl = Messages.get("ALFRSCO_REST_API_URL") + "/login?u=" + u + "&pw="+ p +"&format=json";
+        HttpGet httpget = new HttpGet(loginUrl);
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpResponse response = httpClient.execute(httpget);
+        StringBuilder sb = new StringBuilder();
+        DataInputStream in = new DataInputStream(response.getEntity().getContent());
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        for (String line = br.readLine(); line != null; line = br.readLine()) {
+            sb.append(line);
+        }
+        in.close();
+        br.close();
+        String json = sb.toString();
+        JsonNode result = Json.parse(json);
+
+        return result.get("data").findValue("ticket").textValue();
+    }
+
+    /**
+     * Get ticket from alfresco
+     * @return
+     * @throws IOException
+     */
+    public static String loginAlfrescoOld() throws IOException {
 
         String loginUrl = Messages.get("ALFRSCO_REST_API_URL") + "/login?u=" + Messages.get("ALFRSCO_USERNAME") + "&pw="+ Messages.get("ALFRSCO_PASSWORD") +"&format=json";
         HttpGet httpget = new HttpGet(loginUrl);
@@ -188,18 +215,26 @@ public class Application extends Controller {
         return redirect("/login");
     }
 
-    public static Result authentication_common(String ticket, Form<Login> loginForm,  HashMap<String, String> data){
+    public static Result authentication_common(HashMap<String, String> data){
 
         try{
+            // default factory implementation
             SessionFactory factory = SessionFactoryImpl.newInstance();
-
             Map<String, String> parameter = new HashMap<String, String>();
+
+            // user credentials
             parameter.put(SessionParameter.USER, data.get("username"));
             parameter.put(SessionParameter.PASSWORD, data.get("password"));
+
+            // connection settings
             parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
             parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-            List<Repository> repositories = factory.getRepositories(parameter);
-            ses = repositories.get(0).createSession();
+            parameter.put(SessionParameter.REPOSITORY_ID, "-default-");
+
+            // create session
+//            List<Repository> repositories = factory.getRepositories(parameter);
+//            ses = repositories.get(0).createSession();
+            ses = factory.createSession(parameter);
 
             ItemIterable<QueryResult> query = ses.query("SELECT * FROM cm:person where cm:userName = '" + data.get("username") + "'", false);
 
@@ -223,14 +258,14 @@ public class Application extends Controller {
      */
     public static Result authenticate() throws IOException {
 
-        String ticket = loginAlfresco();
+        String ticket = loginAlfresco(Messages.get("ALFRSCO_USERNAME"), Messages.get("ALFRSCO_PASSWORD"));
         session().put("alf_ticket", ticket);
 
         // Get Data from Login Form
         Form<Login> loginForm = form(Login.class).bindFromRequest();
         HashMap<String, String> data = (HashMap<String, String>) loginForm.data();
         //
-        Result res = authentication_common(ticket, loginForm, data);
+        Result res = authentication_common(data);
         //
         if(res.status()!=200){ // password not authenticated
             return ok(views.html.login.render(form(Login.class), Messages.get("errorWrongCredentials")));
@@ -265,7 +300,7 @@ public class Application extends Controller {
      * @throws IOException
      */
     public static Result authenticateAgency() throws IOException {
-        String ticket = loginAlfresco();
+        String ticket = loginAlfresco(Messages.get("ALFRSCO_USERNAME"), Messages.get("ALFRSCO_PASSWORD"));
         session().put("alf_ticket", ticket);
 
         // Get Data from Login Form
@@ -273,7 +308,7 @@ public class Application extends Controller {
         HashMap<String, String> data = (HashMap<String, String>) loginForm.data();
         // System.out.println(data);
         //
-        Result res = authentication_common(ticket, loginForm, data);
+        Result res = authentication_common(data);
         //
         Map<String, String> sMap = new HashMap<>();
         for (Sharing s: Sharing.find.orderBy("agency_displayname asc").findList()){

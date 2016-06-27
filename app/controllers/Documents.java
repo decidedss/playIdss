@@ -386,8 +386,11 @@ public class Documents extends Controller {
                 Folder commonFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/CommonDocuments");
                 Folder agencyFolder = null;
                 if (!User.isAdmin(session().get("userName"))) {
+                    //agencyFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/" + User.getPersonAgency(session().get("userName")).replace(" ", ""));
                     agencyFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/" + User.getPersonAgency(session().get("userName")).replace(" ", ""));
+
                 }
+//                System.out.println(agencyFolder.getId());
 
                 // ------- Get keyword from request
                 String keyword = "";
@@ -448,6 +451,8 @@ public class Documents extends Controller {
                 } else {
                     return ok(views.html.documents.render(getAlfrescoCategories(), getFiles(agencyQuery, thumbnailId), getFiles(commonQuery, thumbnailId), tags, keyword, User.isAdmin(session().get("userName")), hasEdit(session().get("userName"))));
                 }
+
+
             } else {
                 return redirect("/login");
             }

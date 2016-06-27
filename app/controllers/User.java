@@ -496,8 +496,16 @@ public class User extends Controller {
         String json = sb.toString();
         JsonNode result = Json.parse(json);
 
+        // Compare with the logged in user
+        if (session().get("userName")!=null){
+            if (email.equals(getPerson(session().get("userName")).getEmail())){
+                return true;
+            }
+        }
+
+        // Compare with all Alfresco people
         for (JsonNode n : result.get("people")) {
-            if (n.get("email").textValue().equals(email) || email.equals(getPerson(session().get("userName")).getEmail())) {
+            if (n.get("email").textValue().equals(email)) {
                 return true;
             }
         }
@@ -670,7 +678,7 @@ public class User extends Controller {
     /* When logged out  */
     public static Result passwordmail() throws IOException {
 
-        String ticket = Application.loginAlfresco();
+        String ticket = Application.loginAlfresco(Messages.get("ALFRSCO_USERNAME"), Messages.get("ALFRSCO_PASSWORD"));
         session().put("alf_ticket", ticket);
 
         DynamicForm requestData = Form.form().bindFromRequest();
