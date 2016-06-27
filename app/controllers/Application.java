@@ -38,7 +38,7 @@ import static play.data.Form.form;
 
 public class Application extends Controller {
 
-    public static Session ses;
+    public static Session ses = null;
 
     public static Result index() {
 

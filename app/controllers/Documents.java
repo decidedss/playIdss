@@ -383,14 +383,14 @@ public class Documents extends Controller {
 
             if (session().get("userName") != null && session().get("agency") != null) {
 
-                Folder commonFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/CommonDocuments");
+                Folder commonFolder = null;
                 Folder agencyFolder = null;
-                if (!User.isAdmin(session().get("userName"))) {
-                    //agencyFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/" + User.getPersonAgency(session().get("userName")).replace(" ", ""));
-                    agencyFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/" + User.getPersonAgency(session().get("userName")).replace(" ", ""));
 
+                commonFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/CommonDocuments");
+                if (!User.isAdmin(session().get("userName"))) {
+//                    Application.ses.clear();
+                    agencyFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/" + session().get("agency"));
                 }
-//                System.out.println(agencyFolder.getId());
 
                 // ------- Get keyword from request
                 String keyword = "";

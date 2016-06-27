@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: org.apache.cxf:cxf-rt-bindings-soap:3.0.9:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.cxf/cxf-rt-bindings-soap/bundles/cxf-rt-bindings-soap-3.0.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.cxf/cxf-rt-bindings-soap/srcs/cxf-rt-bindings-soap-3.0.9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
