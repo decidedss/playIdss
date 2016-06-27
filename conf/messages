@@ -22,9 +22,6 @@ twilio_sid=ACbabd8cca802d39fc1b35305faa7cf310
 twilio_token=1178826b2065fd8a14bfc3afeac7e380
 twilio_phone_number=+447481341899
 
-# mail recipient
-mailRecipient=pmalasio@it.auth.gr
-
 # alfresco folders
 alfresco_site = idss
 
