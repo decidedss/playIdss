@@ -139,9 +139,17 @@ public class User extends Controller {
             String password = rp.generateRandomString();
             p.setPassword(password);
 
-            // Check if email exists in Alfresco - parse all /s/api/people
-            if (User.personExists(mForm.get().getEmail())) {
-                System.out.println("coms here");
+            // Check if email exists in Alfresco people - cmis query
+            SessionFactory factory = SessionFactoryImpl.newInstance();
+            Map<String, String> parameter = new HashMap<String, String>();
+            parameter.put(SessionParameter.USER, "admin");
+            parameter.put(SessionParameter.PASSWORD, "admin");
+            parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
+            parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
+            List<Repository> repositories = factory.getRepositories(parameter);
+            Application.ses = repositories.get(0).createSession();
+            ItemIterable<QueryResult> query = Application.ses.query("SELECT * FROM cm:person where cm:email = '" + p.getEmail() + "'", false);
+            if (query.getTotalNumItems() > 0) {
                 flash("email", "exists");
                 return redirect("/signup/agency/members");
             }
@@ -476,12 +484,13 @@ public class User extends Controller {
 
     /**
      * @param email check if person exists in Alfresco with the given email
+     * @param  self check with logged in user as well
      * @return true or false if person was found in Alfresco
      * @throws IOException
      */
-    public static boolean personExists(String email) throws IOException {
+    public static boolean personExists(String email, boolean self) throws IOException {
         HttpClient httpClient = HttpClientBuilder.create().build();
-        String getUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people?alf_ticket=" + session().get("alf_ticket");
+        String getUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people?groups=true&alf_ticket=" + session().get("alf_ticket");
         HttpGet httpget = new HttpGet(getUrl);
         HttpResponse response = httpClient.execute(httpget);
 
@@ -496,19 +505,24 @@ public class User extends Controller {
         String json = sb.toString();
         JsonNode result = Json.parse(json);
 
-        // Compare with the logged in user
-        if (session().get("userName")!=null){
-            if (email.equals(getPerson(session().get("userName")).getEmail())){
-                return true;
-            }
-        }
-
         // Compare with all Alfresco people
         for (JsonNode n : result.get("people")) {
+            System.out.println(email + " .. compare with .. "  + n.get("email").textValue());
             if (n.get("email").textValue().equals(email)) {
                 return true;
             }
         }
+//
+//        if (self) {
+//            // Compare with the logged in user
+//            if (session().get("userName")!=null){
+//                if (email.equals(getPerson(session().get("userName")).getEmail())){
+//                    return true;
+//                }
+//            }
+//        }
+
+
         return false;
     }
 
@@ -825,11 +839,21 @@ public class User extends Controller {
             Person p = pForm.get();
             ArrayList<String> groups = getPerson(p.getUserName()).getGroups();
 
-
-            // Check if email exists in Alfresco - parse all /s/api/people
-            if (User.personExists(p.getEmail())) {
-                flash("email", "exists");
-                return redirect("/signup/agency/members");
+            // Check if email exists in Alfresco people - cmis query
+            if (!p.getEmail().equals(getPerson(p.getUserName()).getEmail())){ // if email has changed in form
+                SessionFactory factory = SessionFactoryImpl.newInstance();
+                Map<String, String> parameter = new HashMap<String, String>();
+                parameter.put(SessionParameter.USER, "admin");
+                parameter.put(SessionParameter.PASSWORD, "admin");
+                parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
+                parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
+                List<Repository> repositories = factory.getRepositories(parameter);
+                Application.ses = repositories.get(0).createSession();
+                ItemIterable<QueryResult> query = Application.ses.query("SELECT * FROM cm:person where cm:email = '" + p.getEmail() + "'", false);
+                if (query.getTotalNumItems() > 0) {
+                    flash("email", "exists");
+                    return redirect("/signup/agency/members");
+                }
             }
 
             // Update person with new group
@@ -948,11 +972,27 @@ public class User extends Controller {
             Form<Person> pForm = play.data.Form.form(Person.class).bindFromRequest();
             Person p = pForm.get();
 
-
             // Check if email exists in Alfresco - parse all /s/api/people
-            if (User.personExists(p.getEmail())) {
-                flash("email", "exists");
-                return redirect("/profile");
+//            if (User.personExists(p.getEmail(), false)) {
+//                flash("email", "exists");
+//                return redirect("/profile");
+//            }
+
+            // Check if email exists in Alfresco people - cmis query
+            if (!p.getEmail().equals(getPerson(p.getUserName()).getEmail())){ // if email has changed in form
+                SessionFactory factory = SessionFactoryImpl.newInstance();
+                Map<String, String> parameter = new HashMap<String, String>();
+                parameter.put(SessionParameter.USER, "admin");
+                parameter.put(SessionParameter.PASSWORD, "admin");
+                parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
+                parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
+                List<Repository> repositories = factory.getRepositories(parameter);
+                Application.ses = repositories.get(0).createSession();
+                ItemIterable<QueryResult> query = Application.ses.query("SELECT * FROM cm:person where cm:email = '" + p.getEmail() + "'", false);
+                if (query.getTotalNumItems() > 0) {
+                    flash("email", "exists");
+                    return redirect("/profile");
+                }
             }
 
             JsonNode n = Json.toJson(p);

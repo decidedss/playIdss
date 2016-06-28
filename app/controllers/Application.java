@@ -3,10 +3,7 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Person;
 import models.Sharing;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
-import org.apache.chemistry.opencmis.client.api.QueryResult;
-import org.apache.chemistry.opencmis.client.api.Session;
-import org.apache.chemistry.opencmis.client.api.SessionFactory;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
@@ -32,6 +29,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static play.data.Form.form;
@@ -111,7 +109,22 @@ public class Application extends Controller {
             }
 
             // Check if email exists in Alfresco - parse all /s/api/people
-            if (User.personExists(mForm.get().getEmail())) {
+//            if (User.personExists(mForm.get().getEmail(), true)) {
+//                flash("email", "exists");
+//                return redirect("/signup/info");
+//            }
+
+            // Check if email exists in Alfresco people - cmis query
+            SessionFactory factory = SessionFactoryImpl.newInstance();
+            Map<String, String> parameter = new HashMap<String, String>();
+            parameter.put(SessionParameter.USER, "admin");
+            parameter.put(SessionParameter.PASSWORD, "admin");
+            parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
+            parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
+            List<Repository> repositories = factory.getRepositories(parameter);
+            Application.ses = repositories.get(0).createSession();
+            ItemIterable<QueryResult> query = Application.ses.query("SELECT * FROM cm:person where cm:email = '" + mForm.get().getEmail() + "'", false);
+            if (query.getTotalNumItems() > 0) {
                 flash("email", "exists");
                 return redirect("/signup/info");
             }

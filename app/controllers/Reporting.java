@@ -43,10 +43,17 @@ public class Reporting extends Controller {
             Notification n = new Notification();
 
             Form<UploadImageForm> form = form(UploadImageForm.class).bindFromRequest();
+
+
             if (form.get().image != null) {
                 File file = form.get().image.getFile();
                 String filename = form.get().image.getFilename();
-                n.setImage(Messages.get("publicImageUrl") + filename.replaceAll(" ", ""));
+                //
+                long unixTime = System.currentTimeMillis() / 1000L; // unix timestamp
+                String imagename = filename.replaceAll(" ", "");
+                imagename = imagename.substring(0, imagename.lastIndexOf(".")) + unixTime + imagename.substring(imagename.lastIndexOf("."));
+                n.setImage(Messages.get("publicImageUrl") + imagename);
+                //
                 saveReportedImage(filename, file);
             }
             n.setInsert_date(LocalDateTime.now());
@@ -135,14 +142,18 @@ public class Reporting extends Controller {
 
     public static void saveReportedImage(String image, File file) throws IOException{
 
+        long unixTime = System.currentTimeMillis() / 1000L; // unix timestamp
+        String imagename = image.replaceAll(" ", "");
+        imagename = imagename.substring(0, imagename.lastIndexOf(".")) + unixTime + imagename.substring(imagename.lastIndexOf("."));
+
         // Remove all empty characters
-        image = image.replaceAll(" ", "");
+//        image = image.replaceAll(" ", "");
 
         InputStream inStream = null;
         OutputStream outStream = null;
         inStream = new FileInputStream(file);
-        outStream = new FileOutputStream(Messages.get("uploadDir")+ image);
-        byte[] buffer  = new byte[(int) image.length()];
+        outStream = new FileOutputStream(Messages.get("uploadDir")+ imagename);
+        byte[] buffer  = new byte[(int) imagename.length()];
         int length;
         //copy the file content in bytes
         while ((length = inStream.read(buffer)) > 0){
