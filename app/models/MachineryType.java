@@ -31,7 +31,10 @@ public class MachineryType extends Model {
     public MachineryType(String iconName, File image, String username, String vehicle_type) throws  IOException{
 
         // Remove all empty characters
+        // iconName = iconName.replaceAll(" ", "");
+        long unixTime = System.currentTimeMillis() / 1000L; // unix timestamp
         iconName = iconName.replaceAll(" ", "");
+        iconName = iconName.substring(0, iconName.lastIndexOf(".")) + unixTime + iconName.substring(iconName.lastIndexOf("."));
 
         this.icon = Messages.get("publicIconUrl") + iconName;
         this.username = username;
@@ -134,7 +137,9 @@ public class MachineryType extends Model {
 
         if (iconName!=null && image!=null) {
             // Remove all empty characters
+            long unixTime = System.currentTimeMillis() / 1000L; // unix timestamp
             iconName = iconName.replaceAll(" ", "");
+            iconName = iconName.substring(0, iconName.lastIndexOf(".")) + unixTime + iconName.substring(iconName.lastIndexOf("."));
             //
             item.setIcon(Messages.get("publicIconUrl") + iconName);
             InputStream inStream = null;
