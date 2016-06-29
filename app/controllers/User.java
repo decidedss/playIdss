@@ -97,7 +97,6 @@ public class User extends Controller {
             return ok(views.html.password_update.render(""));
     }
 
-
     public static Result add() throws IOException {
         Form<Person> mForm = play.data.Form.form(Person.class).bindFromRequest(); // new
 
@@ -116,7 +115,6 @@ public class User extends Controller {
         } else {
             return redirect("/login");
         }
-
     }
 
     public static Result addWithGroup() throws IOException {
@@ -142,8 +140,8 @@ public class User extends Controller {
             // Check if email exists in Alfresco people - cmis query
             SessionFactory factory = SessionFactoryImpl.newInstance();
             Map<String, String> parameter = new HashMap<String, String>();
-            parameter.put(SessionParameter.USER, "admin");
-            parameter.put(SessionParameter.PASSWORD, "admin");
+            parameter.put(SessionParameter.USER, Messages.get("ALFRSCO_USERNAME"));
+            parameter.put(SessionParameter.PASSWORD, Messages.get("ALFRSCO_PASSWORD"));
             parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
             parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
             List<Repository> repositories = factory.getRepositories(parameter);
@@ -361,10 +359,6 @@ public class User extends Controller {
 
     /**
      * First adds group to alfresco, then person to this group
-     *
-     * @param p
-     * @return
-     * @throws IOException
      */
     public static String addToAlfrescoWithGroup(Person p) throws IOException {
 
@@ -482,49 +476,38 @@ public class User extends Controller {
     }
 
 
-    /**
-     * @param email check if person exists in Alfresco with the given email
-     * @param  self check with logged in user as well
-     * @return true or false if person was found in Alfresco
-     * @throws IOException
-     */
-    public static boolean personExists(String email, boolean self) throws IOException {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        String getUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people?groups=true&alf_ticket=" + session().get("alf_ticket");
-        HttpGet httpget = new HttpGet(getUrl);
-        HttpResponse response = httpClient.execute(httpget);
-
-        StringBuilder sb = new StringBuilder();
-        DataInputStream in = new DataInputStream(response.getEntity().getContent());
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        for (String line = br.readLine(); line != null; line = br.readLine()) {
-            sb.append(line);
-        }
-        in.close();
-        br.close();
-        String json = sb.toString();
-        JsonNode result = Json.parse(json);
-
-        // Compare with all Alfresco people
-        for (JsonNode n : result.get("people")) {
-            System.out.println(email + " .. compare with .. "  + n.get("email").textValue());
-            if (n.get("email").textValue().equals(email)) {
-                return true;
-            }
-        }
+//    /**
+//     * @param email check if person exists in Alfresco with the given email
+//     * @param  self check with logged in user as well
+//     * @return true or false if person was found in Alfresco
+//     * @throws IOException
+//     */
+//    public static boolean personExists(String email, boolean self) throws IOException {
+//        HttpClient httpClient = HttpClientBuilder.create().build();
+//        String getUrl = Messages.get("ALFRSCO_REST_API_URL") + "/people?groups=true&alf_ticket=" + session().get("alf_ticket");
+//        HttpGet httpget = new HttpGet(getUrl);
+//        HttpResponse response = httpClient.execute(httpget);
 //
-//        if (self) {
-//            // Compare with the logged in user
-//            if (session().get("userName")!=null){
-//                if (email.equals(getPerson(session().get("userName")).getEmail())){
-//                    return true;
-//                }
+//        StringBuilder sb = new StringBuilder();
+//        DataInputStream in = new DataInputStream(response.getEntity().getContent());
+//        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+//        for (String line = br.readLine(); line != null; line = br.readLine()) {
+//            sb.append(line);
+//        }
+//        in.close();
+//        br.close();
+//        String json = sb.toString();
+//        JsonNode result = Json.parse(json);
+//
+//        // Compare with all Alfresco people
+//        for (JsonNode n : result.get("people")) {
+//            System.out.println(email + " .. compare with .. "  + n.get("email").textValue());
+//            if (n.get("email").textValue().equals(email)) {
+//                return true;
 //            }
 //        }
-
-
-        return false;
-    }
+//        return false;
+//    }
 
 
     public static Result getPersonJson(String userName) throws IOException {
@@ -629,7 +612,6 @@ public class User extends Controller {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
@@ -700,8 +682,8 @@ public class User extends Controller {
 
         SessionFactory factory = SessionFactoryImpl.newInstance();
         Map<String, String> parameter = new HashMap<String, String>();
-        parameter.put(SessionParameter.USER, "admin");
-        parameter.put(SessionParameter.PASSWORD, "admin");
+        parameter.put(SessionParameter.USER, Messages.get("ALFRSCO_USERNAME"));
+        parameter.put(SessionParameter.PASSWORD, Messages.get("ALFRSCO_PASSWORD"));
         parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
         parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
         List<Repository> repositories = factory.getRepositories(parameter);
@@ -736,7 +718,6 @@ public class User extends Controller {
         } else {
             return ok(views.html.password_update.render("No account with the username " + requestData.get("userName") + " has been found!"));
         }
-
         ////////////////////////////////////////////////////////////////////////
 
         return ok(views.html.password_update.render(Messages.get("passwordResetMsg")));
@@ -843,8 +824,8 @@ public class User extends Controller {
             if (!p.getEmail().equals(getPerson(p.getUserName()).getEmail())){ // if email has changed in form
                 SessionFactory factory = SessionFactoryImpl.newInstance();
                 Map<String, String> parameter = new HashMap<String, String>();
-                parameter.put(SessionParameter.USER, "admin");
-                parameter.put(SessionParameter.PASSWORD, "admin");
+                parameter.put(SessionParameter.USER, Messages.get("ALFRSCO_USERNAME"));
+                parameter.put(SessionParameter.PASSWORD, Messages.get("ALFRSCO_PASSWORD"));
                 parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
                 parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
                 List<Repository> repositories = factory.getRepositories(parameter);
@@ -972,18 +953,12 @@ public class User extends Controller {
             Form<Person> pForm = play.data.Form.form(Person.class).bindFromRequest();
             Person p = pForm.get();
 
-            // Check if email exists in Alfresco - parse all /s/api/people
-//            if (User.personExists(p.getEmail(), false)) {
-//                flash("email", "exists");
-//                return redirect("/profile");
-//            }
-
             // Check if email exists in Alfresco people - cmis query
             if (!p.getEmail().equals(getPerson(p.getUserName()).getEmail())){ // if email has changed in form
                 SessionFactory factory = SessionFactoryImpl.newInstance();
                 Map<String, String> parameter = new HashMap<String, String>();
-                parameter.put(SessionParameter.USER, "admin");
-                parameter.put(SessionParameter.PASSWORD, "admin");
+                parameter.put(SessionParameter.USER, Messages.get("ALFRSCO_USERNAME"));
+                parameter.put(SessionParameter.PASSWORD, Messages.get("ALFRSCO_PASSWORD"));
                 parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
                 parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
                 List<Repository> repositories = factory.getRepositories(parameter);
@@ -1043,7 +1018,6 @@ public class User extends Controller {
                 response = httpClient.execute(put, new BasicResponseHandler());
 //                System.out.println(response);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1129,6 +1103,4 @@ public class User extends Controller {
             return redirect("/login");
         }
     }
-
-
 }

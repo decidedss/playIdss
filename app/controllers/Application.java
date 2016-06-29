@@ -108,17 +108,11 @@ public class Application extends Controller {
                 return redirect("/signup/info");
             }
 
-            // Check if email exists in Alfresco - parse all /s/api/people
-//            if (User.personExists(mForm.get().getEmail(), true)) {
-//                flash("email", "exists");
-//                return redirect("/signup/info");
-//            }
-
             // Check if email exists in Alfresco people - cmis query
             SessionFactory factory = SessionFactoryImpl.newInstance();
             Map<String, String> parameter = new HashMap<String, String>();
-            parameter.put(SessionParameter.USER, "admin");
-            parameter.put(SessionParameter.PASSWORD, "admin");
+            parameter.put(SessionParameter.USER, Messages.get("ALFRSCO_USERNAME"));
+            parameter.put(SessionParameter.PASSWORD, Messages.get("ALFRSCO_PASSWORD"));
             parameter.put(SessionParameter.ATOMPUB_URL, Messages.get("ALFRSCO_ATOMPUB_URL"));
             parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
             List<Repository> repositories = factory.getRepositories(parameter);
@@ -352,16 +346,15 @@ public class Application extends Controller {
             } else {
                  return ok(views.html.agency_login.render(form(Login.class), sMap, Messages.get("errorNoSuchUser") + " '" + data.get("username") + "'."));
             }
-
         }
     }
 
-    public static void grandAccess(ItemIterable<QueryResult> query) {
-        for (QueryResult item : query) {
-            session().put("fullName", item.getPropertyByQueryName("cm:firstName").getFirstValue().toString() + " " + item.getPropertyByQueryName("cm:lastName").getFirstValue().toString());
-            session().put("userName", item.getPropertyByQueryName("cm:userName").getFirstValue().toString());
-        }
-    }
+//    public static void grandAccess(ItemIterable<QueryResult> query) {
+//        for (QueryResult item : query) {
+//            session().put("fullName", item.getPropertyByQueryName("cm:firstName").getFirstValue().toString() + " " + item.getPropertyByQueryName("cm:lastName").getFirstValue().toString());
+//            session().put("userName", item.getPropertyByQueryName("cm:userName").getFirstValue().toString());
+//        }
+//    }
 
     public static class Login {
         public String agencyname;
@@ -393,8 +386,7 @@ public class Application extends Controller {
 
             String img ="";
             if (!image.isEmpty()){
-                img = "<img src=\"" + image +  "\" style=\"width:304px;height:236px;\">" +  "<br/>";
-//                System.out.println(img);
+                img = "<img src=\"" + image +  "\" style=\"width:304px;height:236px;\">" +  "<br/>";;
             }
             String agencyDisplayName = Sharing.find.where().eq("agency", session().get("agency")).findUnique().getAgency_displayname();
             email.setHtmlMsg(Messages.get("agency") + ": <strong>" + agencyDisplayName + "</strong>" +
@@ -433,7 +425,6 @@ public class Application extends Controller {
                 response = httpClient.execute(post, new BasicResponseHandler());
             }
 //            System.out.println("Created folder " + name);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -466,8 +457,6 @@ public class Application extends Controller {
 
         return  ok(views.html.remotesensing.render());
     }
-
-
 
 
 

@@ -1,7 +1,7 @@
-2016-06-29 13:13:19,337 [INFO] from play.api.libs.concurrent.ActorSystemProvider in pool-4-thread-6 - Starting application default Akka system: application
-2016-06-29 13:13:19,555 [INFO] from play.core.server.NettyServer$ in pool-4-thread-6 - Listening for HTTP on /0:0:0:0:0:0:0:0:9000
-2016-06-29 13:13:23,585 [INFO] from application in ForkJoinPool-1-worker-1 - Creating Pool for datasource 'default'
-2016-06-29 13:13:24,131 [INFO] from play.api.db.DefaultDBApi in ForkJoinPool-1-worker-1 - Database [default] connected at jdbc:postgresql://localhost:15432/gis
-2016-06-29 13:13:24,774 [WARN] from com.avaje.ebeaninternal.server.ddl.CreateTableVisitor in ForkJoinPool-1-worker-1 - Column name [day] is a suspected SQL reserved word for property models.Last2Days.day
-2016-06-29 13:13:24,797 [INFO] from play.api.libs.concurrent.ActorSystemProvider in ForkJoinPool-1-worker-1 - Starting application default Akka system: application
-2016-06-29 13:13:24,852 [INFO] from play.api.Play$ in ForkJoinPool-1-worker-1 - Application started (Dev)
+2016-06-29 13:47:01,540 [INFO] from play.api.libs.concurrent.ActorSystemProvider in pool-16-thread-1 - Starting application default Akka system: application
+2016-06-29 13:47:01,596 [INFO] from play.core.server.NettyServer$ in pool-16-thread-1 - Listening for HTTP on /0:0:0:0:0:0:0:0:9000
+2016-06-29 13:47:25,548 [INFO] from application in ForkJoinPool-2-worker-1 - Creating Pool for datasource 'default'
+2016-06-29 13:47:25,976 [INFO] from play.api.db.DefaultDBApi in ForkJoinPool-2-worker-1 - Database [default] connected at jdbc:postgresql://localhost:15432/gis
+2016-06-29 13:47:26,491 [WARN] from com.avaje.ebeaninternal.server.ddl.CreateTableVisitor in ForkJoinPool-2-worker-1 - Column name [day] is a suspected SQL reserved word for property models.Last2Days.day
+2016-06-29 13:47:26,612 [INFO] from play.api.libs.concurrent.ActorSystemProvider in ForkJoinPool-2-worker-1 - Starting application default Akka system: application
+2016-06-29 13:47:26,663 [INFO] from play.api.Play$ in ForkJoinPool-2-worker-1 - Application started (Dev)
