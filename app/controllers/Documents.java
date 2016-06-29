@@ -75,28 +75,18 @@ public class Documents extends Controller {
         return ok("error adding tag");
     }
 
-
-//    public static Result upload() throws IOException {
-//
-//        ArrayList<QueryResult > tags = new ArrayList<>();
-//        ItemIterable<QueryResult> tagsQuery = Application.ses.query("SELECT * FROM cm:category WHERE CONTAINS('PATH:\"//cm:categoryRoot/cm:taggable/*\"')", false);
-//        if (tagsQuery !=null) {
-//            for (QueryResult tag : tagsQuery) {
-//                tags.add(tag);
-//            }
-//        }
-//
-//        return ok(views.html.upload.render(tags));
-//    }
-
-    // 100 MB
+    /**
+     * Method that uploads the file-document with the assorted properties, tags, categories on the alfresco repository folder
+     * @return Renders the result (uploaded document) to the user
+     * @throws IOException
+     * @maxLength is set here to 100MB (which means that the uploaded document cannot exceed this limit)
+     */
     @BodyParser.Of(value = BodyParser.MultipartFormData.class, maxLength = 1000 * 1024 * 1024)
     public static Result savefile() throws IOException {
 
         if (session().get("userName") != null && session().get("agency") != null) {
             Http.MultipartFormData.FilePart doc = request().body().asMultipartFormData().getFile("document");
             DynamicForm requestData = Form.form().bindFromRequest();
-            // System.out.println(requestData.get("title"));
 
             if (doc != null) {
 
@@ -127,7 +117,6 @@ public class Documents extends Controller {
                     List<Object> aspects = newDoc.getProperty("cmis:secondaryObjectTypeIds").getValues();
                     Map<String, Object> props = new HashMap<String, Object>();
 
-
                     // -------- Tag list
                     ArrayList<String> addedTags = new ArrayList<String>();
                     for (Map.Entry<String, String> entry : requestData.data().entrySet()) {
@@ -141,8 +130,6 @@ public class Documents extends Controller {
                     ItemIterable<QueryResult> tagsQuery = Application.ses.query("SELECT * FROM cm:category WHERE CONTAINS('PATH:\"//cm:categoryRoot/cm:taggable/*\"')", false);
                     if (tagsQuery != null) {
                         for (QueryResult tag : tagsQuery) {
-//                        System.out.println(tag.getPropertyValueById("alfcmis:nodeRef").toString());
-//                        System.out.println(tag.getPropertyByQueryName("cmis:name").getFirstValue().toString());
                             tagsMap.put(tag.getPropertyByQueryName("cmis:name").getFirstValue().toString(), tag.getPropertyValueById("alfcmis:nodeRef").toString());
                         }
                     }
@@ -195,9 +182,6 @@ public class Documents extends Controller {
                         }
                     }
 
-
-                    // -------------------------------------------------
-
                     // -------- Create OpenCMIS file aspects - dublincore
                     if (!aspects.contains("P:cm:dublincore")) {
                         aspects.add("P:cm:dublincore");
@@ -205,24 +189,20 @@ public class Documents extends Controller {
                         newDoc.updateProperties(props, false);
                     }
 
-                    // -------- OpenCMIS file update properties
-//                props.put("cm:taggable", addedTags);
+                    // -------- OpenCMIS file update properties (dublin core fields)
+                    // props.put("cm:taggable", addedTags);
                     props.put("cm:title", Form.form().bindFromRequest().get("title")); // Get title from form
-                    props.put("cm:description", Form.form().bindFromRequest().get("description")); // Get description from form
-                    props.put("cm:publisher", Form.form().bindFromRequest().get("publisher")); // Get publisher from form
-                    props.put("cm:identifier", Form.form().bindFromRequest().get("number")); // Get publisher from form
-                    props.put("cm:coverage", Form.form().bindFromRequest().get("issuing")); // Get publisher from form
-//                props.put("cm:subject", ""); // empty subject for now
+                    props.put("cm:description", Form.form().bindFromRequest().get("description"));
+                    props.put("cm:publisher", Form.form().bindFromRequest().get("publisher"));
+                    props.put("cm:identifier", Form.form().bindFromRequest().get("number"));
+                    props.put("cm:coverage", Form.form().bindFromRequest().get("issuing"));
                     newDoc.updateProperties(props, false);
 
                     flash("indexing", "The file you just uploaded is being processed, please come back in ~1 minute");
                 } catch (CmisContentAlreadyExistsException exists) {
-//                System.out.println(exists.getExceptionName());
                     flash("contentAlreadyExists", "ERROR! The file already exists!");
                 }
-
                 return redirect("/documents");
-
             } else {
                 return ok("No file found!");
             }
@@ -278,8 +258,6 @@ public class Documents extends Controller {
                 ItemIterable<QueryResult> tagsQuery = Application.ses.query("SELECT * FROM cm:category WHERE CONTAINS('PATH:\"//cm:categoryRoot/cm:taggable/*\"')", false);
                 if (tagsQuery != null) {
                     for (QueryResult tag : tagsQuery) {
-//                        System.out.println(tag.getPropertyValueById("alfcmis:nodeRef").toString());
-//                        System.out.println(tag.getPropertyByQueryName("cmis:name").getFirstValue().toString());
                         tagsMap.put(tag.getPropertyByQueryName("cmis:name").getFirstValue().toString(), tag.getPropertyValueById("alfcmis:nodeRef").toString());
                     }
                 }
@@ -288,7 +266,6 @@ public class Documents extends Controller {
                 List<String> tagIds = new ArrayList<>();
                 if (Form.form().bindFromRequest().get("categories") != "") {
 
-//                List<String> catList = Arrays.asList(Form.form().bindFromRequest().get("categories").split(","));
                     for (String c : Arrays.asList(Form.form().bindFromRequest().get("categories").split(","))) {
                         ItemIterable<QueryResult> query = Application.ses.query("select alfcmis:nodeRef from cm:category where cmis:name = '" + c + "'", false);
                         String catId = null;
@@ -316,11 +293,10 @@ public class Documents extends Controller {
                 Map<String, Object> properties = new HashMap<String, Object>();
                 properties.put("cm:title", requestData.get("title"));
                 properties.put("cmis:description", requestData.get("description"));
-//            properties.put("cm:taggable", addedTags);
-                properties.put("cm:publisher", requestData.get("publisher")); // Get publisher from form
-                properties.put("cm:identifier", requestData.get("number")); // Get number from form
-                properties.put("cm:coverage", requestData.get("issuing")); // Get issuingDate from form
-//            properties.put("cm:subject", ""); // empty subject for now
+                // properties.put("cm:taggable", addedTags);
+                properties.put("cm:publisher", requestData.get("publisher"));
+                properties.put("cm:identifier", requestData.get("number"));
+                properties.put("cm:coverage", requestData.get("issuing"));
 
                 doc.updateProperties(properties, false);
 
@@ -340,7 +316,7 @@ public class Documents extends Controller {
     public static Result delete (String id)  {
         if (session().get("userName") != null && session().get("agency") != null) {
             OperationContext context = Application.ses.createOperationContext();
-            context.setRenditionFilterString("*");// ("cmis:thumbnail");
+            context.setRenditionFilterString("*");
             Document doc = (Document) Application.ses.getObject(Application.ses.createObjectId(id), context);
             doc.delete(true);
             return ok("deleted");
@@ -359,7 +335,7 @@ public class Documents extends Controller {
             context.setRenditionFilterString("*");
             Document doc = (Document) Application.ses.getObject(Application.ses.createObjectId(id), context);
             return ok(doc.getContentUrl().replace("http://", "http://admin:admin@"));
-        }else {
+        } else {
             return redirect("/login");
         }
     }
@@ -374,7 +350,12 @@ public class Documents extends Controller {
         }
 
 
-        public static Result list() throws IOException {
+    /**
+     * Listing of all documents related to the user (agency folder & common documents folder)
+     * @return list of thumbnails
+     * @throws IOException
+     */
+    public static Result list() throws IOException {
 
             String thumbnailId = "/assets/images/very-basic-document-icon.png";
 
@@ -383,76 +364,78 @@ public class Documents extends Controller {
 
             if (session().get("userName") != null && session().get("agency") != null) {
 
-                Folder commonFolder = null;
                 Folder agencyFolder = null;
-
-                commonFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/CommonDocuments");
+                Folder commonFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/CommonDocuments");
                 if (!User.isAdmin(session().get("userName"))) {
-//                    Application.ses.clear();
                     agencyFolder = (Folder) Application.ses.getObjectByPath("/Sites/idss/documentLibrary/" + session().get("agency"));
                 }
 
-                // ------- Get keyword from request
-                String keyword = "";
-                if (request().getQueryString("q") != null) {
-                    keyword = request().getQueryString("q");
-                }
-                // ------- Get tag from request
-                String selectedTag = "";
-                if (request().getQueryString("tag") != null) {
-                    selectedTag = request().getQueryString("tag");
-                }
+                if (agencyFolder!=null) {
 
-                // ------- Get category from request
-                String selectedCategory = "";
-                if (request().getQueryString("category") != null) {
-                    selectedCategory = request().getQueryString("category");
-                }
+                    // ------- Get keyword from request
+                    String keyword = "";
+                    if (request().getQueryString("q") != null) {
+                        keyword = request().getQueryString("q");
+                    }
+                    // ------- Get tag from requestg
+                    String selectedTag = "";
+                    if (request().getQueryString("tag") != null) {
+                        selectedTag = request().getQueryString("tag");
+                    }
 
-                ItemIterable<QueryResult> commonQuery = Application.ses.query("SELECT * FROM cmis:document WHERE  IN_TREE('" + commonFolder.getId() + "')", false);
-                ItemIterable<QueryResult> agencyQuery = null;
-                if (!User.isAdmin(session().get("userName"))) {
-                    agencyQuery = Application.ses.query("SELECT * FROM cmis:document WHERE  IN_TREE('" + agencyFolder.getId() + "')", false);
-                }
+                    // ------- Get category from request
+                    String selectedCategory = "";
+                    if (request().getQueryString("category") != null) {
+                        selectedCategory = request().getQueryString("category");
+                    }
 
-                if (!keyword.isEmpty()) {
-                    commonQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('" + keyword + "') AND IN_TREE('" + commonFolder.getId() + "') ", false);
+                    ItemIterable<QueryResult> commonQuery = Application.ses.query("SELECT * FROM cmis:document WHERE  IN_TREE('" + commonFolder.getId() + "')", false);
+                    ItemIterable<QueryResult> agencyQuery = null;
                     if (!User.isAdmin(session().get("userName"))) {
-                        agencyQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('" + keyword + "') AND IN_TREE('" + agencyFolder.getId() + "') ", false);
+                        agencyQuery = Application.ses.query("SELECT * FROM cmis:document WHERE  IN_TREE('" + agencyFolder.getId() + "')", false);
+                    }
+
+                    if (!keyword.isEmpty()) {
+                        commonQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('" + keyword + "') AND IN_TREE('" + commonFolder.getId() + "') ", false);
+                        if (!User.isAdmin(session().get("userName"))) {
+                            agencyQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('" + keyword + "') AND IN_TREE('" + agencyFolder.getId() + "') ", false);
+                        }
+                    }
+
+                    if (!selectedTag.isEmpty()) {
+                        commonQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('TAG:\"" + selectedTag + "\"') AND IN_TREE('" + commonFolder.getId() + "')", false);
+                        if (!User.isAdmin(session().get("userName"))) {
+                            agencyQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('TAG:\"" + selectedTag + "\"') AND IN_TREE('" + agencyFolder.getId() + "')", false);
+                        }
+                    }
+
+                    if (!selectedCategory.isEmpty()) {
+                        commonQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('TAG:\"" + selectedCategory + "\"') AND IN_TREE('" + commonFolder.getId() + "')", false);
+                        if (!User.isAdmin(session().get("userName"))) {
+                            agencyQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('TAG:\"" + selectedCategory + "\"') AND IN_TREE('" + agencyFolder.getId() + "')", false);
+                        }
+                    }
+
+                    // ------ Get all Tags
+                    ArrayList<QueryResult> tags = new ArrayList<>();
+                    ItemIterable<QueryResult> tagsQuery = Application.ses.query("SELECT * FROM cm:category WHERE CONTAINS('PATH:\"//cm:categoryRoot/cm:taggable/*\"')", false);
+                    if (tagsQuery != null) {
+                        for (QueryResult tag : tagsQuery) {
+                            tags.add(tag);
+                        }
+                    }
+
+                    // ------ Render list based on user role
+                    if (User.isAdmin(session().get("userName"))) { // admin/admin can view only common files
+                        return ok(views.html.documents.render(getAlfrescoCategories(), new ArrayList<>(), getFiles(commonQuery, thumbnailId), tags, keyword, User.isAdmin(session().get("userName")), hasEdit(session().get("userName"))));
+                    } else {
+                        return ok(views.html.documents.render(getAlfrescoCategories(), getFiles(agencyQuery, thumbnailId), getFiles(commonQuery, thumbnailId), tags, keyword, User.isAdmin(session().get("userName")), hasEdit(session().get("userName"))));
                     }
                 }
-
-                if (!selectedTag.isEmpty()) {
-                    commonQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('TAG:\"" + selectedTag + "\"') AND IN_TREE('" + commonFolder.getId() + "')", false);
-                    if (!User.isAdmin(session().get("userName"))) {
-                        agencyQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('TAG:\"" + selectedTag + "\"') AND IN_TREE('" + agencyFolder.getId() + "')", false);
-                    }
+                else {
+                    flash("folder", "notfound");
+                    return ok(views.html.documents.render(getAlfrescoCategories(), new ArrayList<>(), new ArrayList<>(),  new ArrayList<>(),  "", User.isAdmin(session().get("userName")), hasEdit(session().get("userName"))));
                 }
-
-                if (!selectedCategory.isEmpty()) {
-                    commonQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('TAG:\"" + selectedCategory + "\"') AND IN_TREE('" + commonFolder.getId() + "')", false);
-                    if (!User.isAdmin(session().get("userName"))) {
-                        agencyQuery = Application.ses.query("SELECT * FROM cmis:document WHERE CONTAINS ('TAG:\"" + selectedCategory + "\"') AND IN_TREE('" + agencyFolder.getId() + "')", false);
-                    }
-                }
-
-                // ------ Get all Tags
-                ArrayList<QueryResult> tags = new ArrayList<>();
-                ItemIterable<QueryResult> tagsQuery = Application.ses.query("SELECT * FROM cm:category WHERE CONTAINS('PATH:\"//cm:categoryRoot/cm:taggable/*\"')", false);
-                if (tagsQuery != null) {
-                    for (QueryResult tag : tagsQuery) {
-                        tags.add(tag);
-                    }
-                }
-
-                // ------ Render list based on user role
-                if (User.isAdmin(session().get("userName"))) { // View only common files
-                    return ok(views.html.documents.render(getAlfrescoCategories(), new ArrayList<>(), getFiles(commonQuery, thumbnailId), tags, keyword, User.isAdmin(session().get("userName")), hasEdit(session().get("userName"))));
-                } else {
-                    return ok(views.html.documents.render(getAlfrescoCategories(), getFiles(agencyQuery, thumbnailId), getFiles(commonQuery, thumbnailId), tags, keyword, User.isAdmin(session().get("userName")), hasEdit(session().get("userName"))));
-                }
-
-
             } else {
                 return redirect("/login");
             }
@@ -500,7 +483,6 @@ public class Documents extends Controller {
         }
 
         if (!categories.isEmpty()){
-//            System.out.println(categories);
             return categories;
         }
         return null;
@@ -514,7 +496,6 @@ public class Documents extends Controller {
 
                 try {
                 String objectId = item.getPropertyValueByQueryName("cmis:objectId");
-
 
                     OperationContext context = Application.ses.createOperationContext();
                     context.setRenditionFilterString("*");
@@ -613,10 +594,8 @@ public class Documents extends Controller {
                 } catch (NullPointerException e){
                     break;
                 }
-
             }
         }
-
         return res;
     }
 }

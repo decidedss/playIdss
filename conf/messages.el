@@ -179,13 +179,15 @@ publisher=Φορέας έκδοσης
 number=Αριθμός
 issuingDate=Ημερομηνία έκδοσης
 tags=Ετικέτες
-filterCategory=Αναζήτηση με κριτηρια
+filterCategory=Αναζήτηση με κριτήρια
 clearFilters=Καθαρισμός φίλτρων
 uploadLegislation=Προσθήκη εγγράφου
 repository=Αποθετήριο
 common=Κοινό
 filterByCategoryTitle=Αναζήτηση εγγράφων βάσει κριτηρίων
 categories=Κατηγορίες
+emptyFolder=Σφάλμα με τα έγγραφα στον φορέα σας! Παρακαλώ επικοινωνήστε με τον διαχειριστή του συστήματος.
+resultsFor=Αποτελέσματα για
 
 #--------Routing instruction ---------
 routing=Δρομολόγηση

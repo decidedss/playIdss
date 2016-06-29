@@ -22,10 +22,9 @@
             $(document).ready(function() {
                 $("#searchButton").click(function() {
                   location.href="/documents?q="+$("#keyword").val();
+                  console.log(keyword);
                 });
             });
-
-
 
             function addTag(){
                 $.ajax({
@@ -83,7 +82,6 @@
                         url: "/documents/delete/"+data.split(",")[0],
                         beforeSend: function (jqXHR, settings) {
                             url = settings.url + "?" + settings.data;
-                            <!--console.log(url);-->
                         },
                         success :(function(data){
                         loadAjax();
@@ -121,7 +119,6 @@
                     for (var c in categories){
                         var options = '@value';
                         if(options.indexOf(categories[c])>0){
-                            <!--console.log(categories[c]);-->
                             fill.push(categories[c]);
                         }
                     }
@@ -138,18 +135,16 @@
     </script>
 
     <script>
+        function openModal() {
+            document.getElementById('modal').style.display = 'block';
+            document.getElementById('fade').style.display = 'block';
+        }
 
-function openModal() {
-    document.getElementById('modal').style.display = 'block';
-    document.getElementById('fade').style.display = 'block';
-}
-
-function loadAjax() {
-    document.getElementById('results').innerHTML = '';
-    openModal();
-    $('html,body').scrollTop(0);
-}
-
+        function loadAjax() {
+            document.getElementById('results').innerHTML = '';
+            openModal();
+            $('html,body').scrollTop(0);
+        }
     </script>
 </head>
 
@@ -158,10 +153,8 @@ function loadAjax() {
 @views.html.header {
 }
 
-
 <div class="container-fluid">
     <div class="starter-template">
-
 
         @if(flash.containsKey("indexing")) {
         <div class="alert alert-warning" id="alert_template" role="alert">
@@ -175,8 +168,6 @@ function loadAjax() {
                 <span class="sr-only">Close</span>
             </button>
         </div><br/>
-        } else {
-
         }
 
         @if(flash.containsKey("contentAlreadyExists")) {
@@ -187,15 +178,13 @@ function loadAjax() {
                 <span class="sr-only">Close</span>
             </button>
         </div><br/>
-        } else {
-
         }
 
         <div class="page-header">
             <h1>@Messages.get("legislation")</h1>
         </div>
 
-        <!-----------------------------------------LEFT COLUMN------------------------------------------------->
+        <!-----------------------------------BUTTONS & SEARCH------------------------------------------------->
         <div class="row">
             <div class="container col-lg-12" align="center">
 
@@ -227,12 +216,20 @@ function loadAjax() {
             </div>
         </div>
 
-        <br/><br/><br/>
+        <br/><br/>
+        <div id="divlabelcategory" style="display: none;"><h4>@Messages.get("resultsFor") <span id="labelcategory" class="label label-warning" hidden>-</span></h4></div>
+        <br/>
 
-        <!-----------------------------------------RIGHT COLUMN------------------------------------------------->
-
+        <!-------------------------------------AGENCY FOLDER---------------------------------------------->
         <div class="row">
         <div class="container col-lg-12">
+
+            <div class="alert alert-danger" id="alert_template_display" role="alert" style="display: none;">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">@Messages.get("close")</span>
+                </button>
+            </div>
 
             @if(!session.get("groups").contains("GROUP_ALFRESCO_ADMINISTRATORS")){
             <div class="panel panel-default">
@@ -313,7 +310,7 @@ function loadAjax() {
             </div>
             }
 
-
+            <!-------------------------------------COMMON FOLDER---------------------------------------------->
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title"><a data-toggle="collapse" href="#collapse2">@Messages.get("common") &nbsp; @Messages.get("repository")</a></h3>
@@ -648,6 +645,23 @@ function loadAjax() {
 </div><!-- /.container -->
 
 <script type="text/javascript" charset="utf-8">
+
+        var myParam = location.search.split('category=')[1];
+         if (myParam){
+            $(divlabelcategory).show();
+            document.getElementById('labelcategory').innerHTML = myParam;
+        }
+
+         @if(flash.get("folder")=="notfound"){
+            $(alert_template_display).show();
+
+            $("#alert_template_display button").after('@Messages.get("emptyFolder")');
+            $('#alert_template_display').fadeIn('slow');
+            $('#alert_template_display .close').click(function(e) {
+                $('#alert_template_display').hide();
+            });
+        }
+
         var startDate, endDate;
         var cats;
 

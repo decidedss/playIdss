@@ -187,6 +187,8 @@ repository=Repository
 common=Common
 filterByCategoryTitle=Search documents based on criteria
 categories=Categories
+emptyFolder=Error with the documents in your agency! Please contact the system administrator.
+resultsFor=Results for
 
 #--------Routing instruction ---------
 routing=Routing
