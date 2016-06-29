@@ -1,5 +1,5 @@
 # project parameters
-SERVER_PATH=http://160.40.63.119
+SERVER_PATH=http://160.40.63.119 #http://www.dss.decide-project.eu/
 ALFRSCO_ATOMPUB_URL=http://160.40.63.119:8080/alfresco/api/-default-/public/cmis/versions/1.1/atom
 ALFRSCO_REST_API_URL=http://160.40.63.119:8080/alfresco/s/api
 ALFRSCO_USERNAME=admin
